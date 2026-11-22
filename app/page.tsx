@@ -38,6 +38,7 @@ export default function Home() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [homeworkLoading, setHomeworkLoading] = useState(false);
   const [activeHomeworkId, setActiveHomeworkId] = useState<string | null>(null);
+  const [crossedWords, setCrossedWords] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!signedIn || homework.length === 0) return;
@@ -48,14 +49,25 @@ export default function Home() {
   useEffect(() => {
     if (!signedIn || homework.length === 0) return;
     const saved: Record<string, string> = {};
+    const crossed: Record<string, boolean> = {};
     for (const task of homework) {
       try {
         const raw = localStorage.getItem(`hw-answers|${task.id}`);
         if (raw) {
-          const values = JSON.parse(raw) as Record<string, string>;\n          for (const [itemKey, value] of Object.entries(values)) saved[`${task.id}::${itemKey}`] = value;\n        }
+          const values = JSON.parse(raw) as Record<string, string>;
+          for (const [itemKey, value] of Object.entries(values)) saved[`${task.id}::${itemKey}`] = value;
+        }
       } catch { /* Ignore unavailable or invalid local drafts. */ }
+      try {
+        const rawCrossed = localStorage.getItem(`hw-crossed|${task.id}`);
+        if (rawCrossed) {
+          const values = JSON.parse(rawCrossed) as Record<string, boolean>;
+          for (const [wordKey, value] of Object.entries(values)) crossed[`${task.id}::${wordKey}`] = value;
+        }
+      } catch { /* Ignore unavailable or invalid word-bank drafts. */ }
     }
     setAnswers(saved);
+    setCrossedWords(crossed);
   }, [signedIn, homework]);
 
   useEffect(() => {
@@ -65,14 +77,28 @@ export default function Home() {
       const splitAt = key.indexOf("::");
       if (splitAt < 0) continue;
       const taskId = key.slice(0, splitAt);
-      const itemKey = key.slice(splitAt + 2);
       if (!byTask[taskId]) byTask[taskId] = {};
-      byTask[taskId][itemKey] = value;
+      byTask[taskId][key.slice(splitAt + 2)] = value;
     }
     for (const [taskId, values] of Object.entries(byTask)) {
       try { localStorage.setItem(`hw-answers|${taskId}`, JSON.stringify(values)); } catch { /* Storage may be unavailable. */ }
     }
   }, [answers, signedIn]);
+
+  useEffect(() => {
+    if (!signedIn) return;
+    const byTask: Record<string, Record<string, boolean>> = {};
+    for (const [key, value] of Object.entries(crossedWords)) {
+      const splitAt = key.indexOf("::");
+      if (splitAt < 0) continue;
+      const taskId = key.slice(0, splitAt);
+      if (!byTask[taskId]) byTask[taskId] = {};
+      byTask[taskId][key.slice(splitAt + 2)] = value;
+    }
+    for (const [taskId, values] of Object.entries(byTask)) {
+      try { localStorage.setItem(`hw-crossed|${taskId}`, JSON.stringify(values)); } catch { /* Storage may be unavailable. */ }
+    }
+  }, [crossedWords, signedIn]);
 
   function setAnswer(number: number, value: string) {
     setAnswers((current) => ({ ...current, [String(number)]: value }));
@@ -194,7 +220,7 @@ export default function Home() {
                   {task.exercises?.map((section, index) => (
                     <section className="exercise-section" key={section.id}>
                       <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p>{section.instructions}</p>}</div></div>
-                      {section.word_bank && <div className="word-bank"><strong>Word bank</strong>{section.word_bank.map((word) => <span key={word}>{word}</span>)}</div>}
+                      {section.word_bank && <div className="word-bank"><strong>Word bank</strong>{section.word_bank.map((word) => { const wordKey = `${task.id}::${section.id}::${word}`; return <button type="button" className={`word-bank-word ${crossedWords[wordKey] ? "is-crossed" : ""}`} aria-pressed={!!crossedWords[wordKey]} onClick={() => setCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>; })}</div>}
                       {section.items.map((item) => {
                         const answerKey = `${task.id}::${item.number}`;
                         return (
