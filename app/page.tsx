@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
@@ -37,6 +37,41 @@ export default function Home() {
   const [homework, setHomework] = useState<Homework[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [homeworkLoading, setHomeworkLoading] = useState(false);
+  const [activeHomeworkId, setActiveHomeworkId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!signedIn || homework.length === 0) return;
+    const firstId = homework[0].id;
+    setActiveHomeworkId((current) => current && homework.some((task) => task.id === current) ? current : firstId);
+  }, [signedIn, homework]);
+
+  useEffect(() => {
+    if (!signedIn || homework.length === 0) return;
+    const saved: Record<string, string> = {};
+    for (const task of homework) {
+      try {
+        const raw = localStorage.getItem(`hw-answers|${task.id}`);
+        if (raw) Object.assign(saved, JSON.parse(raw));
+      } catch { /* Ignore unavailable or invalid local drafts. */ }
+    }
+    setAnswers(saved);
+  }, [signedIn, homework]);
+
+  useEffect(() => {
+    if (!signedIn) return;
+    const byTask: Record<string, Record<string, string>> = {};
+    for (const [key, value] of Object.entries(answers)) {
+      const splitAt = key.indexOf("::");
+      if (splitAt < 0) continue;
+      const taskId = key.slice(0, splitAt);
+      const itemKey = key.slice(splitAt + 2);
+      if (!byTask[taskId]) byTask[taskId] = {};
+      byTask[taskId][itemKey] = value;
+    }
+    for (const [taskId, values] of Object.entries(byTask)) {
+      try { localStorage.setItem(`hw-answers|${taskId}`, JSON.stringify(values)); } catch { /* Storage may be unavailable. */ }
+    }
+  }, [answers, signedIn]);
 
   function setAnswer(number: number, value: string) {
     setAnswers((current) => ({ ...current, [String(number)]: value }));
@@ -139,33 +174,49 @@ export default function Home() {
           {error && <p className="error-message" role="alert">{error}</p>}
           {homeworkLoading ? <p className="card-copy">Loading your homework…</p> : homework.length === 0 ? (
             <div className="homework-card"><h2>No homework yet</h2><p className="card-copy">There are no published assignments in your space right now.</p></div>
-          ) : homework.map((task) => (
-            <article className="homework-card" key={task.id}>
-              <p className="eyebrow">{task.description || "YOUR ASSIGNMENT"}</p>
-              <h2>{task.title}</h2>
-              <p className="card-copy">Work through each section and enter your answers.</p>
-              {task.exercises?.map((section, index) => (
-                <section className="exercise-section" key={section.id}>
-                  <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p>{section.instructions}</p>}</div></div>
-                  {section.word_bank && <div className="word-bank"><strong>Word bank</strong>{section.word_bank.map((word) => <span key={word}>{word}</span>)}</div>}
-                  {section.items.map((item) => (
-                    <div className="question" key={item.number}>
-                      <label htmlFor={`answer-${item.number}`}>{item.number}. {item.prompt || item.words?.join(" / ") || ""}</label>
-                      {section.type === "matching" ? (
-                        <select id={`answer-${item.number}`} value={answers[String(item.number)] || ""} onChange={(e) => setAnswer(item.number, e.target.value)}>
-                          <option value="">Choose a meaning…</option>
-                          {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
-                        </select>
-                      ) : (
-                        <input id={`answer-${item.number}`} type="text" placeholder={item.cue ? `Use: ${item.cue}` : "Your answer"} value={answers[String(item.number)] || ""} onChange={(e) => setAnswer(item.number, e.target.value)} />
-                      )}
-                    </div>
+          ) : (
+            <>
+              <nav className="homework-list" aria-label="Your homework">
+                <p className="eyebrow">ALL HOMEWORK</p>
+                {homework.map((task) => (
+                  <button className={`homework-list-item ${activeHomeworkId === task.id ? "is-active" : ""}`} key={task.id} onClick={() => setActiveHomeworkId(task.id)}>
+                    <span><small>{task.description || "ASSIGNMENT"}</small><strong>{task.title}</strong></span>
+                    <span className="homework-list-arrow" aria-hidden="true">↗</span>
+                  </button>
+                ))}
+              </nav>
+              {homework.filter((task) => task.id === activeHomeworkId).map((task) => (
+                <article className="homework-card" key={task.id}>
+                  <p className="eyebrow">{task.description || "YOUR ASSIGNMENT"}</p>
+                  <h2>{task.title}</h2>
+                  <p className="card-copy">Work through each section and enter your answers.</p>
+                  {task.exercises?.map((section, index) => (
+                    <section className="exercise-section" key={section.id}>
+                      <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p>{section.instructions}</p>}</div></div>
+                      {section.word_bank && <div className="word-bank"><strong>Word bank</strong>{section.word_bank.map((word) => <span key={word}>{word}</span>)}</div>}
+                      {section.items.map((item) => {
+                        const answerKey = `${task.id}::${item.number}`;
+                        return (
+                          <div className="question" key={item.number}>
+                            <label htmlFor={`answer-${task.id}-${item.number}`}>{item.number}. {item.prompt || item.words?.join(" / ") || ""}</label>
+                            {section.type === "matching" ? (
+                              <select id={`answer-${task.id}-${item.number}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)}>
+                                <option value="">Choose a meaning…</option>
+                                {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
+                              </select>
+                            ) : (
+                              <input id={`answer-${task.id}-${item.number}`} type="text" spellCheck={false} autoCorrect="off" placeholder={item.cue ? `Use: ${item.cue}` : "Your answer"} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)} />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </section>
                   ))}
-                </section>
+                  <p className="privacy-note">Your draft answers are saved on this device and will be here when you return using this browser.</p>
+                </article>
               ))}
-              <p className="privacy-note">Your answers are currently saved in this page while it stays open. Answer submission and progress saving will be added next.</p>
-            </article>
-          ))}
+            </>
+          )}
         </section>
       )}
 
