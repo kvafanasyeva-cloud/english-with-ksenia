@@ -205,6 +205,7 @@ export default function Home() {
               <button className="primary-button" type="submit" disabled={loading}>{loading ? "Checking…" : "Enter my space"} {!loading && <span>↗</span>}</button>
             </form>
             <p className="privacy-note">Your personal code is private. Keep it to yourself.</p>
+            <p className="privacy-note"><a href="/teacher" style={{color:"inherit"}}>Teacher login ↗</a></p>
           </div>
         </section>
       ) : (
