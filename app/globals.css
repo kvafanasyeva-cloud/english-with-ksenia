@@ -316,3 +316,21 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   font-weight: 600;
 }
 .homework-list-arrow { font-size: 17px; }
+
+.word-bank-word {
+  padding: 5px 8px;
+  border: 1px solid #c9c9c9;
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.25;
+  cursor: pointer;
+}
+.word-bank-word:hover { border-color: var(--ink); }
+.word-bank-word.is-crossed {
+  color: #888;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  background: #ededed;
+}
