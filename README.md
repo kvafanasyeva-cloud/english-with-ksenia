@@ -24,3 +24,5 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ## Deployment
 
 Import this repository into Vercel and add the two public Supabase environment variables in Project Settings.
+
+Deployment test
