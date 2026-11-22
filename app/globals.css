@@ -334,3 +334,29 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   text-decoration-thickness: 1.5px;
   background: #ededed;
 }
+
+
+.telegram-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 46px;
+  margin-top: 18px;
+  padding: 0 20px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background .18s ease, color .18s ease;
+}
+.telegram-button:hover {
+  background: #fff;
+  color: var(--ink);
+}
+.telegram-button span { font-size: 15px; }
