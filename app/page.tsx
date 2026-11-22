@@ -44,7 +44,7 @@ function telegramShareUrl(task: Homework, answers: Record<string, string>) {
     ])
   ].filter((line) => line !== undefined);
   const message = lines.join("\n").replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-").replace(/·/g, "-");
-  return `https://t.me/share/url?url=&text=${encodeURIComponent(message)}`;
+  return `https://t.me/afanasyeva_x?text=${encodeURIComponent(message)}`;
 }
 
 export default function Home() {
