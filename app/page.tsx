@@ -51,7 +51,7 @@ export default function Home() {
     for (const task of homework) {
       try {
         const raw = localStorage.getItem(`hw-answers|${task.id}`);
-        if (raw) Object.assign(saved, JSON.parse(raw));
+        if (raw) {\n          const values = JSON.parse(raw) as Record<string, string>;\n          for (const [itemKey, value] of Object.entries(values)) saved[`${task.id}::${itemKey}`] = value;\n        }
       } catch { /* Ignore unavailable or invalid local drafts. */ }
     }
     setAnswers(saved);
