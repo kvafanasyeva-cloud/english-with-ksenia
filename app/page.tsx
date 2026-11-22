@@ -100,8 +100,8 @@ export default function Home() {
     }
   }, [crossedWords, signedIn]);
 
-  function setAnswer(number: number, value: string) {
-    setAnswers((current) => ({ ...current, [String(number)]: value }));
+  function setAnswer(taskId: string, number: number, value: string) {
+    setAnswers((current) => ({ ...current, [`${taskId}::${number}`]: value }));
   }
 
   async function loadHomework() {
