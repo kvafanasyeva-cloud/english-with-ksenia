@@ -28,6 +28,25 @@ type Homework = {
   }>;
 };
 
+function telegramShareUrl(task: Homework, answers: Record<string, string>) {
+  const lines = [
+    "Homework results",
+    task.description || "",
+    task.title,
+    "",
+    ...task.exercises.flatMap((section) => [
+      section.title,
+      ...section.items.map((item) => {
+        const answer = answers[`${task.id}::${item.number}`] || "(empty)";
+        return `${item.number}. ${answer}`;
+      }),
+      ""
+    ])
+  ].filter((line) => line !== undefined);
+  const message = lines.join("\n").replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-").replace(/·/g, "-");
+  return `https://t.me/share/url?url=&text=${encodeURIComponent(message)}`;
+}
+
 export default function Home() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -239,6 +258,7 @@ export default function Home() {
                       })}
                     </section>
                   ))}
+                  <a className="telegram-button" href={telegramShareUrl(task, answers)} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
                   <p className="privacy-note">Your draft answers are saved on this device and will be here when you return using this browser.</p>
                 </article>
               ))}
