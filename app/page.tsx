@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 let supabase: SupabaseClient | null = null;
@@ -79,10 +80,10 @@ export default function Home() {
   return (
     <main className="page-shell">
       <header className="topbar">
-        <a className="wordmark" href="/" aria-label="English with Ksenia home">
+        <Link className="wordmark" href="/" aria-label="English with Ksenia home">
           <span className="wordmark-mark">e.</span>
           <span>ENGLISH WITH KSENIA</span>
-        </a>
+        </Link>
         <span className="topbar-note">YOUR LEARNING SPACE</span>
       </header>
 
