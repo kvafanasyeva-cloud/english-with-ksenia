@@ -122,12 +122,10 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
           );
         })}
       </div>
-      <div className="word-snake-controls">
-        <button type="button" onClick={() => { setChecked(true); setShowAnswers(false); }}>Check</button>
-        <button type="button" className="is-ghost" onClick={() => { setValues(SNAKE_ITEMS.map(() => "")); setRings([]); setStart(null); setChecked(false); setShowAnswers(false); }}>Reset</button>
-        {checked && <button type="button" className="is-ghost" onClick={() => { setValues((current) => current.map((value, index) => SNAKE_ITEMS[index].answers[0])); setShowAnswers(true); }}>Show answers</button>}
-        {checked && <strong className="word-snake-score">{rightCount} / {SNAKE_ITEMS.length}</strong>}
-      </div>
+      {checked && <div className="word-snake-controls">
+        <button type="button" className="is-ghost" onClick={() => { setValues((current) => current.map((value, index) => SNAKE_ITEMS[index].answers[0])); setShowAnswers(true); }}>Show answers</button>
+        <strong className="word-snake-score">{rightCount} / {SNAKE_ITEMS.length}</strong>
+      </div>}
     </section>
   );
 }
@@ -151,7 +149,7 @@ function SampleCrossword({ checkTrigger, resetTrigger }: { checkTrigger: number;
     const row = entry.row + (entry.direction === "down" ? index : 0);
     const col = entry.col + (entry.direction === "across" ? index : 0);
     const key = row + "-" + col;
-    if (!cells[key]) cells[key] = { letter, words: [] };
+    if (!cells[key]) cells[key] = { letter, words: [], number: index === 0 ? CROSSWORD_WORDS.indexOf(entry) + 1 : undefined };
     cells[key].words.push(entry.id);
   }));
   const rows = Array.from({ length: 6 }, (_, row) => Array.from({ length: 8 }, (_, col) => ({ row, col, cell: cells[row + "-" + col] })));
@@ -165,12 +163,12 @@ function SampleCrossword({ checkTrigger, resetTrigger }: { checkTrigger: number;
   return <section className="sample-crossword">
     <div className="word-snake-heading"><h3>Crossword · Verb patterns</h3><p>Complete the crossword using the clues. One letter goes in each square.</p></div>
     <div className="crossword-grid" role="group" aria-label="Crossword grid">
-      {rows.flatMap((row) => row.map(({ row: r, col, cell }) => cell ? <input key={r + "-" + col} aria-label={"Row " + (r + 1) + ", column " + (col + 1)} maxLength={1} value={letters[r + "-" + col] || ""} className={checked ? (cell.words.every((id) => isWordCorrect(CROSSWORD_WORDS.find((entry) => entry.id === id)!)) ? "crossword-letter is-correct" : "crossword-letter is-wrong") : "crossword-letter"} onChange={(event) => { setLetters((current) => ({ ...current, [r + "-" + col]: event.target.value.slice(-1).toUpperCase() })); setChecked(false); }} /> : <span key={r + "-" + col} className="crossword-empty" />))}
+      {rows.flatMap((row) => row.map(({ row: r, col, cell }) => cell ? <div className="crossword-cell-wrap" key={r + "-" + col}>{cell.number && <span className="crossword-cell-number">{cell.number}</span>}<input aria-label={"Row " + (r + 1) + ", column " + (col + 1)} maxLength={1} value={letters[r + "-" + col] || ""} className={checked ? (cell.words.every((id) => isWordCorrect(CROSSWORD_WORDS.find((entry) => entry.id === id)!)) ? "crossword-letter is-correct" : "crossword-letter is-wrong") : "crossword-letter"} onChange={(event) => { setLetters((current) => ({ ...current, [r + "-" + col]: event.target.value.slice(-1).toUpperCase() })); setChecked(false); }} /></div> : <span key={r + "-" + col} className="crossword-empty" />))}
     </div>
     <div className="crossword-clues">
       {CROSSWORD_WORDS.map((entry, index) => <div className="crossword-clue" key={entry.id}><strong>{index + 1}. {entry.direction === "across" ? "Across" : "Down"}</strong><span>{entry.clue}</span>{checked && <b>{isWordCorrect(entry) ? "✓" : "×"}</b>}</div>)}
     </div>
-    <div className="word-snake-controls"><button type="button" onClick={() => setChecked(true)}>Check crossword</button><button type="button" className="is-ghost" onClick={() => { setLetters({}); setChecked(false); }}>Reset crossword</button>{checked && <strong className="word-snake-score">{CROSSWORD_WORDS.filter(isWordCorrect).length} / {CROSSWORD_WORDS.length}</strong>}</div>
+    {checked && <div className="word-snake-controls"><strong className="word-snake-score">{CROSSWORD_WORDS.filter(isWordCorrect).length} / {CROSSWORD_WORDS.length}</strong></div>}
   </section>;
 }
 
