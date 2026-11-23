@@ -36,9 +36,9 @@ function telegramShareUrl(task: Homework, answers: Record<string, string>) {
     "",
     ...task.exercises.flatMap((section) => [
       section.title,
-      ...section.items.map((item) => {
+      ...section.items.map((item, index) => {
         const answer = answers[`${task.id}::${item.number}`] || "(empty)";
-        return `${item.number}. ${answer}`;
+        return `${index + 1}. ${answer}`;
       }),
       ""
     ])
@@ -50,7 +50,7 @@ function telegramShareUrl(task: Homework, answers: Record<string, string>) {
 
 const KATE_NOV_21_HOMEWORK: Homework = {
   id: "kate-2026-11-21-b1-vocabulary",
-  title: "21.11 · B1 vocabulary",
+  title: "21.11 · Everyday life & communication",
   description: "21 November · Vocabulary practice",
   exercises: [
     {
@@ -133,7 +133,7 @@ const SNAKE_ITEMS: Array<{ before: string; answers: string[]; after: string }> =
   { before: "The noise was so loud that nobody could ", answers: ["endure", "bear"], after: " it any longer." }
 ];
 
-function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: number; resetTrigger: number }) {
+function WordSnakeExercise({ checkTrigger, resetTrigger, startNumber = 1 }: { checkTrigger: number; resetTrigger: number; startNumber?: number }) {
   const [rings, setRings] = useState<Array<[number, number]>>([]);
   const [start, setStart] = useState<number | null>(null);
   const [values, setValues] = useState<string[]>(() => SNAKE_ITEMS.map(() => ""));
@@ -181,7 +181,7 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
           const mark = checked && hasAnswer ? (correct ? "ok" : "no") : "";
           return (
             <div className="word-snake-question" key={index}>
-              <span className="word-snake-number">{index + 1}.</span>
+              <span className="word-snake-number">{startNumber + index}.</span>
               <p>{item.before}<input aria-label={"Answer " + (index + 1)} className={"word-snake-gap" + (checked && correct ? " is-correct" : "") + (checked && hasAnswer && !correct ? " is-wrong" : "")} value={values[index]} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => { setValues((current) => current.map((value, i) => i === index ? event.target.value : value)); setChecked(false); }} />{item.after}</p>
               <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect" : ""}>{mark === "ok" ? "✓" : mark === "no" ? "×" : ""}</span>
             </div>
@@ -390,30 +390,32 @@ export default function Home() {
               </nav>
               {homework.filter((task) => task.id === activeHomeworkId).map((task) => (
                 <article className="homework-card" key={task.id}>
-                  <h2>{task.title}</h2>
+                  <h2>{task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" ? "18.11 · Films, feelings & should have + V3" : task.title}</h2>
                   {task.exercises?.map((section, index) => (
                     <section className="exercise-section" key={section.id}>
                       <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p>{section.instructions}</p>}</div></div>
                       {section.word_bank && <div className="word-bank"><strong>Word bank</strong>{section.word_bank.map((word) => { const wordKey = `${task.id}::${section.id}::${word}`; return <button type="button" className={`word-bank-word ${crossedWords[wordKey] ? "is-crossed" : ""}`} aria-pressed={!!crossedWords[wordKey]} onClick={() => setCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>; })}</div>}
-                      {section.items.map((item) => {
+                      {section.items.map((item, itemIndex) => {
+                        const previousItems = task.exercises.slice(0, index).reduce((total, exercise) => total + exercise.items.length, 0);
+                        const displayNumber = previousItems + itemIndex + 1;
                         const answerKey = `${task.id}::${item.number}`;
                         return (
                           <div className={`question${section.type === "matching" ? "" : " answers-under"}`} key={item.number}>
-                            <label htmlFor={`answer-${task.id}-${item.number}`}>{item.number}. {item.prompt || item.words?.join(" / ") || ""}</label>
+                            <label htmlFor={`answer-${task.id}-${item.number}`}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
                             {section.type === "matching" ? (
                               <select id={`answer-${task.id}-${item.number}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)}>
                                 <option value="">Choose a meaning…</option>
                                 {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
                               </select>
                             ) : (
-                              <input id={`answer-${task.id}-${item.number}`} type="text" spellCheck={false} autoCorrect="off" placeholder={item.cue ? `Use: ${item.cue}` : "Your answer"} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)} />
+                              <input id={`answer-${task.id}-${item.number}`} type="text" spellCheck={false} autoCorrect="off" placeholder={item.cue ? `Use: ${item.cue}` : ""} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)} />
                             )}
                           </div>
                         );
                       })}
                     </section>
                   ))}
-                  {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <section className="exercise-section word-snake-section"><div className="section-heading"><span className="section-number">{String((task.exercises?.length || 0) + 1).padStart(2, "0")}</span><div><h3>Find the verbs in the word snake</h3><p>Complete the sentences using verbs from the word snake in the correct form.</p></div></div><WordSnakeExercise checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} /></section>}
+                  {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <section className="exercise-section word-snake-section"><div className="section-heading"><span className="section-number">{String((task.exercises?.length || 0) + 1).padStart(2, "0")}</span><div><h3>Find the verbs in the word snake</h3><p>Complete the sentences using verbs from the word snake in the correct form.</p></div></div><WordSnakeExercise checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} startNumber={(task.exercises?.reduce((total, exercise) => total + exercise.items.length, 0) || 0) + 1} /></section>}
                   <div className="whole-homework-controls">
                     <button type="button" onClick={() => setActivityCheckTrigger((value) => value + 1)}>Check</button>
                     <button type="button" onClick={() => { try { const saved: Record<string, string> = {}; Object.entries(answers).forEach(([key, value]) => { const prefix = task.id + "::"; if (key.startsWith(prefix)) saved[key.slice(prefix.length)] = value; }); localStorage.setItem("hw-answers|" + task.id, JSON.stringify(saved)); setSaveNotice("Saved on this device"); } catch { setSaveNotice("Could not save on this device"); } }}>Save</button>
@@ -421,7 +423,6 @@ export default function Home() {
                     {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
                     <a className="telegram-button" href={telegramShareUrl(task, answers)} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
                   </div>
-                  <p className="privacy-note">Your draft answers are saved on this device and will be here when you return using this browser.</p>
                 </article>
               ))}
             </>
