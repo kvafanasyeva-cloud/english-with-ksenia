@@ -183,6 +183,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .signout { min-width: 104px; justify-content: center; background: #fff; color: var(--ink); }
 .homework-card {
   margin: 0 0 28px;
+  font-weight: 500;
   padding: 30px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -208,7 +209,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   margin: 0;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -.025em;
 }
 .section-heading p {
@@ -248,7 +249,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   gap: 18px;
   margin: 0 0 15px 44px;
 }
-.question label { font-size: 13px; line-height: 1.6; }
+.question label { font-size: 14px; line-height: 1.6; font-weight: 600; }
 .question input, .question select { min-width: 0; }
 .footer {
   min-height: 62px;
@@ -460,11 +461,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 }
 .word-snake-number {
   min-width: 20px;
+  font-weight: 600;
   padding-top: 3px;
   color: var(--muted);
   font-size: 13px;
 }
-.word-snake-question p { flex: 1; margin: 0; }
+.word-snake-question p { flex: 1; margin: 0; font-weight: 500; }
 .word-snake-gap {
   width: 150px;
   max-width: 100%;
