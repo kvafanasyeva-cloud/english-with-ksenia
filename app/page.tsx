@@ -144,7 +144,7 @@ function SampleCrossword({ checkTrigger, resetTrigger }: { checkTrigger: number;
   const [crosswordLoaded, setCrosswordLoaded] = useState(false);
   useEffect(() => { try { const raw = localStorage.getItem("kate-sample-crossword"); if (raw) setLetters(JSON.parse(raw)); } catch {} setCrosswordLoaded(true); }, []);
   useEffect(() => { if (crosswordLoaded) { try { localStorage.setItem("kate-sample-crossword", JSON.stringify(letters)); } catch {} } }, [letters, crosswordLoaded]);
-  const cells: Record<string, { letter: string; words: string[] }> = {};
+  const cells: Record<string, { letter: string; words: string[]; number?: number }> = {};
   CROSSWORD_WORDS.forEach((entry) => entry.word.split("").forEach((letter, index) => {
     const row = entry.row + (entry.direction === "down" ? index : 0);
     const col = entry.col + (entry.direction === "across" ? index : 0);
