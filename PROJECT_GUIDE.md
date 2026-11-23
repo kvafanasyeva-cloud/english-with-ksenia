@@ -131,14 +131,6 @@ Question numbers must run through the entire homework, not restart at the beginn
 
 ## 5. Current homework examples and protected content
 
-### 18.11 — Films, feelings & should have + V3
-
-- This is an existing published assignment in Supabase.
-- Its title should display with the date: **18.11 · Films, feelings & should have + V3**.
-- It has a special Word Snake as a further numbered task.
-- Preserve its existing exercises and Word Snake. Do not alter it unless Ksenia explicitly requests a change.
-- Word Snake uses the existing word set and expressions in the code. Do not replace or remove it when editing another assignment.
-
 ### 21.11 — Everyday life & communication (Kate)
 
 - Student: Kate (show her name as **Kate**, with a capital K).
@@ -194,7 +186,7 @@ The project uses Next.js App Router. Main files:
 
 ## 8. Testing checklist before calling a homework update finished
 
-- [ ] Existing assignments are still present and unchanged.
+- [ ] Existing assignments are still present and unchanged, except 18.11 which is intentionally hidden from the student-facing list.
 - [ ] The correct student sees the new assignment; other students do not see a student-specific static assignment.
 - [ ] Student name is displayed with normal capitalisation (e.g. Kate).
 - [ ] Assignment expands and collapses correctly.
