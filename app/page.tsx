@@ -111,7 +111,7 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
           return (
             <div className="word-snake-question" key={index}>
               <span className="word-snake-number">{index + 1}.</span>
-              <p>{item.before}<input aria-label={"Answer " + (index + 1)} className={"word-snake-gap" + (checked && correct ? " is-correct" : "") + (checked && hasAnswer && !correct ? " is-wrong" : "")} value={values[index]} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => { setValues((current) => current.map((value, i) => i === index ? event.target.value : value)); setChecked(false); setShowAnswers(false); }} />{item.after}</p>
+              <p>{item.before}<input aria-label={"Answer " + (index + 1)} className={"word-snake-gap" + (checked && correct ? " is-correct" : "") + (checked && hasAnswer && !correct ? " is-wrong" : "")} value={values[index]} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => { setValues((current) => current.map((value, i) => i === index ? event.target.value : value)); setChecked(false); }} />{item.after}</p>
               <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect" : ""}>{mark === "ok" ? "✓" : mark === "no" ? "×" : ""}</span>
             </div>
           );
