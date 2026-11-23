@@ -102,7 +102,7 @@ const KATE_NOV_21_HOMEWORK: Homework = {
         { number: 1, prompt: "The way you see yourself is called your ___." },
         { number: 2, prompt: "The plural of 'child' is ___." },
         { number: 3, prompt: "___ it was raining, we went for a walk." },
-        { number: 4, prompt: "There were several ___ waiting outside." },
+        { number: 4, prompt: "We should listen to ___, even when their opinions differ from ours." },
         { number: 5, prompt: "Please don't ___ me for something I didn't do." }
       ]
     },
@@ -300,7 +300,9 @@ export default function Home() {
     if (homeworkError) {
       setError("You're signed in, but we couldn't load your homework. Please try again.");
     } else {
-      const databaseHomework = (data || []) as Homework[];
+      const databaseHomework = ((data || []) as Homework[]).filter(
+        (task) => task.id !== "18bbb034-4f7e-4a77-aa35-851d101b3d93"
+      );
       const visibleHomework = name.trim().toLowerCase() === "kate" &&
         !databaseHomework.some((task) => task.id === KATE_NOV_21_HOMEWORK.id)
         ? [KATE_NOV_21_HOMEWORK, ...databaseHomework]
