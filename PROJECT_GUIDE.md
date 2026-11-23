@@ -71,7 +71,7 @@ The visual direction is clean, quiet, modern, and minimal: a learning workspace,
 - Student login: simple name field, personal-code field, and one clear **Enter my space** action.
 - Signed-in view: a short **Welcome, Kate.** greeting (capitalise the student's name), a sign-out action, then the homework list.
 - Do not add a slogan or explanatory subtitle below Welcome. In particular, do not restore “Your homework, all in one place. Take it one task at a time.”
-- Keep the gap between Welcome and **ALL HOMEWORK** tight. There should not be two empty lines, blank paragraphs, or a large separator in between.
+- Keep the large gap between Welcome and **ALL HOMEWORK**, including the extra top spacing above the homework list. The spacing is intentional; remove only the horizontal separator line between these areas.
 - Homework titles show their date and topic, e.g. **21.11 · Everyday life & communication**.
 - Clicking a homework row expands/collapses that assignment. The open/closed state is indicated with a plus/minus.
 - Exercise text must be comfortably large and readable on desktop and mobile.
