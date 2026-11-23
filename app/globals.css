@@ -519,3 +519,70 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   .word-snake-question { gap: 6px; }
   .word-snake-gap { width: 115px; }
 }
+
+
+/* Whole-assignment actions and sample crossword */
+.whole-homework-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-top: 24px;
+}
+.whole-homework-controls > button {
+  padding: 11px 16px;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+  font: 500 13px Inter, sans-serif;
+  cursor: pointer;
+}
+.whole-homework-controls > button.is-ghost {
+  color: var(--ink);
+  background: transparent;
+}
+.whole-homework-controls .telegram-button {
+  margin: 0;
+  flex: 1 1 220px;
+}
+.save-notice { width: 100%; color: var(--muted); font-size: 12px; }
+.sample-crossword {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid var(--line, #dedbd4);
+  border-radius: 12px;
+  background: var(--paper, #fff);
+}
+.crossword-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 34px);
+  grid-template-rows: repeat(6, 34px);
+  gap: 3px;
+  margin: 20px 0;
+}
+.crossword-letter {
+  width: 34px;
+  height: 34px;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid #222;
+  border-radius: 2px;
+  background: #fff;
+  color: #111;
+  text-align: center;
+  text-transform: uppercase;
+  font: 600 17px Inter, sans-serif;
+}
+.crossword-empty { width: 34px; height: 34px; }
+.crossword-letter.is-correct { border: 2px solid #111; background: #f1f1f1; }
+.crossword-letter.is-wrong { border: 2px solid #111; background: #fff; text-decoration: underline wavy; }
+.crossword-clues { display: grid; gap: 10px; }
+.crossword-clue { display: grid; grid-template-columns: 80px 1fr 18px; gap: 8px; align-items: start; font-size: 13px; }
+.crossword-clue b { color: #111; }
+@media (max-width: 480px) {
+  .sample-crossword { padding: 16px 10px; overflow-x: auto; }
+  .crossword-grid { grid-template-columns: repeat(8, 30px); grid-template-rows: repeat(6, 30px); gap: 2px; }
+  .crossword-letter, .crossword-empty { width: 30px; height: 30px; }
+  .crossword-clue { grid-template-columns: 70px 1fr 16px; }
+}
