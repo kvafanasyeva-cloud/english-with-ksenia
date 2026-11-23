@@ -59,7 +59,7 @@ const KATE_NOV_21_HOMEWORK: Homework = {
       id: "nov21-gap-fill",
       type: "gap",
       title: "Complete the sentences",
-      instructions: "Use the words in the box. Change the form if necessary.",
+      instructions: "Complete each sentence with one word or phrase from the word bank.",
       word_bank: ["cancel", "add up", "consider", "celebrate", "defend", "comprehend", "opinion", "holiday", "door"],
       items: [
         { number: 1, prompt: "We had to ___ the meeting because the teacher was ill." },
@@ -97,25 +97,25 @@ const KATE_NOV_21_HOMEWORK: Homework = {
       id: "nov21-complete",
       type: "write",
       title: "Complete the sentences",
-      instructions: "Use the words and phrases in brackets. Make any necessary changes.",
+      
       items: [
-        { number: 1, prompt: "The way you see yourself is called your ___.", cue: "self-perception" },
-        { number: 2, prompt: "The plural of 'child' is ___.", cue: "child" },
-        { number: 3, prompt: "___ it was raining, we went for a walk.", cue: "even though" },
-        { number: 4, prompt: "There were several ___ waiting outside.", cue: "other people" },
-        { number: 5, prompt: "Please don't ___ me for something I didn't do.", cue: "defend" }
+        { number: 1, prompt: "The way you see yourself is called your ___." },
+        { number: 2, prompt: "The plural of 'child' is ___." },
+        { number: 3, prompt: "___ it was raining, we went for a walk." },
+        { number: 4, prompt: "There were several ___ waiting outside." },
+        { number: 5, prompt: "Please don't ___ me for something I didn't do." }
       ]
     },
     {
       id: "nov21-rewrite",
       type: "rewrite",
       title: "Rewrite the sentences",
-      instructions: "Rewrite each sentence using the word or phrase given. Keep the meaning the same.",
+      
       items: [
-        { number: 1, prompt: "I don't understand what you mean. (quite get)", cue: "quite get" },
-        { number: 2, prompt: "I agree with your opinion. (share)", cue: "share" },
-        { number: 3, prompt: "Although she was tired, she finished the task. (even though)", cue: "even though" },
-        { number: 4, prompt: "I will tell you my decision tomorrow. (say)", cue: "say" }
+        { number: 1, prompt: "I don't understand what you mean. (quite get)" },
+        { number: 2, prompt: "I agree with your opinion. (share)" },
+        { number: 3, prompt: "Although she was tired, she finished the task. (even though)" },
+        { number: 4, prompt: "I will tell you my decision tomorrow. (say)" }
       ]
     }
   ]
@@ -372,7 +372,6 @@ export default function Home() {
             <div>
               <p className="eyebrow">YOUR LEARNING SPACE</p>
               <h1>Welcome, <em>{name.trim()}.</em></h1>
-              <p className="intro">Your homework, all in one place. Take it one task at a time.</p>
             </div>
             <button className="secondary-button signout" onClick={handleSignOut}>Sign out</button>
           </div>
@@ -403,14 +402,24 @@ export default function Home() {
                         const answerKey = `${task.id}::${displayNumber}`;
                         return (
                           <div className={`question${section.type === "matching" ? "" : " answers-under"}`} key={item.number}>
-                            <label htmlFor={`answer-${task.id}-${displayNumber}`}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
-                            {section.type === "matching" ? (
-                              <select id={`answer-${task.id}-${displayNumber}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
-                                <option value="">Choose a meaning…</option>
-                                {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
-                              </select>
+                            {section.type === "gap" ? (
+                              <label className="inline-gap-label" htmlFor={`answer-${task.id}-${displayNumber}`}>
+                                {displayNumber}. {(item.prompt || "").split("___")[0]}
+                                <input className="inline-gap-input" id={`answer-${task.id}-${displayNumber}`} type="text" spellCheck={false} autoCorrect="off" value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)} aria-label={`Answer to question ${displayNumber}`} />
+                                {(item.prompt || "").split("___").slice(1).join("___")}
+                              </label>
                             ) : (
-                              <input id={`answer-${task.id}-${displayNumber}`} type="text" spellCheck={false} autoCorrect="off" placeholder={item.cue ? `Use: ${item.cue}` : ""} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)} />
+                              <>
+                                <label htmlFor={`answer-${task.id}-${displayNumber}`}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
+                                {section.type === "matching" ? (
+                                  <select id={`answer-${task.id}-${displayNumber}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
+                                    <option value="">Choose a meaning…</option>
+                                    {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
+                                  </select>
+                                ) : (
+                                  <input id={`answer-${task.id}-${displayNumber}`} type="text" spellCheck={false} autoCorrect="off" value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)} />
+                                )}
+                              </>
                             )}
                           </div>
                         );
