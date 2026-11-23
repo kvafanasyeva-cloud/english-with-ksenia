@@ -68,6 +68,9 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
   const [values, setValues] = useState<string[]>(() => SNAKE_ITEMS.map(() => ""));
   const [checked, setChecked] = useState(false);
   const [showAnswers, setShowAnswers] = useState(false);
+  const [snakeLoaded, setSnakeLoaded] = useState(false);
+  useEffect(() => { try { const raw = localStorage.getItem("kate-word-snake"); if (raw) { const saved = JSON.parse(raw); if (Array.isArray(saved.values)) setValues(saved.values); if (Array.isArray(saved.rings)) setRings(saved.rings); } } catch {} setSnakeLoaded(true); }, []);
+  useEffect(() => { if (snakeLoaded) { try { localStorage.setItem("kate-word-snake", JSON.stringify({ values, rings })); } catch {} } }, [values, rings, snakeLoaded]);
   const letters = SNAKE_WORDS.join("").split("");
   const normalise = (value: string) => value.trim().toLowerCase().replace(/\s+/g, " ");
   const isCorrect = (index: number) => SNAKE_ITEMS[index].answers.includes(normalise(values[index]));
@@ -140,6 +143,9 @@ const CROSSWORD_WORDS = [
 function SampleCrossword({ checkTrigger, resetTrigger }: { checkTrigger: number; resetTrigger: number }) {
   const [letters, setLetters] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
+  const [crosswordLoaded, setCrosswordLoaded] = useState(false);
+  useEffect(() => { try { const raw = localStorage.getItem("kate-sample-crossword"); if (raw) setLetters(JSON.parse(raw)); } catch {} setCrosswordLoaded(true); }, []);
+  useEffect(() => { if (crosswordLoaded) { try { localStorage.setItem("kate-sample-crossword", JSON.stringify(letters)); } catch {} } }, [letters, crosswordLoaded]);
   const cells: Record<string, { letter: string; words: string[] }> = {};
   CROSSWORD_WORDS.forEach((entry) => entry.word.split("").forEach((letter, index) => {
     const row = entry.row + (entry.direction === "down" ? index : 0);
