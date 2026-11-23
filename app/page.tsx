@@ -133,7 +133,7 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
 const CROSSWORD_WORDS = [
   { id: "endure", word: "ENDURE", clue: "to suffer something difficult or unpleasant without giving up", row: 0, col: 4, direction: "down" as const },
   { id: "face", word: "FACE", clue: "to accept and deal with a difficult situation", row: 1, col: 1, direction: "down" as const },
-  { id: "rely", word: "RELY", clue: "to trust or depend on someone", row: 2, col: 3, direction: "across" as const },
+  { id: "rely", word: "RELY", clue: "to trust or depend on someone", row: 4, col: 4, direction: "across" as const },
   { id: "bear", word: "BEAR", clue: "to tolerate or accept something unpleasant", row: 4, col: 0, direction: "across" as const }
 ];
 
@@ -148,7 +148,7 @@ function SampleCrossword({ checkTrigger, resetTrigger }: { checkTrigger: number;
     if (!cells[key]) cells[key] = { letter, words: [] };
     cells[key].words.push(entry.id);
   }));
-  const rows = Array.from({ length: 6 }, (_, row) => Array.from({ length: 7 }, (_, col) => ({ row, col, cell: cells[row + "-" + col] })));
+  const rows = Array.from({ length: 6 }, (_, row) => Array.from({ length: 8 }, (_, col) => ({ row, col, cell: cells[row + "-" + col] })));
   const isWordCorrect = (entry: typeof CROSSWORD_WORDS[number]) => entry.word.split("").every((letter, index) => {
     const row = entry.row + (entry.direction === "down" ? index : 0);
     const col = entry.col + (entry.direction === "across" ? index : 0);
