@@ -47,6 +47,85 @@ function telegramShareUrl(task: Homework, answers: Record<string, string>) {
   return `https://t.me/afanasyeva_x?text=${encodeURIComponent(message)}`;
 }
 
+
+const SNAKE_WORDS = ["face", "bear", "rely", "put", "go", "fall", "take", "get", "pay", "endure"];
+const SNAKE_EXAMPLE = ["We need to ", "face", " the fact that the old system doesn't work any more."];
+const SNAKE_ITEMS: Array<{ before: string; answers: string[]; after: string }> = [
+  { before: "After years of hard work, our project finally ", answers: ["bore"], after: " fruit." },
+  { before: "You can always ", answers: ["rely"], after: " on me if you need help." },
+  { before: "Don't let one bad result ", answers: ["put"], after: " you off trying again." },
+  { before: "Prices ", answers: ["went"], after: " up again last month." },
+  { before: "She ", answers: ["fell"], after: " ill the day before the exam." },
+  { before: "It ", answers: ["took"], after: " me two hours to get there by bus." },
+  { before: "How did you ", answers: ["get"], after: " through such a difficult year?" },
+  { before: "Hard work always ", answers: ["pays"], after: " off in the end." },
+  { before: "The noise was so loud that nobody could ", answers: ["endure", "bear"], after: " it any longer." }
+];
+
+function WordSnakeExercise() {
+  const [rings, setRings] = useState<Array<[number, number]>>([]);
+  const [start, setStart] = useState<number | null>(null);
+  const [values, setValues] = useState<string[]>(() => SNAKE_ITEMS.map(() => ""));
+  const [checked, setChecked] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
+  const letters = SNAKE_WORDS.join("").split("");
+  const normalise = (value: string) => value.trim().toLowerCase().replace(/\\s+/g, " ");
+  const isCorrect = (index: number) => SNAKE_ITEMS[index].answers.includes(normalise(values[index]));
+  const chooseLetter = (index: number) => {
+    if (start === null) { setStart(index); return; }
+    const a = Math.min(start, index);
+    const b = Math.max(start, index);
+    if (a !== b && !rings.some(([x, y]) => !(b < x || a > y))) setRings((current) => [...current, [a, b]]);
+    setStart(null);
+  };
+  const rightCount = SNAKE_ITEMS.filter((_, index) => isCorrect(index)).length;
+
+  return (
+    <section className="word-snake-exercise">
+      <div className="word-snake-heading">
+        <h3>Find the verbs in the word snake</h3>
+        <p>Complete the sentences using verbs from the word snake in the correct form.</p>
+      </div>
+      <div className="word-snake-letters" aria-label="Word snake">
+        {letters.map((letter, index) => {
+          const ring = rings.find(([a]) => a === index);
+          if (ring) {
+            const [a, b] = ring;
+            return <button type="button" className="word-snake-ring" key={index} title="Click to remove this circle" onClick={() => { setRings((current) => current.filter(([x, y]) => x !== a || y !== b)); setStart(null); }}>{letters.slice(a, b + 1).map((char, offset) => <span key={offset} style={{ transform: "translateY(" + (Math.sin((a + offset) * 0.55) * 7) + "px)" }}>{char}</span>)}</button>;
+          }
+          if (rings.some(([a, b]) => index > a && index <= b)) return null;
+          return <button type="button" className={"word-snake-letter" + (start === index ? " is-start" : "")} key={index} onClick={() => chooseLetter(index)} style={{ transform: "translateY(" + (Math.sin(index * 0.55) * 7) + "px)" }}>{letter}</button>;
+        })}
+      </div>
+      <p className="word-snake-note">Click the first and the last letter of a word to circle it. Click a circle to remove it.</p>
+      <div className="word-snake-example">
+        <span>EXAMPLE</span>
+        {SNAKE_EXAMPLE[0]}<strong>{SNAKE_EXAMPLE[1]}</strong>{SNAKE_EXAMPLE[2]}
+      </div>
+      <div className="word-snake-questions">
+        {SNAKE_ITEMS.map((item, index) => {
+          const correct = isCorrect(index);
+          const hasAnswer = values[index].trim() !== "";
+          const mark = checked && hasAnswer ? (correct ? "ok" : "no") : showAnswers && !correct ? "arrow" : "";
+          return (
+            <div className="word-snake-question" key={index}>
+              <span className="word-snake-number">{index + 1}.</span>
+              <p>{item.before}<input aria-label={"Answer " + (index + 1)} className={"word-snake-gap" + (checked && correct ? " is-correct" : "") + (checked && hasAnswer && !correct ? " is-wrong" : "")} value={values[index]} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => { setValues((current) => current.map((value, i) => i === index ? event.target.value : value)); setChecked(false); setShowAnswers(false); }} />{item.after}</p>
+              <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect" : mark === "arrow" ? "Answer shown" : ""}>{mark === "ok" ? "✓" : mark === "no" ? "×" : mark === "arrow" ? "→" : ""}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="word-snake-controls">
+        <button type="button" onClick={() => { setChecked(true); setShowAnswers(false); }}>Check</button>
+        <button type="button" className="is-ghost" onClick={() => { setValues(SNAKE_ITEMS.map(() => "")); setRings([]); setStart(null); setChecked(false); setShowAnswers(false); }}>Reset</button>
+        {checked && <button type="button" className="is-ghost" onClick={() => { setValues((current) => current.map((value, index) => SNAKE_ITEMS[index].answers[0])); setShowAnswers(true); }}>Show answers</button>}
+        {checked && <strong className="word-snake-score">{rightCount} / {SNAKE_ITEMS.length}</strong>}
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -259,6 +338,7 @@ export default function Home() {
                       })}
                     </section>
                   ))}
+                  {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <WordSnakeExercise />}
                   <a className="telegram-button" href={telegramShareUrl(task, answers)} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
                   <p className="privacy-note">Your draft answers are saved on this device and will be here when you return using this browser.</p>
                 </article>
