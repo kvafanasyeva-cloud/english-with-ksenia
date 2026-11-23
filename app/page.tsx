@@ -67,7 +67,6 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
   const [start, setStart] = useState<number | null>(null);
   const [values, setValues] = useState<string[]>(() => SNAKE_ITEMS.map(() => ""));
   const [checked, setChecked] = useState(false);
-  const [showAnswers, setShowAnswers] = useState(false);
   const [snakeLoaded, setSnakeLoaded] = useState(false);
   useEffect(() => { try { const raw = localStorage.getItem("kate-word-snake"); if (raw) { const saved = JSON.parse(raw); if (Array.isArray(saved.values)) setValues(saved.values); if (Array.isArray(saved.rings)) setRings(saved.rings); } } catch {} setSnakeLoaded(true); }, []);
   useEffect(() => { if (snakeLoaded) { try { localStorage.setItem("kate-word-snake", JSON.stringify({ values, rings })); } catch {} } }, [values, rings, snakeLoaded]);
@@ -83,15 +82,11 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
   };
   const rightCount = SNAKE_ITEMS.filter((_, index) => isCorrect(index)).length;
 
-  useEffect(() => { if (checkTrigger) { setChecked(true); setShowAnswers(false); } }, [checkTrigger]);
-  useEffect(() => { if (resetTrigger) { setValues(SNAKE_ITEMS.map(() => "")); setRings([]); setStart(null); setChecked(false); setShowAnswers(false); } }, [resetTrigger]);
+  useEffect(() => { if (checkTrigger) setChecked(true); }, [checkTrigger]);
+  useEffect(() => { if (resetTrigger) { setValues(SNAKE_ITEMS.map(() => "")); setRings([]); setStart(null); setChecked(false); } }, [resetTrigger]);
 
   return (
     <section className="word-snake-exercise">
-      <div className="word-snake-heading">
-        <h3>Find the verbs in the word snake</h3>
-        <p>Complete the sentences using verbs from the word snake in the correct form.</p>
-      </div>
       <div className="word-snake-letters" aria-label="Word snake">
         {letters.map((letter, index) => {
           const ring = rings.find(([a]) => a === index);
@@ -112,18 +107,17 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
         {SNAKE_ITEMS.map((item, index) => {
           const correct = isCorrect(index);
           const hasAnswer = values[index].trim() !== "";
-          const mark = checked && hasAnswer ? (correct ? "ok" : "no") : showAnswers && !correct ? "arrow" : "";
+          const mark = checked && hasAnswer ? (correct ? "ok" : "no") : "";
           return (
             <div className="word-snake-question" key={index}>
               <span className="word-snake-number">{index + 1}.</span>
               <p>{item.before}<input aria-label={"Answer " + (index + 1)} className={"word-snake-gap" + (checked && correct ? " is-correct" : "") + (checked && hasAnswer && !correct ? " is-wrong" : "")} value={values[index]} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => { setValues((current) => current.map((value, i) => i === index ? event.target.value : value)); setChecked(false); setShowAnswers(false); }} />{item.after}</p>
-              <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect" : mark === "arrow" ? "Answer shown" : ""}>{mark === "ok" ? "✓" : mark === "no" ? "×" : mark === "arrow" ? "→" : ""}</span>
+              <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect" : ""}>{mark === "ok" ? "✓" : mark === "no" ? "×" : ""}</span>
             </div>
           );
         })}
       </div>
       {checked && <div className="word-snake-controls">
-        <button type="button" className="is-ghost" onClick={() => { setValues((current) => current.map((value, index) => SNAKE_ITEMS[index].answers[0])); setShowAnswers(true); }}>Show answers</button>
         <strong className="word-snake-score">{rightCount} / {SNAKE_ITEMS.length}</strong>
       </div>}
     </section>
@@ -334,7 +328,6 @@ export default function Home() {
               <button className="primary-button" type="submit" disabled={loading}>{loading ? "Checking…" : "Enter my space"} {!loading && <span>↗</span>}</button>
             </form>
             <p className="privacy-note">Your personal code is private. Keep it to yourself.</p>
-            <p className="privacy-note"><a href="/teacher" style={{color:"inherit"}}>Teacher login ↗</a></p>
           </div>
         </section>
       ) : (
@@ -356,16 +349,14 @@ export default function Home() {
                 <p className="eyebrow">ALL HOMEWORK</p>
                 {homework.map((task) => (
                   <button className={`homework-list-item ${activeHomeworkId === task.id ? "is-active" : ""}`} key={task.id} onClick={() => setActiveHomeworkId(task.id)}>
-                    <span><small>{task.description || "ASSIGNMENT"}</small><strong>{task.title}</strong></span>
+                    <span><strong>{task.title}</strong></span>
                     <span className="homework-list-arrow" aria-hidden="true">↗</span>
                   </button>
                 ))}
               </nav>
               {homework.filter((task) => task.id === activeHomeworkId).map((task) => (
                 <article className="homework-card" key={task.id}>
-                  <p className="eyebrow">{task.description || "YOUR ASSIGNMENT"}</p>
                   <h2>{task.title}</h2>
-                  <p className="card-copy">Work through each section and enter your answers.</p>
                   {task.exercises?.map((section, index) => (
                     <section className="exercise-section" key={section.id}>
                       <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p>{section.instructions}</p>}</div></div>
@@ -388,7 +379,7 @@ export default function Home() {
                       })}
                     </section>
                   ))}
-                  {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <><WordSnakeExercise checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} /><SampleCrossword checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} /></>}
+                  {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <section className="exercise-section word-snake-section"><div className="section-heading"><span className="section-number">{String((task.exercises?.length || 0) + 1).padStart(2, "0")}</span><div><h3>Find the verbs in the word snake</h3><p>Complete the sentences using verbs from the word snake in the correct form.</p></div></div><WordSnakeExercise checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} /></section>}
                   <div className="whole-homework-controls">
                     <button type="button" onClick={() => setActivityCheckTrigger((value) => value + 1)}>Check</button>
                     <button type="button" onClick={() => { try { const saved: Record<string, string> = {}; Object.entries(answers).forEach(([key, value]) => { const prefix = task.id + "::"; if (key.startsWith(prefix)) saved[key.slice(prefix.length)] = value; }); localStorage.setItem("hw-answers|" + task.id, JSON.stringify(saved)); setSaveNotice("Saved on this device"); } catch { setSaveNotice("Could not save on this device"); } }}>Save</button>
