@@ -62,7 +62,7 @@ const SNAKE_ITEMS: Array<{ before: string; answers: string[]; after: string }> =
   { before: "The noise was so loud that nobody could ", answers: ["endure", "bear"], after: " it any longer." }
 ];
 
-function WordSnakeExercise() {
+function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: number; resetTrigger: number }) {
   const [rings, setRings] = useState<Array<[number, number]>>([]);
   const [start, setStart] = useState<number | null>(null);
   const [values, setValues] = useState<string[]>(() => SNAKE_ITEMS.map(() => ""));
@@ -79,6 +79,9 @@ function WordSnakeExercise() {
     setStart(null);
   };
   const rightCount = SNAKE_ITEMS.filter((_, index) => isCorrect(index)).length;
+
+  useEffect(() => { if (checkTrigger) { setChecked(true); setShowAnswers(false); } }, [checkTrigger]);
+  useEffect(() => { if (resetTrigger) { setValues(SNAKE_ITEMS.map(() => "")); setRings([]); setStart(null); setChecked(false); setShowAnswers(false); } }, [resetTrigger]);
 
   return (
     <section className="word-snake-exercise">
@@ -126,6 +129,45 @@ function WordSnakeExercise() {
   );
 }
 
+
+const CROSSWORD_WORDS = [
+  { id: "endure", word: "ENDURE", clue: "to suffer something difficult or unpleasant without giving up", row: 0, col: 4, direction: "down" as const },
+  { id: "face", word: "FACE", clue: "to accept and deal with a difficult situation", row: 1, col: 1, direction: "down" as const },
+  { id: "rely", word: "RELY", clue: "to trust or depend on someone", row: 2, col: 3, direction: "across" as const },
+  { id: "bear", word: "BEAR", clue: "to tolerate or accept something unpleasant", row: 4, col: 0, direction: "across" as const }
+];
+
+function SampleCrossword({ checkTrigger, resetTrigger }: { checkTrigger: number; resetTrigger: number }) {
+  const [letters, setLetters] = useState<Record<string, string>>({});
+  const [checked, setChecked] = useState(false);
+  const cells: Record<string, { letter: string; words: string[] }> = {};
+  CROSSWORD_WORDS.forEach((entry) => entry.word.split("").forEach((letter, index) => {
+    const row = entry.row + (entry.direction === "down" ? index : 0);
+    const col = entry.col + (entry.direction === "across" ? index : 0);
+    const key = row + "-" + col;
+    if (!cells[key]) cells[key] = { letter, words: [] };
+    cells[key].words.push(entry.id);
+  }));
+  const rows = Array.from({ length: 6 }, (_, row) => Array.from({ length: 7 }, (_, col) => ({ row, col, cell: cells[row + "-" + col] })));
+  const isWordCorrect = (entry: typeof CROSSWORD_WORDS[number]) => entry.word.split("").every((letter, index) => {
+    const row = entry.row + (entry.direction === "down" ? index : 0);
+    const col = entry.col + (entry.direction === "across" ? index : 0);
+    return (letters[row + "-" + col] || "").toUpperCase() === letter;
+  });
+  useEffect(() => { if (checkTrigger) setChecked(true); }, [checkTrigger]);
+  useEffect(() => { if (resetTrigger) { setLetters({}); setChecked(false); } }, [resetTrigger]);
+  return <section className="sample-crossword">
+    <div className="word-snake-heading"><h3>Crossword · Verb patterns</h3><p>Complete the crossword using the clues. One letter goes in each square.</p></div>
+    <div className="crossword-grid" role="group" aria-label="Crossword grid">
+      {rows.flatMap((row) => row.map(({ row: r, col, cell }) => cell ? <input key={r + "-" + col} aria-label={"Row " + (r + 1) + ", column " + (col + 1)} maxLength={1} value={letters[r + "-" + col] || ""} className={checked ? (cell.words.every((id) => isWordCorrect(CROSSWORD_WORDS.find((entry) => entry.id === id)!)) ? "crossword-letter is-correct" : "crossword-letter is-wrong") : "crossword-letter"} onChange={(event) => { setLetters((current) => ({ ...current, [r + "-" + col]: event.target.value.slice(-1).toUpperCase() })); setChecked(false); }} /> : <span key={r + "-" + col} className="crossword-empty" />))}
+    </div>
+    <div className="crossword-clues">
+      {CROSSWORD_WORDS.map((entry, index) => <div className="crossword-clue" key={entry.id}><strong>{index + 1}. {entry.direction === "across" ? "Across" : "Down"}</strong><span>{entry.clue}</span>{checked && <b>{isWordCorrect(entry) ? "✓" : "×"}</b>}</div>)}
+    </div>
+    <div className="word-snake-controls"><button type="button" onClick={() => setChecked(true)}>Check crossword</button><button type="button" className="is-ghost" onClick={() => { setLetters({}); setChecked(false); }}>Reset crossword</button>{checked && <strong className="word-snake-score">{CROSSWORD_WORDS.filter(isWordCorrect).length} / {CROSSWORD_WORDS.length}</strong>}</div>
+  </section>;
+}
+
 export default function Home() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -137,6 +179,9 @@ export default function Home() {
   const [homeworkLoading, setHomeworkLoading] = useState(false);
   const [activeHomeworkId, setActiveHomeworkId] = useState<string | null>(null);
   const [crossedWords, setCrossedWords] = useState<Record<string, boolean>>({});
+  const [activityCheckTrigger, setActivityCheckTrigger] = useState(0);
+  const [activityResetTrigger, setActivityResetTrigger] = useState(0);
+  const [saveNotice, setSaveNotice] = useState("");
 
   useEffect(() => {
     if (!signedIn || homework.length === 0) return;
@@ -338,8 +383,14 @@ export default function Home() {
                       })}
                     </section>
                   ))}
-                  {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <WordSnakeExercise />}
-                  <a className="telegram-button" href={telegramShareUrl(task, answers)} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
+                  {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <><WordSnakeExercise checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} /><SampleCrossword checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} /></>}
+                  <div className="whole-homework-controls">
+                    <button type="button" onClick={() => setActivityCheckTrigger((value) => value + 1)}>Check</button>
+                    <button type="button" onClick={() => { try { const saved: Record<string, string> = {}; Object.entries(answers).forEach(([key, value]) => { const prefix = task.id + "::"; if (key.startsWith(prefix)) saved[key.slice(prefix.length)] = value; }); localStorage.setItem("hw-answers|" + task.id, JSON.stringify(saved)); setSaveNotice("Saved on this device"); } catch { setSaveNotice("Could not save on this device"); } }}>Save</button>
+                    <button type="button" className="is-ghost" onClick={() => { setAnswers((current) => { const next = { ...current }; Object.keys(next).forEach((key) => { if (key.startsWith(task.id + "::")) delete next[key]; }); return next; }); try { localStorage.removeItem("hw-answers|" + task.id); } catch {} setActivityResetTrigger((value) => value + 1); setSaveNotice("Exercise reset"); }}>Reset</button>
+                    {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
+                    <a className="telegram-button" href={telegramShareUrl(task, answers)} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
+                  </div>
                   <p className="privacy-note">Your draft answers are saved on this device and will be here when you return using this browser.</p>
                 </article>
               ))}
