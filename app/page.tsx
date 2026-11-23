@@ -371,7 +371,7 @@ export default function Home() {
           <div className="dashboard-heading">
             <div>
               <p className="eyebrow">YOUR LEARNING SPACE</p>
-              <h1>Welcome, <em>{name.trim()}.</em></h1>
+              <h1>Welcome, <em>{name.trim().charAt(0).toUpperCase() + name.trim().slice(1)}.</em></h1>
             </div>
             <button className="secondary-button signout" onClick={handleSignOut}>Sign out</button>
           </div>
