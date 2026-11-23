@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type Student = { id: string; name: string; created_at: string };
 type Homework = { id: string; student_id: string; title: string; description: string | null; published: boolean; created_at: string; due_at: string | null };
@@ -56,15 +57,15 @@ export default function TeacherArea() {
   const visibleHomework = useMemo(() => selected === "all" ? homework : homework.filter(item => item.student_id === selected), [selected, homework]);
 
   if (!loggedIn) return <main className="page-shell">
-    <header className="topbar"><a className="wordmark" href="/"><span className="wordmark-mark">e.</span><span>ENGLISH WITH KSENIA</span></a><span className="topbar-note">TEACHER ACCESS</span></header>
+    <header className="topbar"><Link className="wordmark" href="/"><span className="wordmark-mark">e.</span><span>ENGLISH WITH KSENIA</span></Link><span className="topbar-note">TEACHER ACCESS</span></header>
     <section className="hero">
-      <div className="hero-copy"><p className="eyebrow">PRIVATE TEACHER SPACE</p><h1>Your students.<br/><em>One overview.</em></h1><p className="intro">Manage your students' homework and review their submitted work in one place.</p></div>
+      <div className="hero-copy"><p className="eyebrow">PRIVATE TEACHER SPACE</p><h1>Your students.<br/><em>One overview.</em></h1><p className="intro">Manage your students&apos; homework and review their submitted work in one place.</p></div>
       <div className="login-card"><p className="eyebrow">TEACHER LOGIN</p><h2>Welcome back.</h2><p className="card-copy">Sign in with your private teacher access code.</p><form onSubmit={login}><label htmlFor="teacher-name">Username</label><input id="teacher-name" value="K" readOnly aria-label="Username K"/><label htmlFor="teacher-code">Private access code</label><input id="teacher-code" type="password" autoComplete="current-password" value={code} onChange={e=>setCode(e.target.value)} required/><button className="primary-button" disabled={loading}>{loading?"Checking…":"Enter teacher area"} <span>↗</span></button>{error&&<p className="error-message" role="alert">{error}</p>}</form><p className="privacy-note">This area is private. Do not share your teacher code.</p></div>
-    </section><footer className="footer"><span>ENGLISH WITH KSENIA</span><a href="/">STUDENT LOGIN</a></footer>
+    </section><footer className="footer"><span>ENGLISH WITH KSENIA</span><a href="/">STUDENT LOGIN</Link></footer>
   </main>;
 
   return <main className="page-shell">
-    <header className="topbar"><a className="wordmark" href="/"><span className="wordmark-mark">e.</span><span>ENGLISH WITH KSENIA</span></a><button className="secondary-button signout" onClick={logout}>Sign out</button></header>
+    <header className="topbar"><Link className="wordmark" href="/"><span className="wordmark-mark">e.</span><span>ENGLISH WITH KSENIA</span></Link><button className="secondary-button signout" onClick={logout}>Sign out</button></header>
     <section className="dashboard">
       <div className="dashboard-heading"><div><p className="eyebrow">PRIVATE TEACHER SPACE</p><h1>Your <em>students.</em></h1><p className="intro">Every student, their homework and submitted results.</p></div></div>
       <div className="teacher-stats"><div><strong>{students.length}</strong><span>STUDENTS</span></div><div><strong>{homework.length}</strong><span>ASSIGNMENTS</span></div><div><strong>{submissions.length}</strong><span>SUBMISSIONS</span></div></div>
