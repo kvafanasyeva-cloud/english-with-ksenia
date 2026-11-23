@@ -609,20 +609,24 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   margin-top: 28px;
   padding-top: 24px;
 }
-/* Put answer fields underneath prompts in writing exercises. */
-.exercise-section.answers-under .question {
+/* All typing exercises use a full-width answer line underneath the prompt. */
+.question.answers-under {
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: 7px;
 }
-.exercise-section.answers-under .question input {
+.question.answers-under input {
   width: 100%;
-  min-height: 34px;
-  padding: 5px 2px;
+  min-height: 38px;
+  padding: 6px 2px;
   border: 0;
   border-bottom: 1px solid var(--ink);
   border-radius: 0;
   background: transparent;
+  font-size: 18px;
+}
+.question.answers-under label {
+  font-size: 15px;
 }
 /* Make the start of each across/down answer easy to identify. */
 .crossword-cell-wrap[class*="crossword-start-"] .crossword-letter {
