@@ -69,7 +69,7 @@ function WordSnakeExercise() {
   const [checked, setChecked] = useState(false);
   const [showAnswers, setShowAnswers] = useState(false);
   const letters = SNAKE_WORDS.join("").split("");
-  const normalise = (value: string) => value.trim().toLowerCase().replace(/\\s+/g, " ");
+  const normalise = (value: string) => value.trim().toLowerCase().replace(/\s+/g, " ");
   const isCorrect = (index: number) => SNAKE_ITEMS[index].answers.includes(normalise(values[index]));
   const chooseLetter = (index: number) => {
     if (start === null) { setStart(index); return; }
