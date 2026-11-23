@@ -322,21 +322,21 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .homework-list-arrow { font-size: 17px; }
 
 .word-bank-word {
-  padding: 5px 8px;
-  border: 1px solid #c9c9c9;
-  border-radius: 6px;
-  background: #fff;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--ink);
   font-size: 18px;
-  line-height: 1.25;
+  line-height: 1.4;
   cursor: pointer;
 }
-.word-bank-word:hover { border-color: var(--ink); }
+.word-bank-word:hover { text-decoration: underline; }
 .word-bank-word.is-crossed {
   color: #888;
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
-  background: #ededed;
+  background: transparent;
 }
 
 
