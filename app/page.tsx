@@ -391,7 +391,7 @@ export default function Home() {
                   <div className="whole-homework-controls">
                     <button type="button" onClick={() => setActivityCheckTrigger((value) => value + 1)}>Check</button>
                     <button type="button" onClick={() => { try { const saved: Record<string, string> = {}; Object.entries(answers).forEach(([key, value]) => { const prefix = task.id + "::"; if (key.startsWith(prefix)) saved[key.slice(prefix.length)] = value; }); localStorage.setItem("hw-answers|" + task.id, JSON.stringify(saved)); setSaveNotice("Saved on this device"); } catch { setSaveNotice("Could not save on this device"); } }}>Save</button>
-                    <button type="button" className="is-ghost" onClick={() => { setAnswers((current) => { const next = { ...current }; Object.keys(next).forEach((key) => { if (key.startsWith(task.id + "::")) delete next[key]; }); return next; }); try { localStorage.removeItem("hw-answers|" + task.id); } catch {} setActivityResetTrigger((value) => value + 1); setSaveNotice("Exercise reset"); }}>Reset</button>
+                    <button type="button" className="is-ghost" onClick={() => { setAnswers((current) => { const next = { ...current }; Object.keys(next).forEach((key) => { if (key.startsWith(task.id + "::")) delete next[key]; }); return next; }); try { localStorage.removeItem("hw-answers|" + task.id); } catch {} setActivityResetTrigger((value) => value + 1); setSaveNotice(""); }}>Reset</button>
                     {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
                     <a className="telegram-button" href={telegramShareUrl(task, answers)} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
                   </div>
