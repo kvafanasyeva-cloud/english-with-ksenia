@@ -17,7 +17,7 @@ const KATE_NOV_21_HOMEWORK = {
       type: "gap",
       title: "Complete the sentences",
       instructions: "Use the words in the box. Change the form if necessary.",
-      word_bank: ["cancel", "add up", "consider", "celebrate", "defend", "comprehend", "opinion", "holiday"],
+      word_bank: ["cancel", "add up", "consider", "celebrate", "defend", "comprehend", "opinion", "holiday", "door"],
       items: [
         { number: 1, prompt: "We had to ___ the meeting because the teacher was ill." },
         { number: 2, prompt: "These numbers don't ___ . Can you check them again?" },
@@ -26,7 +26,8 @@ const KATE_NOV_21_HOMEWORK = {
         { number: 5, prompt: "It's important to ___ your point of view with clear reasons." },
         { number: 6, prompt: "I didn't ___ what he was trying to explain." },
         { number: 7, prompt: "In my ___, this is the best solution." },
-        { number: 8, prompt: "We usually travel abroad during the summer ___." }
+        { number: 8, prompt: "We usually travel abroad during the summer ___." },
+        { number: 9, prompt: "Please close the ___ quietly when you leave." }
       ]
     },
     {
@@ -58,7 +59,7 @@ const KATE_NOV_21_HOMEWORK = {
         { number: 1, prompt: "The way you see yourself is called your ___.", cue: "self-perception" },
         { number: 2, prompt: "The plural of 'child' is ___.", cue: "child" },
         { number: 3, prompt: "___ it was raining, we went for a walk.", cue: "even though" },
-        { number: 4, prompt: "There were several ___ people waiting outside.", cue: "other" },
+        { number: 4, prompt: "There were several ___ waiting outside.", cue: "other people" },
         { number: 5, prompt: "Please don't ___ me for something I didn't do.", cue: "defend" }
       ]
     },
