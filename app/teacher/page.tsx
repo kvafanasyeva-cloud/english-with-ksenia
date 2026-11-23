@@ -7,6 +7,76 @@ type Student = { id: string; name: string; created_at: string };
 type Homework = { id: string; student_id: string; title: string; description: string | null; published: boolean; created_at: string; due_at: string | null };
 type Submission = { id: string; student_id: string; homework_id: string; score: number | null; submitted_at: string };
 
+
+const KATE_NOV_21_HOMEWORK = {
+  title: "21.11 · B1 vocabulary",
+  description: "21 November · Vocabulary practice",
+  exercises: [
+    {
+      id: "nov21-gap-fill",
+      type: "gap",
+      title: "Complete the sentences",
+      instructions: "Use the words in the box. Change the form if necessary.",
+      word_bank: ["cancel", "add up", "consider", "celebrate", "defend", "comprehend", "opinion", "holiday"],
+      items: [
+        { number: 1, prompt: "We had to ___ the meeting because the teacher was ill." },
+        { number: 2, prompt: "These numbers don't ___ . Can you check them again?" },
+        { number: 3, prompt: "Have you ever ___ moving to another country?" },
+        { number: 4, prompt: "We're going to ___ my sister's birthday this weekend." },
+        { number: 5, prompt: "It's important to ___ your point of view with clear reasons." },
+        { number: 6, prompt: "I didn't ___ what he was trying to explain." },
+        { number: 7, prompt: "In my ___, this is the best solution." },
+        { number: 8, prompt: "We usually travel abroad during the summer ___." }
+      ]
+    },
+    {
+      id: "nov21-matching",
+      type: "matching",
+      title: "Match the phrases and meanings",
+      instructions: "Choose the correct meaning for each phrase.",
+      options: [
+        { id: "a", text: "to understand something" },
+        { id: "b", text: "to agree with someone" },
+        { id: "c", text: "to be busy doing your job" },
+        { id: "d", text: "to tell someone something" },
+        { id: "e", text: "to understand or hear something with difficulty" }
+      ],
+      items: [
+        { number: 1, prompt: "quite get / catch it" },
+        { number: 2, prompt: "agree" },
+        { number: 3, prompt: "at work" },
+        { number: 4, prompt: "say something to you" },
+        { number: 5, prompt: "comprehend" }
+      ]
+    },
+    {
+      id: "nov21-complete",
+      type: "write",
+      title: "Complete the sentences",
+      instructions: "Use the words and phrases in brackets. Make any necessary changes.",
+      items: [
+        { number: 1, prompt: "The way you see yourself is called your ___.", cue: "self-perception" },
+        { number: 2, prompt: "The plural of 'child' is ___.", cue: "child" },
+        { number: 3, prompt: "___ it was raining, we went for a walk.", cue: "even though" },
+        { number: 4, prompt: "There were several ___ people waiting outside.", cue: "other" },
+        { number: 5, prompt: "Please don't ___ me for something I didn't do.", cue: "defend" }
+      ]
+    },
+    {
+      id: "nov21-rewrite",
+      type: "rewrite",
+      title: "Rewrite the sentences",
+      instructions: "Rewrite each sentence using the word or phrase given. Keep the meaning the same.",
+      items: [
+        { number: 1, prompt: "I don't understand what you mean. (quite get)", cue: "quite get" },
+        { number: 2, prompt: "I agree with your opinion. (share)", cue: "share" },
+        { number: 3, prompt: "Although she was tired, she finished the task. (even though)", cue: "even though" },
+        { number: 4, prompt: "I will tell you my decision tomorrow. (say)", cue: "say" }
+      ]
+    }
+  ]
+};
+
 export default function TeacherArea() {
   const [code, setCode] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
@@ -16,6 +86,8 @@ export default function TeacherArea() {
   const [homework, setHomework] = useState<Homework[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selected, setSelected] = useState("all");
+  const [creatingHomework, setCreatingHomework] = useState(false);
+  const [createNotice, setCreateNotice] = useState("");
 
   async function loadData() {
     const response = await fetch("/api/teacher/data", { cache: "no-store" });
@@ -49,6 +121,30 @@ export default function TeacherArea() {
     } finally { setLoading(false); }
   }
 
+  async function createKateHomework() {
+    const kate = students.find((student) => student.name.trim().toLowerCase() === "kate");
+    if (!kate) { setCreateNotice("Kate was not found in your student list."); return; }
+    if (homework.some((item) => item.student_id === kate.id && item.title === KATE_NOV_21_HOMEWORK.title)) {
+      setCreateNotice("This homework already exists for Kate."); return;
+    }
+    setCreatingHomework(true);
+    setCreateNotice("");
+    try {
+      const response = await fetch("/api/teacher/homework", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: kate.id, ...KATE_NOV_21_HOMEWORK, published: true })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not create homework.");
+      setCreateNotice("Kate’s 21.11 homework has been created and published.");
+      await loadData();
+      setSelected(kate.id);
+    } catch (err) {
+      setCreateNotice(err instanceof Error ? err.message : "Could not create homework.");
+    } finally { setCreatingHomework(false); }
+  }
+
   async function logout() {
     await fetch("/api/teacher/logout", { method: "POST" });
     setLoggedIn(false); setStudents([]); setHomework([]); setSubmissions([]);
@@ -69,6 +165,7 @@ export default function TeacherArea() {
     <section className="dashboard">
       <div className="dashboard-heading"><div><p className="eyebrow">PRIVATE TEACHER SPACE</p><h1>Your <em>students.</em></h1><p className="intro">Every student, their homework and submitted results.</p></div></div>
       <div className="teacher-stats"><div><strong>{students.length}</strong><span>STUDENTS</span></div><div><strong>{homework.length}</strong><span>ASSIGNMENTS</span></div><div><strong>{submissions.length}</strong><span>SUBMISSIONS</span></div></div>
+      <div className="homework-list"><p className="eyebrow">QUICK CREATE</p><p className="card-copy">Create and publish the prepared B1 vocabulary homework for Kate.</p><button className="primary-button" type="button" onClick={createKateHomework} disabled={creatingHomework || !students.some((student) => student.name.trim().toLowerCase() === "kate")}>{creatingHomework ? "Creating…" : "Create Kate’s 21.11 homework"} <span>↗</span></button>{createNotice && <p className="card-copy" role="status">{createNotice}</p>}</div>
       <nav className="homework-list"><p className="eyebrow">STUDENTS</p><button className={selected==="all"?"homework-list-item is-active":"homework-list-item"} onClick={()=>setSelected("all")}><span><strong>All students</strong></span><span className="homework-list-arrow">{students.length}</span></button>{students.map(student=><button key={student.id} className={selected===student.id?"homework-list-item is-active":"homework-list-item"} onClick={()=>setSelected(student.id)}><span><strong>{student.name}</strong><small>Joined {new Date(student.created_at).toLocaleDateString()}</small></span><span className="homework-list-arrow">↗</span></button>)}</nav>
       <div className="homework-list"><p className="eyebrow">HOMEWORK {selected!=="all"?"· "+(students.find(s=>s.id===selected)?.name||""):"· ALL STUDENTS"}</p>{visibleHomework.map(item=><article className="homework-list-item" key={item.id}><span><small>{students.find(s=>s.id===item.student_id)?.name||"Student"} · {item.description||new Date(item.created_at).toLocaleDateString()}</small><strong>{item.title}</strong></span><span className="tag">{item.published?"Published":"Draft"} · {submissions.filter(s=>s.homework_id===item.id).length} submissions</span></article>)}{visibleHomework.length===0&&<p className="card-copy">No homework for this selection yet.</p>}</div>
       {error&&<p className="error-message">{error}</p>}
