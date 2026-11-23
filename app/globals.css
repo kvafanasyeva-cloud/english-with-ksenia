@@ -185,6 +185,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   margin: 0 0 28px;
   padding: 30px;
   border: 1px solid var(--line);
+  border-radius: 14px;
   background: #fff;
 }
 .homework-card > .eyebrow { margin-bottom: 12px; }
@@ -223,6 +224,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   gap: 9px;
   margin: 0 0 22px 44px;
   padding: 14px;
+  border-radius: 10px;
   background: var(--soft);
 }
 .word-bank strong {
@@ -320,7 +322,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .word-bank-word {
   padding: 5px 8px;
   border: 1px solid #c9c9c9;
-  border-radius: 0;
+  border-radius: 6px;
   background: #fff;
   color: var(--ink);
   font-size: 18px;
