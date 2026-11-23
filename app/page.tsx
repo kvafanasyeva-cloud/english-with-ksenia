@@ -48,6 +48,77 @@ function telegramShareUrl(task: Homework, answers: Record<string, string>) {
 }
 
 
+const KATE_NOV_21_HOMEWORK: Homework = {
+  id: "kate-2026-11-21-b1-vocabulary",
+  title: "21.11 · B1 vocabulary",
+  description: "21 November · Vocabulary practice",
+  exercises: [
+    {
+      id: "nov21-gap-fill",
+      type: "gap",
+      title: "Complete the sentences",
+      instructions: "Use the words in the box. Change the form if necessary.",
+      word_bank: ["cancel", "add up", "consider", "celebrate", "defend", "comprehend", "opinion", "holiday", "door"],
+      items: [
+        { number: 1, prompt: "We had to ___ the meeting because the teacher was ill." },
+        { number: 2, prompt: "These numbers don't ___ . Can you check them again?" },
+        { number: 3, prompt: "Have you ever ___ moving to another country?" },
+        { number: 4, prompt: "We're going to ___ my sister's birthday this weekend." },
+        { number: 5, prompt: "It's important to ___ your point of view with clear reasons." },
+        { number: 6, prompt: "I didn't ___ what he was trying to explain." },
+        { number: 7, prompt: "In my ___, this is the best solution." },
+        { number: 8, prompt: "We usually travel abroad during the summer ___." },
+        { number: 9, prompt: "Please close the ___ quietly when you leave." }
+      ]
+    },
+    {
+      id: "nov21-matching",
+      type: "matching",
+      title: "Match the phrases and meanings",
+      instructions: "Choose the correct meaning for each phrase.",
+      options: [
+        { id: "a", text: "to understand something" },
+        { id: "b", text: "to agree with someone" },
+        { id: "c", text: "to be busy doing your job" },
+        { id: "d", text: "to tell someone something" },
+        { id: "e", text: "to understand or hear something with difficulty" }
+      ],
+      items: [
+        { number: 1, prompt: "quite get / catch it" },
+        { number: 2, prompt: "agree" },
+        { number: 3, prompt: "at work" },
+        { number: 4, prompt: "say something to you" },
+        { number: 5, prompt: "comprehend" }
+      ]
+    },
+    {
+      id: "nov21-complete",
+      type: "write",
+      title: "Complete the sentences",
+      instructions: "Use the words and phrases in brackets. Make any necessary changes.",
+      items: [
+        { number: 1, prompt: "The way you see yourself is called your ___.", cue: "self-perception" },
+        { number: 2, prompt: "The plural of 'child' is ___.", cue: "child" },
+        { number: 3, prompt: "___ it was raining, we went for a walk.", cue: "even though" },
+        { number: 4, prompt: "There were several ___ waiting outside.", cue: "other people" },
+        { number: 5, prompt: "Please don't ___ me for something I didn't do.", cue: "defend" }
+      ]
+    },
+    {
+      id: "nov21-rewrite",
+      type: "rewrite",
+      title: "Rewrite the sentences",
+      instructions: "Rewrite each sentence using the word or phrase given. Keep the meaning the same.",
+      items: [
+        { number: 1, prompt: "I don't understand what you mean. (quite get)", cue: "quite get" },
+        { number: 2, prompt: "I agree with your opinion. (share)", cue: "share" },
+        { number: 3, prompt: "Although she was tired, she finished the task. (even though)", cue: "even though" },
+        { number: 4, prompt: "I will tell you my decision tomorrow. (say)", cue: "say" }
+      ]
+    }
+  ]
+};
+
 const SNAKE_WORDS = ["face", "bear", "rely", "put", "go", "fall", "take", "get", "pay", "endure"];
 const SNAKE_EXAMPLE = ["We need to ", "face", " the fact that the old system doesn't work any more."];
 const SNAKE_ITEMS: Array<{ before: string; answers: string[]; after: string }> = [
@@ -214,7 +285,12 @@ export default function Home() {
     if (homeworkError) {
       setError("You're signed in, but we couldn't load your homework. Please try again.");
     } else {
-      setHomework((data || []) as Homework[]);
+      const databaseHomework = (data || []) as Homework[];
+      const visibleHomework = name.trim().toLowerCase() === "kate" &&
+        !databaseHomework.some((task) => task.id === KATE_NOV_21_HOMEWORK.id)
+        ? [KATE_NOV_21_HOMEWORK, ...databaseHomework]
+        : databaseHomework;
+      setHomework(visibleHomework);
     }
     setHomeworkLoading(false);
   }
@@ -306,9 +382,9 @@ export default function Home() {
               <nav className="homework-list" aria-label="Your homework">
                 <p className="eyebrow">ALL HOMEWORK</p>
                 {homework.map((task) => (
-                  <button className={`homework-list-item ${activeHomeworkId === task.id ? "is-active" : ""}`} key={task.id} onClick={() => setActiveHomeworkId(task.id)}>
+                  <button className={`homework-list-item ${activeHomeworkId === task.id ? "is-active" : ""}`} key={task.id} onClick={() => setActiveHomeworkId((current) => current === task.id ? null : task.id)}>
                     <span><strong>{task.title}</strong></span>
-                    <span className="homework-list-arrow" aria-hidden="true">↗</span>
+                    <span className="homework-list-arrow" aria-hidden="true">{activeHomeworkId === task.id ? "−" : "+"}</span>
                   </button>
                 ))}
               </nav>
