@@ -576,3 +576,18 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .question.answers-under label {
   font-size: 15px;
 }
+
+
+/* Larger, easier-to-read exercise text. */
+.exercise-section .section-heading h3 { font-size: 21px; }
+.exercise-section .section-heading p { font-size: 15px; }
+.exercise-section .question label { font-size: 17px; line-height: 1.7; }
+.exercise-section .question input,
+.exercise-section .question select { font-size: 17px; }
+.exercise-section .word-bank strong { font-size: 13px; }
+.exercise-section .word-bank-word { font-size: 20px; }
+.word-snake-note { font-size: 14px; }
+.word-snake-example { font-size: 16px; }
+.word-snake-question p { font-size: 17px; line-height: 1.7; }
+.word-snake-number { font-size: 15px; }
+.word-snake-gap { font-size: 17px; }
