@@ -403,14 +403,14 @@ export default function Home() {
                         const answerKey = `${task.id}::${displayNumber}`;
                         return (
                           <div className={`question${section.type === "matching" ? "" : " answers-under"}`} key={item.number}>
-                            <label htmlFor={`answer-${task.id}-${item.number}`}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
+                            <label htmlFor={`answer-${task.id}-${displayNumber}`}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
                             {section.type === "matching" ? (
-                              <select id={`answer-${task.id}-${item.number}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
+                              <select id={`answer-${task.id}-${displayNumber}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
                                 <option value="">Choose a meaning…</option>
                                 {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
                               </select>
                             ) : (
-                              <input id={`answer-${task.id}-${item.number}`} type="text" spellCheck={false} autoCorrect="off" placeholder={item.cue ? `Use: ${item.cue}` : ""} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)} />
+                              <input id={`answer-${task.id}-${displayNumber}`} type="text" spellCheck={false} autoCorrect="off" placeholder={item.cue ? `Use: ${item.cue}` : ""} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)} />
                             )}
                           </div>
                         );
