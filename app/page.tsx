@@ -117,6 +117,19 @@ const KATE_NOV_21_HOMEWORK: Homework = {
         { number: 3, prompt: "Although she was tired, she finished the task. (even though)" },
         { number: 4, prompt: "I will tell you my decision tomorrow. (say)" }
       ]
+    },
+    {
+      id: "nov21-error-correction",
+      type: "error-correction",
+      title: "Correct the mistakes",
+      instructions: "Each sentence contains one mistake. Rewrite the sentence correctly.",
+      items: [
+        { number: 1, prompt: "I don't can understand what he is saying." },
+        { number: 2, prompt: "Even though it was late, but we kept talking." },
+        { number: 3, prompt: "She explained me her opinion." },
+        { number: 4, prompt: "We have celebrated her birthday last weekend." },
+        { number: 5, prompt: "These figures don't adds up." }
+      ]
     }
   ]
 };
