@@ -366,16 +366,16 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 
 .word-snake-exercise {
   margin-top: 30px;
-  padding: 20px 18px 22px;
-  border: 1px solid var(--ink);
-  border-radius: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
 }
 .word-snake-heading {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
+  padding-top: 0;
+  border-top: 0;
 }
 .word-snake-heading h3 {
   margin: 0;
@@ -551,10 +551,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .save-notice { width: 100%; color: var(--muted); font-size: 12px; }
 .sample-crossword {
   margin-top: 28px;
-  padding: 22px;
-  border: 1px solid var(--line, #dedbd4);
-  border-radius: 12px;
-  background: var(--paper, #fff);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 .crossword-grid {
   display: grid;
