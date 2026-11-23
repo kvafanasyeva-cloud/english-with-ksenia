@@ -18,8 +18,8 @@ function validTeacherSession(request: NextRequest) {
 export async function POST(request: NextRequest) {
   if (!validTeacherSession(request)) return NextResponse.json({ error: "Please log in again." }, { status: 401 });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceKey) return NextResponse.json({ error: "The homework database connection is not configured." }, { status: 503 });
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return NextResponse.json({ error: "The homework database connection is not configured. Please check the Supabase URL and anon key." }, { status: 503 });
 
   let body: { student_id?: string; title?: string; description?: string; exercises?: unknown; published?: boolean };
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
   }
 
   const headers = {
-    apikey: serviceKey,
-    Authorization: `Bearer ${serviceKey}`,
+    apikey: anonKey,
+    Authorization: `Bearer ${anonKey}`,
     "Content-Type": "application/json",
     Prefer: "return=representation",
   };
