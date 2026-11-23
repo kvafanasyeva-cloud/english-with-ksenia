@@ -173,9 +173,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 38px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid var(--line);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 .dashboard-heading .eyebrow { margin-bottom: 12px; }
 .dashboard-heading h1 { font-size: clamp(38px, 5vw, 56px); }
@@ -288,7 +288,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   margin: 0 0 28px;
   border-top: 1px solid var(--line);
 }
-.homework-list > .eyebrow { margin: 0; padding: 16px 0 10px; }
+.homework-list > .eyebrow { margin: 0; padding: 0 0 10px; }
 .homework-list-item {
   width: 100%;
   min-height: 66px;
