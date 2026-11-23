@@ -34,11 +34,13 @@ function telegramShareUrl(task: Homework, answers: Record<string, string>) {
     task.description || "",
     task.title,
     "",
-    ...task.exercises.flatMap((section) => [
+    ...task.exercises.flatMap((section, sectionIndex) => [
       section.title,
-      ...section.items.map((item, index) => {
-        const answer = answers[`${task.id}::${item.number}`] || "(empty)";
-        return `${index + 1}. ${answer}`;
+      ...section.items.map((item, itemIndex) => {
+        const previousItems = task.exercises.slice(0, sectionIndex).reduce((total, exercise) => total + exercise.items.length, 0);
+        const displayNumber = previousItems + itemIndex + 1;
+        const answer = answers[`${task.id}::${displayNumber}`] || "(empty)";
+        return `${displayNumber}. ${answer}`;
       }),
       ""
     ])
@@ -383,7 +385,7 @@ export default function Home() {
                 <p className="eyebrow">ALL HOMEWORK</p>
                 {homework.map((task) => (
                   <button className={`homework-list-item ${activeHomeworkId === task.id ? "is-active" : ""}`} key={task.id} onClick={() => setActiveHomeworkId((current) => current === task.id ? null : task.id)}>
-                    <span><strong>{task.title}</strong></span>
+                    <span><strong>{task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" ? "18.11 · Films, feelings & should have + V3" : task.title}</strong></span>
                     <span className="homework-list-arrow" aria-hidden="true">{activeHomeworkId === task.id ? "−" : "+"}</span>
                   </button>
                 ))}
@@ -398,12 +400,12 @@ export default function Home() {
                       {section.items.map((item, itemIndex) => {
                         const previousItems = task.exercises.slice(0, index).reduce((total, exercise) => total + exercise.items.length, 0);
                         const displayNumber = previousItems + itemIndex + 1;
-                        const answerKey = `${task.id}::${item.number}`;
+                        const answerKey = `${task.id}::${displayNumber}`;
                         return (
                           <div className={`question${section.type === "matching" ? "" : " answers-under"}`} key={item.number}>
                             <label htmlFor={`answer-${task.id}-${item.number}`}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
                             {section.type === "matching" ? (
-                              <select id={`answer-${task.id}-${item.number}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)}>
+                              <select id={`answer-${task.id}-${item.number}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
                                 <option value="">Choose a meaning…</option>
                                 {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
                               </select>
