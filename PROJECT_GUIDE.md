@@ -66,7 +66,9 @@ The visual direction is clean, quiet, modern, and minimal: a learning workspace,
 
 - White / light background, restrained neutral palette, dark readable text.
 - Typography uses Inter and Space Grotesk.
-- Clear hierarchy, generous but controlled spacing, thin dividers, softly rounded homework cards and word-bank chips.
+- Clear hierarchy, generous but controlled spacing, softly rounded homework cards and word-bank chips.
+- Do not show a separator line above **ALL HOMEWORK**; preserve the large vertical gap above the homework list.
+- The word-bank container itself is white with a dashed outline around its edge.
 - Brand header at the top: **e. ENGLISH WITH KSENIA**.
 - Student login: simple name field, personal-code field, and one clear **Enter my space** action.
 - Signed-in view: a short **Welcome, Kate.** greeting (capitalise the student's name), a sign-out action, then the homework list.
@@ -117,6 +119,7 @@ Use 3–4 formats per ordinary homework unless Ksenia asks for a particular stru
 - **Word bank:** show selectable/cross-off-able word chips when the exercise needs a bank. Keep the bank visually distinct and rounded.
 - **Matching:** use a clear dropdown for each item, with the options visible and easy to distinguish.
 - **Sentence completion / rewriting:** do not reveal the target word or answer in a “Use:” placeholder or an explicit cue unless Ksenia specifically asks for hints. Do not add “Use:” tips to these exercise types by default.
+- **Error correction:** each sentence should contain one clear, level-appropriate mistake. Ask the student to rewrite the full sentence correctly.
 - **Instructions:** concise and student-facing. Do not repeat the same instruction unnecessarily.
 - **Writing:** give a clear task and an appropriate target length only when useful.
 - **Word Snake:** keep the interactive letter-selection behaviour, answer gaps, and whole-assignment numbering when included.
@@ -142,7 +145,8 @@ Question numbers must run through the entire homework, not restart at the beginn
 - Level: B1.
 - Current title: **21.11 · Everyday life & communication**.
 - Content is based on the vocabulary supplied by Ksenia for the 21.11 lesson.
-- Four exercises are currently included: gap fill, matching, sentence completion, and rewriting.
+- Five exercises are currently included: gap fill, matching, sentence completion, rewriting, and error correction.
+- The final **Correct the mistakes** exercise has one error per sentence and asks the student to rewrite each sentence correctly.
 - The sentence-completion and rewriting tasks should not show “Use:” hints.
 - Exercise 1 uses inline fillable gaps.
 - Do not change this assignment unless Ksenia asks.
@@ -202,7 +206,8 @@ The project uses Next.js App Router. Main files:
 - [ ] Word Snake / crossword interactions still work when included.
 - [ ] Save and Reset work for the whole assignment.
 - [ ] Telegram handoff includes the entered answers.
-- [ ] No new blank paragraphs or large empty gaps have appeared around Welcome and ALL HOMEWORK.
+- [ ] The large gap above ALL HOMEWORK remains, with no separator line above the list.
+- [ ] The word bank has a white background and dashed outline.
 - [ ] Mobile layout remains usable.
 - [ ] Vercel deployment is **Ready**.
 
