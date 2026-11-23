@@ -125,48 +125,6 @@ function WordSnakeExercise({ checkTrigger, resetTrigger }: { checkTrigger: numbe
 }
 
 
-const CROSSWORD_WORDS = [
-  { id: "endure", word: "ENDURE", clue: "to suffer something difficult or unpleasant without giving up", row: 0, col: 4, direction: "down" as const },
-  { id: "face", word: "FACE", clue: "to accept and deal with a difficult situation", row: 1, col: 1, direction: "down" as const },
-  { id: "rely", word: "RELY", clue: "to trust or depend on someone", row: 4, col: 4, direction: "across" as const },
-  { id: "bear", word: "BEAR", clue: "to tolerate or accept something unpleasant", row: 4, col: 0, direction: "across" as const }
-];
-
-function SampleCrossword({ checkTrigger, resetTrigger }: { checkTrigger: number; resetTrigger: number }) {
-  const [letters, setLetters] = useState<Record<string, string>>({});
-  const [checked, setChecked] = useState(false);
-  const [crosswordLoaded, setCrosswordLoaded] = useState(false);
-  useEffect(() => { try { const raw = localStorage.getItem("kate-sample-crossword"); if (raw) setLetters(JSON.parse(raw)); } catch {} setCrosswordLoaded(true); }, []);
-  useEffect(() => { if (crosswordLoaded) { try { localStorage.setItem("kate-sample-crossword", JSON.stringify(letters)); } catch {} } }, [letters, crosswordLoaded]);
-  const cells: Record<string, { letter: string; words: string[]; number?: number }> = {};
-  CROSSWORD_WORDS.forEach((entry) => entry.word.split("").forEach((letter, index) => {
-    const row = entry.row + (entry.direction === "down" ? index : 0);
-    const col = entry.col + (entry.direction === "across" ? index : 0);
-    const key = row + "-" + col;
-    if (!cells[key]) cells[key] = { letter, words: [] };
-    if (index === 0) cells[key].number = CROSSWORD_WORDS.indexOf(entry) + 1;
-    cells[key].words.push(entry.id);
-  }));
-  const rows = Array.from({ length: 6 }, (_, row) => Array.from({ length: 8 }, (_, col) => ({ row, col, cell: cells[row + "-" + col] })));
-  const isWordCorrect = (entry: typeof CROSSWORD_WORDS[number]) => entry.word.split("").every((letter, index) => {
-    const row = entry.row + (entry.direction === "down" ? index : 0);
-    const col = entry.col + (entry.direction === "across" ? index : 0);
-    return (letters[row + "-" + col] || "").toUpperCase() === letter;
-  });
-  useEffect(() => { if (checkTrigger) setChecked(true); }, [checkTrigger]);
-  useEffect(() => { if (resetTrigger) { setLetters({}); setChecked(false); } }, [resetTrigger]);
-  return <section className="sample-crossword">
-    <div className="word-snake-heading"><h3>Crossword · Verb patterns</h3><p>Complete the crossword using the clues. One letter goes in each square.</p></div>
-    <div className="crossword-grid" role="group" aria-label="Crossword grid">
-      {rows.flatMap((row) => row.map(({ row: r, col, cell }) => cell ? <div className={"crossword-cell-wrap" + (cell.number ? " crossword-start-" + cell.number : "")} key={r + "-" + col}>{cell.number && <span className="crossword-cell-number">{cell.number}</span>}<input aria-label={"Row " + (r + 1) + ", column " + (col + 1)} maxLength={1} value={letters[r + "-" + col] || ""} className={checked ? (cell.words.every((id) => isWordCorrect(CROSSWORD_WORDS.find((entry) => entry.id === id)!)) ? "crossword-letter is-correct" : "crossword-letter is-wrong") : "crossword-letter"} onChange={(event) => { setLetters((current) => ({ ...current, [r + "-" + col]: event.target.value.slice(-1).toUpperCase() })); setChecked(false); }} /></div> : <span key={r + "-" + col} className="crossword-empty" />))}
-    </div>
-    <div className="crossword-clues">
-      {CROSSWORD_WORDS.map((entry, index) => <div className="crossword-clue" key={entry.id}><strong>{index + 1}. {entry.direction === "across" ? "Across" : "Down"}</strong><span>{entry.clue}</span>{checked && <b>{isWordCorrect(entry) ? "✓" : "×"}</b>}</div>)}
-    </div>
-    {checked && <div className="word-snake-controls"><strong className="word-snake-score">{CROSSWORD_WORDS.filter(isWordCorrect).length} / {CROSSWORD_WORDS.length}</strong></div>}
-  </section>;
-}
-
 export default function Home() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
