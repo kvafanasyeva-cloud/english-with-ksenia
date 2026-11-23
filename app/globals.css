@@ -591,3 +591,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .word-snake-question p { font-size: 17px; line-height: 1.7; }
 .word-snake-number { font-size: 15px; }
 .word-snake-gap { font-size: 17px; }
+
+
+/* Inline answer gaps for sentence-completion exercises. */
+.question:has(.inline-gap-label) { display: block; }
+.inline-gap-label { display: inline; font-size: 17px; line-height: 2.2; font-weight: 600; }
+.inline-gap-input { display: inline-block !important; width: 150px !important; min-width: 90px !important; min-height: 32px !important; margin: 0 6px; padding: 2px 5px !important; border: 0 !important; border-bottom: 1.5px solid var(--ink) !important; border-radius: 0 !important; background: transparent !important; vertical-align: baseline; text-align: center; }
