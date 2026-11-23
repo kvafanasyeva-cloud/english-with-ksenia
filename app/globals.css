@@ -225,8 +225,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   gap: 9px;
   margin: 0 0 22px 44px;
   padding: 14px;
+  border: 1.5px dashed #aaa;
   border-radius: 10px;
-  background: var(--soft);
+  background: #fff;
 }
 .word-bank strong {
   width: 100%;
@@ -286,7 +287,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 
 .homework-list {
   margin: 0 0 28px;
-  border-top: 1px solid var(--line);
+  border-top: 0;
 }
 .homework-list > .eyebrow { margin: 0; padding: 0 0 10px; }
 .homework-list-item {
