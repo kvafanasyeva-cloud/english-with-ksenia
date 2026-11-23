@@ -367,13 +367,13 @@ export default function Home() {
                   <h2>{task.title}</h2>
                   <p className="card-copy">Work through each section and enter your answers.</p>
                   {task.exercises?.map((section, index) => (
-                    <section className={`exercise-section${["Write the correct form", "Build the sentence"].includes(section.title) ? " answers-under" : ""}`} key={section.id}>
+                    <section className="exercise-section" key={section.id}>
                       <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p>{section.instructions}</p>}</div></div>
                       {section.word_bank && <div className="word-bank"><strong>Word bank</strong>{section.word_bank.map((word) => { const wordKey = `${task.id}::${section.id}::${word}`; return <button type="button" className={`word-bank-word ${crossedWords[wordKey] ? "is-crossed" : ""}`} aria-pressed={!!crossedWords[wordKey]} onClick={() => setCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>; })}</div>}
                       {section.items.map((item) => {
                         const answerKey = `${task.id}::${item.number}`;
                         return (
-                          <div className="question" key={item.number}>
+                          <div className={`question${section.type === "matching" ? "" : " answers-under"}`} key={item.number}>
                             <label htmlFor={`answer-${task.id}-${item.number}`}>{item.number}. {item.prompt || item.words?.join(" / ") || ""}</label>
                             {section.type === "matching" ? (
                               <select id={`answer-${task.id}-${item.number}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, item.number, e.target.value)}>
