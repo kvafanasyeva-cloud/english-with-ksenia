@@ -173,8 +173,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 0;
-  padding-bottom: 0;
+  margin-bottom: 38px;
+  padding-bottom: 30px;
   border-bottom: 0;
 }
 .dashboard-heading .eyebrow { margin-bottom: 12px; }
