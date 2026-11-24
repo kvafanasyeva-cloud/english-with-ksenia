@@ -117,6 +117,7 @@ export default function TeacherArea() {
   const [teacherCode, setTeacherCode] = useState("");
   const [teacherAnswers, setTeacherAnswers] = useState<Record<string, string>>({});
   const [teacherGrades, setTeacherGrades] = useState<Record<string, {score:number; total:number; wrong_or_empty:number[]}>>({});
+  const [teacherCrossedWords, setTeacherCrossedWords] = useState<Record<string, boolean>>({});
   const [checkingHomework, setCheckingHomework] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -282,7 +283,7 @@ export default function TeacherArea() {
                 return <section className="teacher-exercise-preview" key={exercise.id || index}>
                   <h3><span>{String(index + 1).padStart(2, "0")}</span>{exercise.title}</h3>
                   {exercise.instructions && <p className="teacher-exercise-instructions">{exercise.instructions}</p>}
-                  {exercise.word_bank?.length ? <div className="teacher-word-bank"><strong>Word bank</strong>{exercise.word_bank.map((word) => <span key={word}>{word}</span>)}</div> : null}
+                  {exercise.word_bank?.length ? <div className="teacher-word-bank"><strong>Word bank</strong>{exercise.word_bank.map((word) => <button type="button" className={teacherCrossedWords[item.id + "::" + exercise.id + "::" + word] ? "teacher-word-crossed" : "teacher-word-choice"} key={word} onClick={() => setTeacherCrossedWords((current)=>({...current,[item.id + "::" + exercise.id + "::" + word]:!current[item.id + "::" + exercise.id + "::" + word]}))}>{word}</button>)}</div> : null}
                   {exercise.snake_words?.length ? <div className="teacher-snake-letters" aria-label="Word snake">{exercise.snake_words.join("").replace(/\s/g, "").split("").map((letter, i) => <span key={i}>{letter}</span>)}</div> : null}
                   {exercise.items?.map((entry, entryIndex) => {
                     const number = offset + entryIndex + 1;
@@ -292,7 +293,7 @@ export default function TeacherArea() {
                       <label htmlFor={"teacher-answer-" + item.id + "-" + number}><span>{number}.</span> {prompt}</label>
                       {exercise.type === "matching" ? <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }}>
                         <option value="">Choose a meaning…</option>{exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.id}. {option.text}</option>)}
-                      </select> : <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }} autoComplete="off" spellCheck={false} />}
+                      </select> : exercise.type === "gap" && prompt.includes("___") ? <label className="teacher-inline-gap" htmlFor={"teacher-answer-" + item.id + "-" + number}><span>{number}.</span> {prompt.split("___")[0]}<input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }} autoComplete="off" spellCheck={false} />{prompt.split("___").slice(1).join("___")}</label> : <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }} autoComplete="off" spellCheck={false} />}
                     </div>;
                   })}
                   {exercise.options?.length && exercise.type !== "matching" ? <div className="teacher-options"><strong>Options:</strong>{exercise.options.map((option) => <span key={option.id}>{option.id}. {option.text}</span>)}</div> : null}
