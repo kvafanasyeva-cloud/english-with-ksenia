@@ -17,12 +17,13 @@ A simple, shared English-learning website where each student signs in with their
 
 The branding is **ENGLISH WITH KSENIA**.
 
-### Product decision: keep it simple
+### Product decision: student portal + teacher space
 
-- There is **no teacher dashboard workflow**. Do not send Ksenia to a separate teacher page or ask her to use a teacher login.
-- Ksenia sends lesson-board screenshots, vocabulary, or lesson notes in chat. The assistant prepares the homework and adds it to the existing student page.
-- Students use the same website link and their own name + personal code.
-- Homework is listed on the student's page and each assignment can be opened or collapsed.
+- Students use the shared website and sign in with their own name and personal code.
+- Ksenia has a separate private teacher area at **/teacher**. It lists every student and every homework assignment, with filters by student and expandable exercise previews.
+- The teacher area must retrieve roster and assignment data through a server-side Supabase Edge Function. Never expose a Supabase secret/service-role key in browser code.
+- Teacher login is currently the simple **username k / code k** requested by Ksenia. This one-character code is intentionally easy to remember but is weak; do not recommend sharing the teacher URL widely until a stronger code is chosen.
+- Ksenia can continue sending lesson-board screenshots, vocabulary, or notes in chat; the assistant can also create and update homework directly in the database.
 - Keep existing published homework intact. Never rewrite, delete, or silently change an old assignment.
 
 ## 2. How the site is built
@@ -42,6 +43,7 @@ The branding is **ENGLISH WITH KSENIA**.
 - Login is verified by the Supabase Edge Function `student-login`.
 - On successful login, the returned Supabase session is set in the browser.
 - Existing published assignments are loaded from the Supabase `homework` table, filtered to `published = true`, newest first.
+- The private teacher area at `/teacher` uses the `teacher-dashboard` Edge Function to retrieve all students, all homework (including drafts), and submission summaries through a server-only Supabase key.
 - Student answers and crossed-out word-bank entries are currently saved in the student's browser using `localStorage`. They are not a cross-device submission system.
 - The Telegram action prepares a message addressed to Ksenia. Do not claim that answers are stored centrally unless that functionality is actually implemented and tested.
 
@@ -56,8 +58,8 @@ This is the current arrangement, not a general-purpose teacher publishing tool. 
 ### Security
 
 - Never commit `.env.local`.
-- Never put a Supabase service-role key in client code, a `NEXT_PUBLIC_*` variable, GitHub, or a message.
-- Keep the existing student-login and database access protections.
+- Never put a Supabase service-role/secret key in client code, a `NEXT_PUBLIC_*` variable, GitHub, or a message.
+- Keep the existing student-login and database access protections. The `teacher-dashboard` Edge Function uses a server-only secret key and checks the teacher code before returning roster data.
 - Do not reintroduce a teacher dashboard or request extra secret keys as a shortcut.
 
 ## 3. Visual design — what the website should look like
@@ -181,6 +183,8 @@ npm run lint
 
 The project uses Next.js App Router. Main files:
 - `app/page.tsx` — student experience and homework data/rendering
+- `app/teacher/page.tsx` — private teacher dashboard
+- `supabase/functions/teacher-dashboard/index.ts` — server-side teacher data access
 - `app/globals.css` — visual styling
 - `package.json` — scripts and dependencies
 
