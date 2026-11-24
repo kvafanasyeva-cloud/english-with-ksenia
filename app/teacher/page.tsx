@@ -327,9 +327,9 @@ export default function TeacherArea() {
                         const wordKey = item.id + "::" + exercise.id + "::" + word;
                         return <button type="button" className={teacherCrossedWords[wordKey] ? "word-bank-word is-crossed" : "word-bank-word"} aria-pressed={!!teacherCrossedWords[wordKey]} onClick={() => setTeacherCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>;
                       })}
+                      <p className="teacher-word-bank-note">Click or tap a word to cross it out when you've used it.</p>
                     </div>
                   ) : null}
-                  {exercise.word_bank?.length ? <p className="teacher-word-bank-note">Click or tap a word to cross it out when you've used it.</p> : null}
 
                   {exercise.type === "snake" && exercise.snake_words?.length ? <TeacherWordSnake words={exercise.snake_words} /> : null}
 
