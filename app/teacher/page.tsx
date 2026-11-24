@@ -255,7 +255,7 @@ export default function TeacherArea() {
                   const isExpanded = expandedHomework === item.id;
                   const cleanTitle = item.title.replace(/^\\d{1,2}[./]\\d{1,2}\\s*[·—-]\\s*/, "");
                   const dateLabel = new Date(item.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
-                  return <article className="teacher-assignment" key={item.id} ref={isExpanded ? expandedHomeworkRef : null}>
+                  return <article className="teacher-assignment" key={item.id} ref={(node) => { expandedHomeworkRef.current = isExpanded ? node : null; }}>
                     <button type="button" className="teacher-assignment-row" aria-expanded={isExpanded} onClick={() => setExpandedHomework(isExpanded ? null : item.id)}>
                       <span className="teacher-assignment-main">
                         <small>{dateLabel}</small>
