@@ -13,40 +13,56 @@ function getSupabase() {
   return supabase;
 }
 
+type HomeworkItem = {
+  number: number;
+  prompt?: string;
+  cue?: string;
+  words?: string[];
+  before?: string;
+  after?: string;
+};
+
+type HomeworkExercise = {
+  id: string;
+  type: string;
+  title: string;
+  instructions?: string;
+  items: HomeworkItem[];
+  word_bank?: string[];
+  options?: Array<{ id: string; text: string }>;
+  snake_words?: string[];
+  example?: { before: string; word: string; after: string };
+};
+
 type Homework = {
   id: string;
   title: string;
   description: string | null;
-  exercises: Array<{
-    id: string;
-    type: string;
-    title: string;
-    instructions?: string;
-    items: Array<{ number: number; prompt?: string; cue?: string; words?: string[] }>;
-    word_bank?: string[];
-    options?: Array<{ id: string; text: string }>;
-  }>;
+  exercises: HomeworkExercise[];
 };
 
-function telegramShareUrl(task: Homework, answers: Record<string, string>) {
-  const lines = [
-    "Homework results",
-    task.description || "",
-    task.title,
-    "",
-    ...task.exercises.flatMap((section, sectionIndex) => [
-      section.title,
-      ...section.items.map((item, itemIndex) => {
-        const previousItems = task.exercises.slice(0, sectionIndex).reduce((total, exercise) => total + exercise.items.length, 0);
-        const displayNumber = previousItems + itemIndex + 1;
-        const answer = answers[`${task.id}::${displayNumber}`] || "(empty)";
-        return `${displayNumber}. ${answer}`;
-      }),
-      ""
-    ])
-  ].filter((line) => line !== undefined);
-  const message = lines.join("\n").replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-").replace(/·/g, "-");
-  return `https://t.me/afanasyeva_x?text=${encodeURIComponent(message)}`;
+type GradeResult = {
+  score: number;
+  total: number;
+  wrong_or_empty: number[];
+};
+
+function homeworkDateLabel(task: Homework) {
+  const match = task.title.match(/(\\d{1,2})\\.(\\d{1,2})/);
+  if (!match) return task.title;
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const month = months[Number(match[2]) - 1];
+  return month ? Number(match[1]) + " " + month : task.title;
+}
+
+function telegramShareUrl(task: Homework, grade: GradeResult) {
+  const wrongOrEmpty = grade.wrong_or_empty.length ? grade.wrong_or_empty.join(", ") : "none";
+  const message = [
+    "Homework - " + homeworkDateLabel(task),
+    "Score: " + grade.score + " / " + grade.total,
+    "Wrong or empty: " + wrongOrEmpty
+  ].join("\\n").replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-");
+  return "https://t.me/afanasyeva_x?text=" + encodeURIComponent(message);
 }
 
 
@@ -211,6 +227,146 @@ function WordSnakeExercise({ checkTrigger, resetTrigger, startNumber = 1 }: { ch
 }
 
 
+
+function LessonWordSnake({
+  taskId,
+  section,
+  startNumber,
+  answers,
+  onAnswer,
+  grade,
+  resetTrigger
+}: {
+  taskId: string;
+  section: HomeworkExercise;
+  startNumber: number;
+  answers: Record<string, string>;
+  onAnswer: (taskId: string, number: number, value: string) => void;
+  grade?: GradeResult;
+  resetTrigger: number;
+}) {
+  const [rings, setRings] = useState<Array<[number, number]>>([]);
+  const [start, setStart] = useState<number | null>(null);
+  const [snakeLoaded, setSnakeLoaded] = useState(false);
+  const targets = section.snake_words || [];
+  const letters = targets.join("").replace(/\\s/g, "").split("");
+  const storageKey = "word-snake|" + taskId + "|" + section.id;
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (Array.isArray(saved.rings)) setRings(saved.rings);
+      }
+    } catch { /* Ignore unavailable or invalid saved circles. */ }
+    setSnakeLoaded(true);
+  }, [storageKey]);
+
+  useEffect(() => {
+    if (!snakeLoaded) return;
+    try { localStorage.setItem(storageKey, JSON.stringify({ rings })); } catch { /* Storage may be unavailable. */ }
+  }, [rings, snakeLoaded, storageKey]);
+
+  useEffect(() => {
+    if (resetTrigger) {
+      setRings([]);
+      setStart(null);
+    }
+  }, [resetTrigger]);
+
+  function chooseLetter(index: number) {
+    if (start === null) {
+      setStart(index);
+      return;
+    }
+    const a = Math.min(start, index);
+    const b = Math.max(start, index);
+    if (a !== b && !rings.some(([x, y]) => !(b < x || a > y))) {
+      setRings((current) => [...current, [a, b]]);
+    }
+    setStart(null);
+  }
+
+  return (
+    <div className="word-snake-exercise lesson-word-snake">
+      <div className="word-snake-targets">
+        <strong>Words and phrases to find</strong>
+        {targets.map((word) => <span className="word-snake-target" key={word}>{word}</span>)}
+      </div>
+      <div className="word-snake-letters" aria-label="Word snake">
+        {letters.map((letter, index) => {
+          const ring = rings.find(([a]) => a === index);
+          if (ring) {
+            const [a, b] = ring;
+            return (
+              <button
+                type="button"
+                className="word-snake-ring"
+                key={index}
+                title="Click to remove this circle"
+                onClick={() => { setRings((current) => current.filter(([x, y]) => x !== a || y !== b)); setStart(null); }}
+              >
+                {letters.slice(a, b + 1).map((char, offset) => (
+                  <span key={offset} style={{ transform: "translateY(" + (Math.sin((a + offset) * 0.55) * 7) + "px)" }}>{char}</span>
+                ))}
+              </button>
+            );
+          }
+          if (rings.some(([a, b]) => index > a && index <= b)) return null;
+          return (
+            <button
+              type="button"
+              className={"word-snake-letter" + (start === index ? " is-start" : "")}
+              key={index}
+              onClick={() => chooseLetter(index)}
+              style={{ transform: "translateY(" + (Math.sin(index * 0.55) * 7) + "px)" }}
+            >
+              {letter}
+            </button>
+          );
+        })}
+      </div>
+      <p className="word-snake-note">Click the first and last letter of each word or phrase to circle it. Click a circle to remove it.</p>
+      {section.example && (
+        <div className="word-snake-example">
+          <span>EXAMPLE</span>
+          {section.example.before}<strong>{section.example.word}</strong>{section.example.after}
+        </div>
+      )}
+      <div className="word-snake-questions">
+        {section.items.map((item, index) => {
+          const displayNumber = startNumber + index;
+          const value = answers[taskId + "::" + displayNumber] || "";
+          const wrong = grade?.wrong_or_empty.includes(displayNumber) || false;
+          const mark = grade ? (wrong ? "no" : "ok") : "";
+          return (
+            <div className="word-snake-question" key={displayNumber}>
+              <span className="word-snake-number">{displayNumber}.</span>
+              <p>
+                {item.before}
+                <input
+                  aria-label={"Answer " + displayNumber}
+                  className={"word-snake-gap" + (grade && !wrong ? " is-correct" : "") + (grade && wrong && value.trim() ? " is-wrong" : "")}
+                  value={value}
+                  autoComplete="off"
+                  spellCheck={false}
+                  autoCorrect="off"
+                  onChange={(event) => onAnswer(taskId, displayNumber, event.target.value)}
+                />
+                {item.after}
+              </p>
+              <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect or empty" : ""}>
+                {mark === "ok" ? "✓" : mark === "no" ? "×" : ""}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -225,6 +381,9 @@ export default function Home() {
   const [activityCheckTrigger, setActivityCheckTrigger] = useState(0);
   const [activityResetTrigger, setActivityResetTrigger] = useState(0);
   const [saveNotice, setSaveNotice] = useState("");
+  const [grades, setGrades] = useState<Record<string, GradeResult>>({});
+  const [gradingTaskId, setGradingTaskId] = useState<string | null>(null);
+  const [gradeError, setGradeError] = useState("");
 
   useEffect(() => {
     if (!signedIn || homework.length === 0) return;
@@ -287,7 +446,48 @@ export default function Home() {
   }, [crossedWords, signedIn]);
 
   function setAnswer(taskId: string, number: number, value: string) {
-    setAnswers((current) => ({ ...current, [`${taskId}::${number}`]: value }));
+    setAnswers((current) => ({ ...current, [taskId + "::" + number]: value }));
+    setGrades((current) => {
+      if (!current[taskId]) return current;
+      const next = { ...current };
+      delete next[taskId];
+      return next;
+    });
+    setGradeError("");
+  }
+
+  async function handleCheck(task: Homework) {
+    setActivityCheckTrigger((value) => value + 1);
+    setGrades((current) => {
+      const next = { ...current };
+      delete next[task.id];
+      return next;
+    });
+    setGradeError("");
+    setGradingTaskId(task.id);
+
+    const taskAnswers: Record<string, string> = {};
+    const prefix = task.id + "::";
+    Object.entries(answers).forEach(([key, value]) => {
+      if (key.startsWith(prefix)) taskAnswers[key.slice(prefix.length)] = value;
+    });
+
+    try {
+      const { data, error: checkError } = await getSupabase().rpc("grade_homework", {
+        p_homework_id: task.id,
+        p_answers: taskAnswers
+      });
+      if (checkError) throw checkError;
+      const result = data as GradeResult | null;
+      if (!result || typeof result.score !== "number" || typeof result.total !== "number" || !Array.isArray(result.wrong_or_empty)) {
+        throw new Error("The grading service returned an unexpected result.");
+      }
+      setGrades((current) => ({ ...current, [task.id]: result }));
+    } catch {
+      setGradeError("Automatic checking is not available for this homework yet. Please try again later.");
+    } finally {
+      setGradingTaskId(null);
+    }
   }
 
   async function loadHomework() {
@@ -347,6 +547,8 @@ export default function Home() {
     setSignedIn(false);
     setHomework([]);
     setAnswers({});
+    setGrades({});
+    setGradeError("");
     setError("");
   }
 
@@ -378,7 +580,6 @@ export default function Home() {
               {error && <p className="error-message" role="alert">{error}</p>}
               <button className="primary-button" type="submit" disabled={loading}>{loading ? "Checking…" : "Enter my space"} {!loading && <span>↗</span>}</button>
             </form>
-            <p className="privacy-note">Your personal code is private. Keep it to yourself.</p>
           </div>
         </section>
       ) : (
@@ -411,28 +612,38 @@ export default function Home() {
                     <section className="exercise-section" key={section.id}>
                       <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p>{section.instructions}</p>}</div></div>
                       {section.word_bank && <div className="word-bank"><strong>Word bank</strong>{section.word_bank.map((word) => { const wordKey = `${task.id}::${section.id}::${word}`; return <button type="button" className={`word-bank-word ${crossedWords[wordKey] ? "is-crossed" : ""}`} aria-pressed={!!crossedWords[wordKey]} onClick={() => setCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>; })}</div>}
-                      {section.items.map((item, itemIndex) => {
+                      {section.type === "snake" ? (
+                        <LessonWordSnake
+                          taskId={task.id}
+                          section={section}
+                          startNumber={task.exercises.slice(0, index).reduce((total, exercise) => total + exercise.items.length, 0) + 1}
+                          answers={answers}
+                          onAnswer={setAnswer}
+                          grade={grades[task.id]}
+                          resetTrigger={activityResetTrigger}
+                        />
+                      ) : section.items.map((item, itemIndex) => {
                         const previousItems = task.exercises.slice(0, index).reduce((total, exercise) => total + exercise.items.length, 0);
                         const displayNumber = previousItems + itemIndex + 1;
-                        const answerKey = `${task.id}::${displayNumber}`;
+                        const answerKey = task.id + "::" + displayNumber;
                         return (
-                          <div className={`question${section.type === "matching" ? "" : " answers-under"}`} key={item.number}>
+                          <div className={"question" + (section.type === "matching" ? "" : " answers-under")} key={item.number}>
                             {section.type === "gap" ? (
-                              <label className="inline-gap-label" htmlFor={`answer-${task.id}-${displayNumber}`}>
+                              <label className="inline-gap-label" htmlFor={"answer-" + task.id + "-" + displayNumber}>
                                 {displayNumber}. {(item.prompt || "").split("___")[0]}
-                                <input className="inline-gap-input" id={`answer-${task.id}-${displayNumber}`} type="text" spellCheck={false} autoCorrect="off" value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)} aria-label={`Answer to question ${displayNumber}`} />
+                                <input className="inline-gap-input" id={"answer-" + task.id + "-" + displayNumber} type="text" spellCheck={false} autoCorrect="off" value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)} aria-label={"Answer to question " + displayNumber} />
                                 {(item.prompt || "").split("___").slice(1).join("___")}
                               </label>
                             ) : (
                               <>
-                                <label htmlFor={`answer-${task.id}-${displayNumber}`}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
+                                <label htmlFor={"answer-" + task.id + "-" + displayNumber}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
                                 {section.type === "matching" ? (
-                                  <select id={`answer-${task.id}-${displayNumber}`} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
+                                  <select id={"answer-" + task.id + "-" + displayNumber} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
                                     <option value="">Choose a meaning…</option>
                                     {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
                                   </select>
                                 ) : (
-                                  <input id={`answer-${task.id}-${displayNumber}`} type="text" spellCheck={false} autoCorrect="off" value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)} />
+                                  <input id={"answer-" + task.id + "-" + displayNumber} type="text" spellCheck={false} autoCorrect="off" value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)} />
                                 )}
                               </>
                             )}
@@ -443,11 +654,17 @@ export default function Home() {
                   ))}
                   {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <section className="exercise-section word-snake-section"><div className="section-heading"><span className="section-number">{String((task.exercises?.length || 0) + 1).padStart(2, "0")}</span><div><h3>Find the verbs in the word snake</h3><p>Complete the sentences using verbs from the word snake in the correct form.</p></div></div><WordSnakeExercise checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} startNumber={(task.exercises?.reduce((total, exercise) => total + exercise.items.length, 0) || 0) + 1} /></section>}
                   <div className="whole-homework-controls">
-                    <button type="button" onClick={() => setActivityCheckTrigger((value) => value + 1)}>Check</button>
+                    <button type="button" disabled={gradingTaskId === task.id} onClick={() => handleCheck(task)}>{gradingTaskId === task.id ? "Checking…" : "Check"}</button>
                     <button type="button" onClick={() => { try { const saved: Record<string, string> = {}; Object.entries(answers).forEach(([key, value]) => { const prefix = task.id + "::"; if (key.startsWith(prefix)) saved[key.slice(prefix.length)] = value; }); localStorage.setItem("hw-answers|" + task.id, JSON.stringify(saved)); setSaveNotice("Saved on this device"); } catch { setSaveNotice("Could not save on this device"); } }}>Save</button>
-                    <button type="button" className="is-ghost" onClick={() => { setAnswers((current) => { const next = { ...current }; Object.keys(next).forEach((key) => { if (key.startsWith(task.id + "::")) delete next[key]; }); return next; }); try { localStorage.removeItem("hw-answers|" + task.id); } catch {} setActivityResetTrigger((value) => value + 1); setSaveNotice(""); }}>Reset</button>
+                    <button type="button" className="is-ghost" onClick={() => { setAnswers((current) => { const next = { ...current }; Object.keys(next).forEach((key) => { if (key.startsWith(task.id + "::")) delete next[key]; }); return next; }); setGrades((current) => { const next = { ...current }; delete next[task.id]; return next; }); setGradeError(""); try { localStorage.removeItem("hw-answers|" + task.id); localStorage.removeItem("word-snake|" + task.id + "|nov24-word-snake"); } catch {} setActivityResetTrigger((value) => value + 1); setSaveNotice(""); }}>Reset</button>
                     {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
-                    <a className="telegram-button" href={telegramShareUrl(task, answers)} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
+                    {gradeError && <span className="grade-error" role="alert">{gradeError}</span>}
+                    {grades[task.id] && <p className="grade-summary">Score: {grades[task.id].score} / {grades[task.id].total}<br />Wrong or empty: {grades[task.id].wrong_or_empty.length ? grades[task.id].wrong_or_empty.join(", ") : "none"}</p>}
+                    {grades[task.id] ? (
+                      <a className="telegram-button" href={telegramShareUrl(task, grades[task.id])} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
+                    ) : (
+                      <span className="telegram-hint">Check your answers to prepare the Telegram message.</span>
+                    )}
                   </div>
                 </article>
               ))}
