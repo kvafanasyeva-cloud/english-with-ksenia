@@ -114,6 +114,10 @@ const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
 
 export default function TeacherArea() {
   const [code, setCode] = useState("");
+  const [teacherCode, setTeacherCode] = useState("");
+  const [teacherAnswers, setTeacherAnswers] = useState<Record<string, string>>({});
+  const [teacherGrades, setTeacherGrades] = useState<Record<string, {score:number; total:number; wrong_or_empty:number[]}>>({});
+  const [checkingHomework, setCheckingHomework] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -151,6 +155,9 @@ export default function TeacherArea() {
     setStudents(loadedStudents);
     setHomework(loadedHomework);
     setSubmissions(data.submissions || []);
+    setTeacherCode(accessCode);
+    setTeacherAnswers({});
+    setTeacherGrades({});
     setLoggedIn(true);
     setSelected("all");
     setExpandedHomework(null);
@@ -178,6 +185,9 @@ export default function TeacherArea() {
     setSelected("all");
     setExpandedHomework(null);
     setCode("");
+    setTeacherCode("");
+    setTeacherAnswers({});
+    setTeacherGrades({});
     setError("");
   }
 
@@ -267,17 +277,44 @@ export default function TeacherArea() {
               <span className="homework-list-arrow">{isExpanded ? "−" : "+"}</span>
             </button>
             {isExpanded && <div className="teacher-assignment-detail">
-              {item.exercises?.map((exercise, index) => <section className="teacher-exercise-preview" key={exercise.id || index}>
-                <h3><span>{String(index + 1).padStart(2, "0")}</span>{exercise.title}</h3>
-                {exercise.instructions && <p className="teacher-exercise-instructions">{exercise.instructions}</p>}
-                {exercise.word_bank?.length ? <div className="teacher-word-bank"><strong>Word bank</strong>{exercise.word_bank.map((word) => <span key={word}>{word}</span>)}</div> : null}
-                {exercise.snake_words?.length ? <p className="teacher-exercise-words"><strong>Snake words:</strong> {exercise.snake_words.join(" · ")}</p> : null}
-                {exercise.items?.map((entry, entryIndex) => <p className="teacher-exercise-item" key={entry.number ?? entryIndex}>
-                  <span>{item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0) + entryIndex + 1}.</span>
-                  {entry.prompt || (entry.words || []).join(" / ") || [entry.before, "___", entry.after].filter(Boolean).join("")}
-                </p>)}
-                {exercise.options?.length ? <div className="teacher-options"><strong>Options:</strong>{exercise.options.map((option) => <span key={option.id}>{option.id}. {option.text}</span>)}</div> : null}
-              </section>)}
+              {item.exercises?.map((exercise, index) => {
+                const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
+                return <section className="teacher-exercise-preview" key={exercise.id || index}>
+                  <h3><span>{String(index + 1).padStart(2, "0")}</span>{exercise.title}</h3>
+                  {exercise.instructions && <p className="teacher-exercise-instructions">{exercise.instructions}</p>}
+                  {exercise.word_bank?.length ? <div className="teacher-word-bank"><strong>Word bank</strong>{exercise.word_bank.map((word) => <span key={word}>{word}</span>)}</div> : null}
+                  {exercise.snake_words?.length ? <div className="teacher-snake-letters" aria-label="Word snake">{exercise.snake_words.join("").replace(/\s/g, "").split("").map((letter, i) => <span key={i}>{letter}</span>)}</div> : null}
+                  {exercise.items?.map((entry, entryIndex) => {
+                    const number = offset + entryIndex + 1;
+                    const answerId = item.id + "::" + number;
+                    const prompt = entry.prompt || (entry.words || []).join(" / ") || [entry.before, "___", entry.after].filter(Boolean).join("");
+                    return <div className="teacher-live-question" key={entry.number ?? entryIndex}>
+                      <label htmlFor={"teacher-answer-" + item.id + "-" + number}><span>{number}.</span> {prompt}</label>
+                      {exercise.type === "matching" ? <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }}>
+                        <option value="">Choose a meaning…</option>{exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.id}. {option.text}</option>)}
+                      </select> : <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }} autoComplete="off" spellCheck={false} />}
+                    </div>;
+                  })}
+                  {exercise.options?.length && exercise.type !== "matching" ? <div className="teacher-options"><strong>Options:</strong>{exercise.options.map((option) => <span key={option.id}>{option.id}. {option.text}</span>)}</div> : null}
+                </section>;
+              })}
+              <div className="teacher-practice-footer">
+                <button type="button" disabled={checkingHomework === item.id} onClick={async () => {
+                  setCheckingHomework(item.id);
+                  try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "")}/functions/v1/teacher-dashboard`, {
+                      method: "POST", headers: {"Content-Type":"application/json", apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "", Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`},
+                      body: JSON.stringify({username:"k", code:teacherCode, action:"grade", homework_id:item.id, answers:Object.fromEntries(Object.entries(teacherAnswers).filter(([key])=>key.startsWith(item.id+"::")).map(([key,value])=>[key.slice(item.id.length+2),value]))})
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || "Could not check this homework.");
+                    setTeacherGrades((current)=>({...current,[item.id]:result}));
+                  } catch (err) { window.alert(err instanceof Error ? err.message : "Could not check this homework."); }
+                  finally { setCheckingHomework(null); }
+                }}>{checkingHomework === item.id ? "Checking…" : "Check answers"}</button>
+                <button type="button" className="teacher-clear-button" onClick={()=>{setTeacherAnswers((current)=>{const next={...current};Object.keys(next).forEach((key)=>{if(key.startsWith(item.id+"::"))delete next[key];});return next;});setTeacherGrades((current)=>{const next={...current};delete next[item.id];return next;});}}>Reset</button>
+                <strong className="teacher-practice-score">{teacherGrades[item.id] ? `Score: ${teacherGrades[item.id].score} / ${teacherGrades[item.id].total}` : " "}</strong>
+              </div>
             </div>}
           </article>;
         })}
