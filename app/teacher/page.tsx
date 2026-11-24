@@ -132,7 +132,7 @@ function TeacherWordSnake({
   const [rings, setRings] = useState<Array<[number, number]>>([]);
   const [start, setStart] = useState<number | null>(null);
   const [snakeLoaded, setSnakeLoaded] = useState(false);
-  const letters = (section.snake_words || []).join("").replace(/\\s/g, "").split("");
+  const letters = (section.snake_words || []).join("").replace(/\s/g, "").split("");
   const storageKey = "teacher-word-snake|" + homeworkId + "|" + section.id;
 
   useEffect(() => {
@@ -404,7 +404,7 @@ export default function TeacherArea() {
                       <h3>{exercise.title}</h3>
                       {exercise.instructions && <p>{exercise.instructions}</p>}
                     </div>
-                  
+                  </div>
 
                   {exercise.type !== "snake" && exercise.word_bank?.length ? (
                     <div className="word-bank">
