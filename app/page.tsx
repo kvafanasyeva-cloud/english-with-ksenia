@@ -620,13 +620,13 @@ export default function Home() {
                           <div className={"question" + (section.type === "matching" ? "" : " answers-under")} key={item.number}>
                             {section.type === "gap" ? (
                               <label className="inline-gap-label" htmlFor={"answer-" + task.id + "-" + displayNumber}>
-                                {displayNumber}. {(item.prompt || "").split("___")[0]}
+                                <span className="question-number">{displayNumber}.</span> {(item.prompt || "").split("___")[0]}
                                 <input className="inline-gap-input" id={"answer-" + task.id + "-" + displayNumber} type="text" spellCheck={false} autoCorrect="off" value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)} aria-label={"Answer to question " + displayNumber} />
                                 {(item.prompt || "").split("___").slice(1).join("___")}
                               </label>
                             ) : (
                               <>
-                                <label htmlFor={"answer-" + task.id + "-" + displayNumber}>{displayNumber}. {item.prompt || item.words?.join(" / ") || ""}</label>
+                                <label htmlFor={"answer-" + task.id + "-" + displayNumber}><span className="question-number">{displayNumber}.</span> {item.prompt || item.words?.join(" / ") || ""}</label>
                                 {section.type === "matching" ? (
                                   <select id={"answer-" + task.id + "-" + displayNumber} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
                                     <option value="">Choose a meaning…</option>
