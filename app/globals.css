@@ -951,38 +951,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   margin-top: 48px;
   scroll-margin-top: 24px;
 }
-.teacher-homework-card > .teacher-card-meta {
-  margin: 0 0 7px;
-  font-size: 11px;
-  letter-spacing: .1em;
-}
-.teacher-homework-card > h2 {
-  padding-bottom: 9px;
-  border-bottom: 1px solid var(--line);
-  font-size: 23px;
-  letter-spacing: -.025em;
-}
-.teacher-homework-card .section-number { display: none; }
-.teacher-homework-card .section-heading { margin-bottom: 14px; }
-.teacher-homework-card .word-bank {
-  margin-left: 0;
-  padding: 14px 16px;
-}
-.teacher-homework-card .word-bank strong {
-  color: var(--ink);
-  font-size: 12px;
-  letter-spacing: .08em;
-}
-.teacher-word-bank-note {
-  width: 100%;
-  margin: 3px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-.teacher-homework-card .question { margin-left: 0; }
-.teacher-homework-card .question.answers-under { margin-left: 0; }
-.teacher-homework-card .word-snake-exercise { margin-left: 0; }
-.teacher-homework-card .word-snake-question { margin-bottom: 8px; }
 @media (max-width: 760px) {
   .teacher-homework-link {
     grid-template-columns: 108px minmax(0, 1fr);
@@ -990,6 +958,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     min-height: 44px;
   }
   .teacher-homework-date, .teacher-homework-title { font-size: 15px; }
-  .teacher-homework-card { margin-top: 34px; padding: 22px 17px; }
-  .teacher-homework-card > h2 { font-size: 21px; }
+  .teacher-homework-card { margin-top: 34px; }
+}
+
+/* Keep the snake inside its own exercise section: the section supplies the single divider. */
+.exercise-section > .word-snake-exercise {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
 }
