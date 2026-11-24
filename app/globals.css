@@ -874,3 +874,30 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 @media (max-width: 600px) {
   .teacher-practice-score { width: 100%; margin-left: 0; text-align: right; }
 }
+
+.teacher-live-prompt { font-size: 15px; line-height: 1.65; font-weight: 500; }
+.teacher-live-prompt > span { display: inline-block; min-width: 27px; color: var(--muted); }
+.teacher-inline-gap { display: inline; font-size: 15px; line-height: 2.2; }
+.teacher-inline-gap input {
+  display: inline-block;
+  width: 145px;
+  min-height: 30px;
+  margin: 0 5px;
+  padding: 2px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  text-align: center;
+  vertical-align: baseline;
+}
+.teacher-word-bank button {
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: white;
+  color: var(--ink);
+  font: 11px Inter, sans-serif;
+  cursor: pointer;
+}
+.teacher-word-bank .teacher-word-crossed { color: #888; text-decoration: line-through; }
