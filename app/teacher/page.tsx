@@ -118,7 +118,6 @@ function TeacherWordSnake({
   startNumber,
   answers,
   onAnswer,
-  grade,
   resetTrigger
 }: {
   homeworkId: string;
@@ -126,7 +125,6 @@ function TeacherWordSnake({
   startNumber: number;
   answers: Record<string, string>;
   onAnswer: (number: number, value: string) => void;
-  grade?: { score: number; total: number; wrong_or_empty: number[] };
   resetTrigger: number;
 }) {
   const [rings, setRings] = useState<Array<[number, number]>>([]);
@@ -211,16 +209,13 @@ function TeacherWordSnake({
         {section.items.map((entry, index) => {
           const displayNumber = startNumber + index;
           const value = answers[homeworkId + "::" + displayNumber] || "";
-          const wrong = grade?.wrong_or_empty.includes(displayNumber) || false;
-          const mark = grade ? (wrong ? "no" : "ok") : "";
           return (
             <div className="word-snake-question" key={displayNumber}>
               <span className="word-snake-number">{displayNumber}.</span>
               <p>
                 {entry.before}
                 <input
-                  aria-label={"Answer " + displayNumber}
-                  className={"word-snake-gap" + (grade && !wrong ? " is-correct" : "") + (grade && wrong && value.trim() ? " is-wrong" : "")}
+                  aria-label={"Answer " + displayNumber}                  className="word-snake-gap"
                   value={value}
                   autoComplete="off"
                   spellCheck={false}
@@ -229,9 +224,7 @@ function TeacherWordSnake({
                 />
                 {entry.after}
               </p>
-              <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect or empty" : ""}>
-                {mark === "ok" ? "✓" : mark === "no" ? "×" : ""}
-              </span>
+              <span className="word-snake-mark" aria-hidden="true" />
             </div>
           );
         })}
@@ -243,11 +236,10 @@ export default function TeacherArea() {
   const [code, setCode] = useState("");
   const [teacherCode, setTeacherCode] = useState("");
   const [teacherAnswers, setTeacherAnswers] = useState<Record<string, string>>({});
-  const [teacherGrades, setTeacherGrades] = useState<Record<string, {score:number; total:number; wrong_or_empty:number[]}>>({});
   const [teacherSaveNotice, setTeacherSaveNotice] = useState("");
+  const [teacherCheckedHomework, setTeacherCheckedHomework] = useState<Record<string, boolean>>({});
   const [teacherResetTrigger, setTeacherResetTrigger] = useState(0);
   const [teacherCrossedWords, setTeacherCrossedWords] = useState<Record<string, boolean>>({});
-  const [checkingHomework, setCheckingHomework] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -256,6 +248,21 @@ export default function TeacherArea() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [expandedHomework, setExpandedHomework] = useState<string | null>(null);
   const expandedHomeworkRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("teacher-homework-checks");
+      if (saved) setTeacherCheckedHomework(JSON.parse(saved));
+    } catch { /* Ignore unavailable or invalid saved check marks. */ }
+  }, []);
+
+  function markHomeworkChecked(homeworkId: string) {
+    setTeacherCheckedHomework((current) => {
+      const next = { ...current, [homeworkId]: true };
+      try { localStorage.setItem("teacher-homework-checks", JSON.stringify(next)); } catch { /* Storage may be unavailable. */ }
+      return next;
+    });
+  }
 
   useEffect(() => {
     if (!expandedHomework || !expandedHomeworkRef.current) return;
@@ -292,7 +299,6 @@ export default function TeacherArea() {
     setSubmissions(data.submissions || []);
     setTeacherCode(accessCode);
     setTeacherAnswers({});
-    setTeacherGrades({});
     setLoggedIn(true);
     setExpandedHomework(null);
   }
@@ -320,7 +326,6 @@ export default function TeacherArea() {
     setCode("");
     setTeacherCode("");
     setTeacherAnswers({});
-    setTeacherGrades({});
     setError("");
   }
 
@@ -379,7 +384,7 @@ export default function TeacherArea() {
                   return (
                     <button type="button" key={item.id} className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); }}>
                       <span className="teacher-homework-date">{dateLabel}</span>
-                      <span className="teacher-homework-title">{cleanTitle}</span>
+                      <span className="teacher-homework-title"><span>{cleanTitle}</span>{teacherCheckedHomework[item.id] && <span className="simple-checkmark teacher-homework-checkmark" role="img" aria-label="Checked" />}</span>
                     </button>
                   );
                 })}
@@ -393,7 +398,7 @@ export default function TeacherArea() {
       {homework.filter((item) => item.id === expandedHomework).map((item) => {
         return (
           <article className="homework-card teacher-homework-card" key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
-            <h2>{item.title}</h2>
+            <h2>{item.title}{teacherCheckedHomework[item.id] && <span className="simple-checkmark teacher-card-checkmark" role="img" aria-label="Checked" />}</h2>
             {item.exercises?.map((exercise, index) => {
               const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
               return (
@@ -425,14 +430,7 @@ export default function TeacherArea() {
                       onAnswer={(number, value) => {
                         const answerId = item.id + "::" + number;
                         setTeacherAnswers((current) => ({ ...current, [answerId]: value }));
-                        setTeacherGrades((current) => {
-                          const next = { ...current };
-                          delete next[item.id];
-                          return next;
-                        });
-                      }}
-                      grade={teacherGrades[item.id]}
-                      resetTrigger={teacherResetTrigger}
+                      }}                      resetTrigger={teacherResetTrigger}
                     />
                   ) : (
                     exercise.items?.map((entry, entryIndex) => {
@@ -441,11 +439,6 @@ export default function TeacherArea() {
                       const prompt = entry.prompt || (entry.words || []).join(" / ") || "";
                       const updateAnswer = (value: string) => {
                         setTeacherAnswers((current) => ({ ...current, [answerId]: value }));
-                        setTeacherGrades((current) => {
-                          const next = { ...current };
-                          delete next[item.id];
-                          return next;
-                        });
                       };
 
                       return (
@@ -476,41 +469,8 @@ export default function TeacherArea() {
                 </section>
               );
             })}
-
-            {teacherGrades[item.id] && (
-              <div className="homework-score">
-                <p className="grade-summary">Score: {teacherGrades[item.id].score} / {teacherGrades[item.id].total}</p>
-              </div>
-            )}
-
-            <div className="whole-homework-controls">
-              <button type="button" disabled={checkingHomework === item.id} onClick={async () => {
-                setCheckingHomework(item.id);
-                try {
-                  const response = await fetch((process.env.NEXT_PUBLIC_SUPABASE_URL || "").replace(/\/$/, "") + "/functions/v1/teacher-dashboard", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
-                      Authorization: "Bearer " + (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "")
-                    },
-                    body: JSON.stringify({
-                      username: "k",
-                      code: teacherCode,
-                      action: "grade",
-                      homework_id: item.id,
-                      answers: Object.fromEntries(Object.entries(teacherAnswers).filter(([key]) => key.startsWith(item.id + "::")).map(([key, value]) => [key.slice(item.id.length + 2), value]))
-                    })
-                  });
-                  const result = await response.json();
-                  if (!response.ok) throw new Error(result.error || "Could not check this homework.");
-                  setTeacherGrades((current) => ({ ...current, [item.id]: result }));
-                } catch (err) {
-                  window.alert(err instanceof Error ? err.message : "Could not check this homework.");
-                } finally {
-                  setCheckingHomework(null);
-                }
-              }}>{checkingHomework === item.id ? "Checking…" : "Check"}</button>
+<div className="whole-homework-controls">
+              <button type="button" onClick={() => markHomeworkChecked(item.id)} aria-pressed={!!teacherCheckedHomework[item.id]}>{teacherCheckedHomework[item.id] ? "Checked ✓" : "Check"}</button>
               <button type="button" onClick={() => {
                 const savedAnswers = Object.fromEntries(Object.entries(teacherAnswers).filter(([key]) => key.startsWith(item.id + "::")));
                 try {
@@ -524,11 +484,6 @@ export default function TeacherArea() {
                 setTeacherAnswers((current) => {
                   const next = { ...current };
                   Object.keys(next).forEach((key) => { if (key.startsWith(item.id + "::")) delete next[key]; });
-                  return next;
-                });
-                setTeacherGrades((current) => {
-                  const next = { ...current };
-                  delete next[item.id];
                   return next;
                 });
                 setTeacherSaveNotice("");
