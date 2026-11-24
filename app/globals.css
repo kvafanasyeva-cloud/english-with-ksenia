@@ -967,3 +967,49 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   padding-top: 0;
   border-top: 0;
 }
+
+/* Homework readability refinements. */
+.homework-card > h2 {
+  margin-bottom: 12px;
+}
+.homework-score .grade-summary {
+  text-align: right;
+}
+.question {
+  margin-bottom: 10px;
+}
+.question label {
+  font-weight: 550;
+  line-height: 1.55;
+}
+.question select {
+  border-radius: 8px;
+}
+.exercise-section .question label {
+  line-height: 1.55;
+}
+.inline-gap-label {
+  line-height: 1.95;
+  font-weight: 550;
+}
+.word-snake-questions {
+  gap: 7px;
+}
+.word-snake-question p {
+  line-height: 1.55;
+}
+
+/* Checked homework is marked with the same simple tick used in exercises. */
+.teacher-homework-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.teacher-homework-checkmark,
+.teacher-card-checkmark {
+  flex: 0 0 auto;
+}
+.teacher-card-checkmark {
+  margin-left: 12px;
+}
