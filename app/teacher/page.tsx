@@ -112,11 +112,48 @@ const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
   ]
 };
 
+function TeacherWordSnake({ words }: { words: string[] }) {
+  const [rings, setRings] = useState<Array<[number, number]>>([]);
+  const [start, setStart] = useState<number | null>(null);
+  const letters = words.join("").replace(/\s/g, "").split("");
+
+  function chooseLetter(index: number) {
+    if (start === null) {
+      setStart(index);
+      return;
+    }
+    const a = Math.min(start, index);
+    const b = Math.max(start, index);
+    if (a !== b && !rings.some(([x, y]) => !(b < x || a > y))) {
+      setRings((current) => [...current, [a, b]]);
+    }
+    setStart(null);
+  }
+
+  return (
+    <div className="word-snake-exercise lesson-word-snake">
+      <div className="word-snake-letters" aria-label="Word snake">
+        {letters.map((letter, index) => {
+          const ring = rings.find(([a]) => a === index);
+          if (ring) {
+            const [a, b] = ring;
+            return <button type="button" className="word-snake-ring" key={index} title="Click to remove this circle" onClick={() => { setRings((current) => current.filter(([x, y]) => x !== a || y !== b)); setStart(null); }}>{letters.slice(a, b + 1).map((char, offset) => <span key={offset} style={{ transform: "translateY(" + (Math.sin((a + offset) * 0.55) * 7) + "px)" }}>{char}</span>)}</button>;
+          }
+          if (rings.some(([a, b]) => index > a && index <= b)) return null;
+          return <button type="button" className={"word-snake-letter" + (start === index ? " is-start" : "")} key={index} onClick={() => chooseLetter(index)} style={{ transform: "translateY(" + (Math.sin(index * 0.55) * 7) + "px)" }}>{letter}</button>;
+        })}
+      </div>
+      <p className="word-snake-note">Click the first and last letter of each word or phrase to circle it. Click a circle to remove it.</p>
+    </div>
+  );
+}
+
 export default function TeacherArea() {
   const [code, setCode] = useState("");
   const [teacherCode, setTeacherCode] = useState("");
   const [teacherAnswers, setTeacherAnswers] = useState<Record<string, string>>({});
   const [teacherGrades, setTeacherGrades] = useState<Record<string, {score:number; total:number; wrong_or_empty:number[]}>>({});
+  const [teacherSaveNotice, setTeacherSaveNotice] = useState("");
   const [teacherCrossedWords, setTeacherCrossedWords] = useState<Record<string, boolean>>({});
   const [checkingHomework, setCheckingHomework] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -236,83 +273,182 @@ export default function TeacherArea() {
         </div>
       </div>
 
-      <div className="teacher-stats">
-        <div className="teacher-stat"><strong>{students.length}</strong><span>STUDENTS</span></div>
-        <div className="teacher-stat"><strong>{homework.length}</strong><span>HOMEWORKS</span></div>
-        <div className="teacher-stat"><strong>{submissions.length}</strong><span>SUBMISSIONS</span></div>
-      </div>
-
       <section className="teacher-roster" aria-label="Students and homework">
-        {students.map((student, studentIndex) => {
+        {students.map((student) => {
           const studentHomework = homework.filter((item) => item.student_id === student.id);
           return (
             <section className="teacher-student-group" key={student.id}>
-              <h2 className="teacher-student-heading"><span>{studentIndex + 1}.</span> {student.name}</h2>
-              <div className="homework-list teacher-homework-list">
+              <h2 className="teacher-student-heading">{student.name}</h2>
+              <div className="teacher-homework-links">
                 {studentHomework.map((item) => {
-                  const submissionCount = submissions.filter((submission) => submission.homework_id === item.id).length;
-                  const questionCount = item.exercises?.reduce((total, exercise) => total + (exercise.items?.length || 0), 0) || 0;
-                  const isExpanded = expandedHomework === item.id;
-                  const cleanTitle = item.title.replace(/^\\d{1,2}[./]\\d{1,2}\\s*[·—-]\\s*/, "");
                   const dateLabel = new Date(item.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
-                  return <article className="teacher-assignment" key={item.id} ref={(node) => { expandedHomeworkRef.current = isExpanded ? node : null; }}>
-                    <button type="button" className="teacher-assignment-row" aria-expanded={isExpanded} onClick={() => setExpandedHomework(isExpanded ? null : item.id)}>
-                      <span className="teacher-assignment-main">
-                        <small>{dateLabel}</small>
-                        <strong>{cleanTitle}</strong>
-                        <span className="teacher-assignment-meta">{item.exercises?.length || 0} exercises · {questionCount} questions · {submissionCount} submissions</span>
-                      </span>
-                      <span className={item.published ? "teacher-status is-published" : "teacher-status"}>{item.published ? "Published" : "Draft"}</span>
-                      <span className="homework-list-arrow">{isExpanded ? "−" : "+"}</span>
+                  const cleanTitle = item.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]\s*/, "");
+                  const isActive = expandedHomework === item.id;
+                  return (
+                    <button type="button" key={item.id} className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); }}>
+                      <span className="teacher-homework-date">{dateLabel}</span>
+                      <span className="teacher-homework-title">{cleanTitle}</span>
                     </button>
-                    {isExpanded && <div className="teacher-assignment-detail">
-                      {item.exercises?.map((exercise, index) => {
-                        const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
-                        return <section className="teacher-exercise-preview" key={exercise.id || index}>
-                          <h3><span>{String(index + 1).padStart(2, "0")}</span>{exercise.title}</h3>
-                          {exercise.instructions && <p className="teacher-exercise-instructions">{exercise.instructions}</p>}
-                          {exercise.word_bank?.length ? <div className="teacher-word-bank"><strong>Word bank</strong>{exercise.word_bank.map((word) => <button type="button" className={teacherCrossedWords[item.id + "::" + exercise.id + "::" + word] ? "teacher-word-crossed" : "teacher-word-choice"} key={word} onClick={() => setTeacherCrossedWords((current)=>({...current,[item.id + "::" + exercise.id + "::" + word]:!current[item.id + "::" + exercise.id + "::" + word]}))}>{word}</button>)}</div> : null}
-                          {exercise.snake_words?.length ? <div className="teacher-snake-letters" aria-label="Word snake">{exercise.snake_words.join("").replace(/\\s/g, "").split("").map((letter, i) => <span key={i}>{letter}</span>)}</div> : null}
-                          {exercise.items?.map((entry, entryIndex) => {
-                            const number = offset + entryIndex + 1;
-                            const answerId = item.id + "::" + number;
-                            const prompt = entry.prompt || (entry.words || []).join(" / ") || [entry.before, "___", entry.after].filter(Boolean).join("");
-                            return <div className="teacher-live-question" key={entry.number ?? entryIndex}>
-                              <div className="teacher-live-prompt"><span>{number}.</span> {prompt}</div>
-                              {exercise.type === "matching" ? <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }}>
-                                <option value="">Choose a meaning…</option>{exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.id}. {option.text}</option>)}
-                              </select> : exercise.type === "gap" && prompt.includes("___") ? <label className="teacher-inline-gap" htmlFor={"teacher-answer-" + item.id + "-" + number}>{prompt.split("___")[0]}<input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }} autoComplete="off" spellCheck={false} />{prompt.split("___").slice(1).join("___")}</label> : <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(e) => { setTeacherAnswers((current) => ({...current,[answerId]:e.target.value})); setTeacherGrades((current) => { const next={...current}; delete next[item.id]; return next; }); }} autoComplete="off" spellCheck={false} />}
-                            </div>;
-                          })}
-                          {exercise.options?.length && exercise.type !== "matching" ? <div className="teacher-options"><strong>Options:</strong>{exercise.options.map((option) => <span key={option.id}>{option.id}. {option.text}</span>)}</div> : null}
-                        </section>;
-                      })}
-                      <div className="teacher-practice-footer">
-                        <button type="button" disabled={checkingHomework === item.id} onClick={async () => {
-                          setCheckingHomework(item.id);
-                          try {
-                            const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\\/$/, "")}/functions/v1/teacher-dashboard`, {
-                              method: "POST", headers: {"Content-Type":"application/json", apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "", Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`},
-                              body: JSON.stringify({username:"k", code:teacherCode, action:"grade", homework_id:item.id, answers:Object.fromEntries(Object.entries(teacherAnswers).filter(([key])=>key.startsWith(item.id+"::")).map(([key,value])=>[key.slice(item.id.length+2),value]))})
-                            });
-                            const result = await response.json();
-                            if (!response.ok) throw new Error(result.error || "Could not check this homework.");
-                            setTeacherGrades((current)=>({...current,[item.id]:result}));
-                          } catch (err) { window.alert(err instanceof Error ? err.message : "Could not check this homework."); }
-                          finally { setCheckingHomework(null); }
-                        }}>{checkingHomework === item.id ? "Checking…" : "Check answers"}</button>
-                        <button type="button" className="teacher-clear-button" onClick={()=>{setTeacherAnswers((current)=>{const next={...current};Object.keys(next).forEach((key)=>{if(key.startsWith(item.id+"::"))delete next[key];});return next;});setTeacherGrades((current)=>{const next={...current};delete next[item.id];return next;});}}>Reset</button>
-                        <strong className="teacher-practice-score">{teacherGrades[item.id] ? `Score: ${teacherGrades[item.id].score} / ${teacherGrades[item.id].total}` : " "}</strong>
-                      </div>
-                    </div>}
-                  </article>;
+                  );
                 })}
-                {studentHomework.length === 0 && <p className="teacher-empty">No homework for this student yet.</p>}
+                {studentHomework.length === 0 && <p className="teacher-empty">No homework yet.</p>}
               </div>
             </section>
           );
         })}
       </section>
+
+      {homework.filter((item) => item.id === expandedHomework).map((item) => {
+        const student = students.find((entry) => entry.id === item.student_id);
+        const studentName = student?.name || "Student";
+        const dateLabel = new Date(item.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+        const cleanTitle = item.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]\s*/, "");
+        return (
+          <article className="homework-card teacher-homework-card" key={item.id} ref={expandedHomeworkRef}>
+            <p className="eyebrow teacher-card-meta">{studentName.toUpperCase()} · {dateLabel.toUpperCase()}</p>
+            <h2>{cleanTitle}</h2>
+            {item.exercises?.map((exercise, index) => {
+              const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
+              return (
+                <section className="exercise-section" key={exercise.id || index}>
+                  <div className="section-heading">
+                    <span className="section-number">{String(index + 1).padStart(2, "0")}</span>
+                    <div>
+                      <h3>{exercise.title}</h3>
+                      {exercise.instructions && <p>{exercise.instructions}</p>}
+                    </div>
+                  </div>
+
+                  {exercise.word_bank?.length ? (
+                    <div className="word-bank">
+                      <strong>Word bank</strong>
+                      {exercise.word_bank.map((word) => {
+                        const wordKey = item.id + "::" + exercise.id + "::" + word;
+                        return <button type="button" className={teacherCrossedWords[wordKey] ? "word-bank-word is-crossed" : "word-bank-word"} aria-pressed={!!teacherCrossedWords[wordKey]} onClick={() => setTeacherCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>;
+                      })}
+                    </div>
+                  ) : null}
+
+                  {exercise.type === "snake" && exercise.snake_words?.length ? <TeacherWordSnake words={exercise.snake_words} /> : null}
+
+                  {exercise.items?.map((entry, entryIndex) => {
+                    const number = offset + entryIndex + 1;
+                    const answerId = item.id + "::" + number;
+                    const prompt = entry.prompt || (entry.words || []).join(" / ") || "";
+                    const updateAnswer = (value: string) => {
+                      setTeacherAnswers((current) => ({ ...current, [answerId]: value }));
+                      setTeacherGrades((current) => {
+                        const next = { ...current };
+                        delete next[item.id];
+                        return next;
+                      });
+                    };
+
+                    if (exercise.type === "snake") {
+                      return (
+                        <div className="word-snake-question" key={entry.number ?? entryIndex}>
+                          <span className="word-snake-number">{number}.</span>
+                          <p>{entry.before || ""}<input aria-label={"Answer " + number} className="word-snake-gap" value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />{entry.after || ""}</p>
+                          <span className={"word-snake-mark " + (teacherGrades[item.id] ? (teacherGrades[item.id].wrong_or_empty.includes(number) ? "no" : "ok") : "")}>{teacherGrades[item.id] ? (teacherGrades[item.id].wrong_or_empty.includes(number) ? "×" : "✓") : ""}</span>
+                        </div>
+                      );
+                    }
+
+                    if (exercise.type === "gap" && prompt.includes("___")) {
+                      return (
+                        <div className="question answers-under" key={entry.number ?? entryIndex}>
+                          <label className="inline-gap-label" htmlFor={"teacher-answer-" + item.id + "-" + number}>
+                            {number}. {prompt.split("___")[0]}
+                            <input className="inline-gap-input" id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
+                            {prompt.split("___").slice(1).join("___")}
+                          </label>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className={"question" + (exercise.type === "matching" ? "" : " answers-under")} key={entry.number ?? entryIndex}>
+                        <label htmlFor={"teacher-answer-" + item.id + "-" + number}>{number}. {prompt}</label>
+                        {exercise.type === "matching" ? (
+                          <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(event) => updateAnswer(event.target.value)}>
+                            <option value="">Choose a meaning…</option>
+                            {exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.text}</option>)}
+                          </select>
+                        ) : (
+                          <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {exercise.options?.length && exercise.type !== "matching" ? (
+                    <div className="teacher-options"><strong>Options:</strong>{exercise.options.map((option) => <span key={option.id}>{option.id}. {option.text}</span>)}</div>
+                  ) : null}
+                </section>
+              );
+            })}
+
+            {teacherGrades[item.id] && (
+              <div className="homework-score">
+                <p className="grade-summary">Score: {teacherGrades[item.id].score} / {teacherGrades[item.id].total}</p>
+              </div>
+            )}
+
+            <div className="whole-homework-controls">
+              <button type="button" disabled={checkingHomework === item.id} onClick={async () => {
+                setCheckingHomework(item.id);
+                try {
+                  const response = await fetch((process.env.NEXT_PUBLIC_SUPABASE_URL || "").replace(/\/$/, "") + "/functions/v1/teacher-dashboard", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+                      Authorization: "Bearer " + (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "")
+                    },
+                    body: JSON.stringify({
+                      username: "k",
+                      code: teacherCode,
+                      action: "grade",
+                      homework_id: item.id,
+                      answers: Object.fromEntries(Object.entries(teacherAnswers).filter(([key]) => key.startsWith(item.id + "::")).map(([key, value]) => [key.slice(item.id.length + 2), value]))
+                    })
+                  });
+                  const result = await response.json();
+                  if (!response.ok) throw new Error(result.error || "Could not check this homework.");
+                  setTeacherGrades((current) => ({ ...current, [item.id]: result }));
+                } catch (err) {
+                  window.alert(err instanceof Error ? err.message : "Could not check this homework.");
+                } finally {
+                  setCheckingHomework(null);
+                }
+              }}>{checkingHomework === item.id ? "Checking…" : "Check"}</button>
+              <button type="button" onClick={() => {
+                const savedAnswers = Object.fromEntries(Object.entries(teacherAnswers).filter(([key]) => key.startsWith(item.id + "::")));
+                try {
+                  localStorage.setItem("teacher-preview|" + item.id, JSON.stringify(savedAnswers));
+                  setTeacherSaveNotice("Saved on this device");
+                } catch {
+                  setTeacherSaveNotice("Could not save on this device");
+                }
+              }}>Save</button>
+              <button type="button" className="is-ghost" onClick={() => {
+                setTeacherAnswers((current) => {
+                  const next = { ...current };
+                  Object.keys(next).forEach((key) => { if (key.startsWith(item.id + "::")) delete next[key]; });
+                  return next;
+                });
+                setTeacherGrades((current) => {
+                  const next = { ...current };
+                  delete next[item.id];
+                  return next;
+                });
+                setTeacherSaveNotice("");
+              }}>Reset</button>
+              {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
+            </div>
+          </article>
+        );
+      })}
     </section>
     <footer className="footer"><span>ENGLISH WITH KSENIA</span><span>YOUR TEACHING SPACE</span></footer>
   </main>;
