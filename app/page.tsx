@@ -290,10 +290,6 @@ function LessonWordSnake({
 
   return (
     <div className="word-snake-exercise lesson-word-snake">
-      <div className="word-snake-targets">
-        <strong>Words and phrases to find</strong>
-        {targets.map((word) => <span className="word-snake-target" key={word}>{word}</span>)}
-      </div>
       <div className="word-snake-letters" aria-label="Word snake">
         {letters.map((letter, index) => {
           const ring = rings.find(([a]) => a === index);
