@@ -112,10 +112,51 @@ const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
   ]
 };
 
-function TeacherWordSnake({ words }: { words: string[] }) {
+function TeacherWordSnake({
+  homeworkId,
+  section,
+  startNumber,
+  answers,
+  onAnswer,
+  grade,
+  resetTrigger
+}: {
+  homeworkId: string;
+  section: HomeworkExercise;
+  startNumber: number;
+  answers: Record<string, string>;
+  onAnswer: (number: number, value: string) => void;
+  grade?: { score: number; total: number; wrong_or_empty: number[] };
+  resetTrigger: number;
+}) {
   const [rings, setRings] = useState<Array<[number, number]>>([]);
   const [start, setStart] = useState<number | null>(null);
-  const letters = words.join("").replace(/\s/g, "").split("");
+  const [snakeLoaded, setSnakeLoaded] = useState(false);
+  const letters = (section.snake_words || []).join("").replace(/\\s/g, "").split("");
+  const storageKey = "teacher-word-snake|" + homeworkId + "|" + section.id;
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (Array.isArray(saved.rings)) setRings(saved.rings);
+      }
+    } catch { /* Ignore unavailable or invalid saved circles. */ }
+    setSnakeLoaded(true);
+  }, [storageKey]);
+
+  useEffect(() => {
+    if (!snakeLoaded) return;
+    try { localStorage.setItem(storageKey, JSON.stringify({ rings })); } catch { /* Storage may be unavailable. */ }
+  }, [rings, snakeLoaded, storageKey]);
+
+  useEffect(() => {
+    if (resetTrigger) {
+      setRings([]);
+      setStart(null);
+    }
+  }, [resetTrigger]);
 
   function chooseLetter(index: number) {
     if (start === null) {
@@ -137,23 +178,74 @@ function TeacherWordSnake({ words }: { words: string[] }) {
           const ring = rings.find(([a]) => a === index);
           if (ring) {
             const [a, b] = ring;
-            return <button type="button" className="word-snake-ring" key={index} title="Click to remove this circle" onClick={() => { setRings((current) => current.filter(([x, y]) => x !== a || y !== b)); setStart(null); }}>{letters.slice(a, b + 1).map((char, offset) => <span key={offset} style={{ transform: "translateY(" + (Math.sin((a + offset) * 0.55) * 7) + "px)" }}>{char}</span>)}</button>;
+            return (
+              <button
+                type="button"
+                className="word-snake-ring"
+                key={index}
+                title="Click to remove this circle"
+                onClick={() => { setRings((current) => current.filter(([x, y]) => x !== a || y !== b)); setStart(null); }}
+              >
+                {letters.slice(a, b + 1).map((char, offset) => (
+                  <span key={offset} style={{ transform: "translateY(" + (Math.sin((a + offset) * 0.55) * 7) + "px)" }}>{char}</span>
+                ))}
+              </button>
+            );
           }
           if (rings.some(([a, b]) => index > a && index <= b)) return null;
-          return <button type="button" className={"word-snake-letter" + (start === index ? " is-start" : "")} key={index} onClick={() => chooseLetter(index)} style={{ transform: "translateY(" + (Math.sin(index * 0.55) * 7) + "px)" }}>{letter}</button>;
+          return (
+            <button
+              type="button"
+              className={"word-snake-letter" + (start === index ? " is-start" : "")}
+              key={index}
+              onClick={() => chooseLetter(index)}
+              style={{ transform: "translateY(" + (Math.sin(index * 0.55) * 7) + "px)" }}
+            >
+              {letter}
+            </button>
+          );
         })}
       </div>
       <p className="word-snake-note">Click the first and last letter of each word or phrase to circle it. Click a circle to remove it.</p>
+      <div className="word-snake-questions">
+        {section.items.map((entry, index) => {
+          const displayNumber = startNumber + index;
+          const value = answers[homeworkId + "::" + displayNumber] || "";
+          const wrong = grade?.wrong_or_empty.includes(displayNumber) || false;
+          const mark = grade ? (wrong ? "no" : "ok") : "";
+          return (
+            <div className="word-snake-question" key={displayNumber}>
+              <span className="word-snake-number">{displayNumber}.</span>
+              <p>
+                {entry.before}
+                <input
+                  aria-label={"Answer " + displayNumber}
+                  className={"word-snake-gap" + (grade && !wrong ? " is-correct" : "") + (grade && wrong && value.trim() ? " is-wrong" : "")}
+                  value={value}
+                  autoComplete="off"
+                  spellCheck={false}
+                  autoCorrect="off"
+                  onChange={(event) => onAnswer(displayNumber, event.target.value)}
+                />
+                {entry.after}
+              </p>
+              <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect or empty" : ""}>
+                {mark === "ok" ? "✓" : mark === "no" ? "×" : ""}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
-
 export default function TeacherArea() {
   const [code, setCode] = useState("");
   const [teacherCode, setTeacherCode] = useState("");
   const [teacherAnswers, setTeacherAnswers] = useState<Record<string, string>>({});
   const [teacherGrades, setTeacherGrades] = useState<Record<string, {score:number; total:number; wrong_or_empty:number[]}>>({});
   const [teacherSaveNotice, setTeacherSaveNotice] = useState("");
+  const [teacherResetTrigger, setTeacherResetTrigger] = useState(0);
   const [teacherCrossedWords, setTeacherCrossedWords] = useState<Record<string, boolean>>({});
   const [checkingHomework, setCheckingHomework] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -299,93 +391,88 @@ export default function TeacherArea() {
       </section>
 
       {homework.filter((item) => item.id === expandedHomework).map((item) => {
-        const student = students.find((entry) => entry.id === item.student_id);
-        const studentName = student?.name || "Student";
-        const dateLabel = new Date(item.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
-        const cleanTitle = item.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]\s*/, "");
-        const boardDate = item.title.match(/^(\d{1,2}[./]\d{1,2})/);
         return (
           <article className="homework-card teacher-homework-card" key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
-            <p className="eyebrow teacher-card-meta">{studentName.toUpperCase()} · {dateLabel.toUpperCase()}{boardDate ? " · BOARD " + boardDate[1] : ""}</p>
-            <h2>{cleanTitle}</h2>
+            <h2>{item.title}</h2>
             {item.exercises?.map((exercise, index) => {
               const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
               return (
                 <section className="exercise-section" key={exercise.id || index}>
-                  {exercise.type !== "snake" && <div className="section-heading">
+                  <div className="section-heading">
                     <span className="section-number">{String(index + 1).padStart(2, "0")}</span>
                     <div>
                       <h3>{exercise.title}</h3>
                       {exercise.instructions && <p>{exercise.instructions}</p>}
                     </div>
-                  </div>}
+                  
 
                   {exercise.type !== "snake" && exercise.word_bank?.length ? (
                     <div className="word-bank">
-                      <strong>WORD BOX</strong>
+                      <strong>Word bank</strong>
                       {exercise.word_bank.map((word) => {
                         const wordKey = item.id + "::" + exercise.id + "::" + word;
                         return <button type="button" className={teacherCrossedWords[wordKey] ? "word-bank-word is-crossed" : "word-bank-word"} aria-pressed={!!teacherCrossedWords[wordKey]} onClick={() => setTeacherCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>;
                       })}
-                      <p className="teacher-word-bank-note">Click or tap a word to cross it out when you&apos;ve used it.</p>
                     </div>
                   ) : null}
 
-                  {exercise.type === "snake" && exercise.snake_words?.length ? <TeacherWordSnake words={exercise.snake_words} /> : null}
+                  {exercise.type === "snake" ? (
+                    <TeacherWordSnake
+                      homeworkId={item.id}
+                      section={exercise}
+                      startNumber={offset + 1}
+                      answers={teacherAnswers}
+                      onAnswer={(number, value) => {
+                        const answerId = item.id + "::" + number;
+                        setTeacherAnswers((current) => ({ ...current, [answerId]: value }));
+                        setTeacherGrades((current) => {
+                          const next = { ...current };
+                          delete next[item.id];
+                          return next;
+                        });
+                      }}
+                      grade={teacherGrades[item.id]}
+                      resetTrigger={teacherResetTrigger}
+                    />
+                  ) : (
+                    exercise.items?.map((entry, entryIndex) => {
+                      const number = offset + entryIndex + 1;
+                      const answerId = item.id + "::" + number;
+                      const prompt = entry.prompt || (entry.words || []).join(" / ") || "";
+                      const updateAnswer = (value: string) => {
+                        setTeacherAnswers((current) => ({ ...current, [answerId]: value }));
+                        setTeacherGrades((current) => {
+                          const next = { ...current };
+                          delete next[item.id];
+                          return next;
+                        });
+                      };
 
-                  {exercise.items?.map((entry, entryIndex) => {
-                    const number = offset + entryIndex + 1;
-                    const answerId = item.id + "::" + number;
-                    const prompt = entry.prompt || (entry.words || []).join(" / ") || "";
-                    const updateAnswer = (value: string) => {
-                      setTeacherAnswers((current) => ({ ...current, [answerId]: value }));
-                      setTeacherGrades((current) => {
-                        const next = { ...current };
-                        delete next[item.id];
-                        return next;
-                      });
-                    };
-
-                    if (exercise.type === "snake") {
                       return (
-                        <div className="word-snake-question" key={entry.number ?? entryIndex}>
-                          <span className="word-snake-number">{number}.</span>
-                          <p>{entry.before || ""}<input aria-label={"Answer " + number} className="word-snake-gap" value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />{entry.after || ""}</p>
-                          <span className={"word-snake-mark " + (teacherGrades[item.id] ? (teacherGrades[item.id].wrong_or_empty.includes(number) ? "no" : "ok") : "")}>{teacherGrades[item.id] ? (teacherGrades[item.id].wrong_or_empty.includes(number) ? "×" : "✓") : ""}</span>
+                        <div className={"question" + (exercise.type === "matching" ? "" : " answers-under")} key={entry.number ?? entryIndex}>
+                          {exercise.type === "gap" ? (
+                            <label className="inline-gap-label" htmlFor={"teacher-answer-" + item.id + "-" + number}>
+                              {number}. {(entry.prompt || "").split("___")[0]}
+                              <input className="inline-gap-input" id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
+                              {(entry.prompt || "").split("___").slice(1).join("___")}
+                            </label>
+                          ) : (
+                            <>
+                              <label htmlFor={"teacher-answer-" + item.id + "-" + number}>{number}. {prompt}</label>
+                              {exercise.type === "matching" ? (
+                                <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(event) => updateAnswer(event.target.value)}>
+                                  <option value="">Choose a meaning…</option>
+                                  {exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.text}</option>)}
+                                </select>
+                              ) : (
+                                <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
+                              )}
+                            </>
+                          )}
                         </div>
                       );
-                    }
-
-                    if (exercise.type === "gap" && prompt.includes("___")) {
-                      return (
-                        <div className="question answers-under" key={entry.number ?? entryIndex}>
-                          <label className="inline-gap-label" htmlFor={"teacher-answer-" + item.id + "-" + number}>
-                            {number}. {prompt.split("___")[0]}
-                            <input className="inline-gap-input" id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
-                            {prompt.split("___").slice(1).join("___")}
-                          </label>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div className={"question" + (exercise.type === "matching" ? "" : " answers-under")} key={entry.number ?? entryIndex}>
-                        <label htmlFor={"teacher-answer-" + item.id + "-" + number}>{number}. {prompt}</label>
-                        {exercise.type === "matching" ? (
-                          <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(event) => updateAnswer(event.target.value)}>
-                            <option value="">Choose a meaning…</option>
-                            {exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.text}</option>)}
-                          </select>
-                        ) : (
-                          <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
-                        )}
-                      </div>
-                    );
-                  })}
-
-                  {exercise.options?.length && exercise.type !== "matching" ? (
-                    <div className="teacher-options"><strong>Options:</strong>{exercise.options.map((option) => <span key={option.id}>{option.id}. {option.text}</span>)}</div>
-                  ) : null}
+                    })
+                  )}
                 </section>
               );
             })}
@@ -445,6 +532,7 @@ export default function TeacherArea() {
                   return next;
                 });
                 setTeacherSaveNotice("");
+                setTeacherResetTrigger((value) => value + 1);
               }}>Reset</button>
               {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
             </div>
