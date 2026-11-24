@@ -113,7 +113,7 @@ const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
 };
 
 export default function TeacherArea() {
-  const [code, setCode] = useState("k");
+  const [code, setCode] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -162,7 +162,7 @@ export default function TeacherArea() {
     setError("");
     try {
       await loadData(code);
-      setCode("k");
+      setCode("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -177,7 +177,7 @@ export default function TeacherArea() {
     setSubmissions([]);
     setSelected("all");
     setExpandedHomework(null);
-    setCode("k");
+    setCode("");
     setError("");
   }
 
@@ -205,7 +205,7 @@ export default function TeacherArea() {
           <label htmlFor="teacher-name">Username</label>
           <input id="teacher-name" value="k" readOnly aria-label="Username k"/>
           <label htmlFor="teacher-code">Code</label>
-          <input id="teacher-code" type="password" autoComplete="current-password" value={code} onChange={(event) => setCode(event.target.value)} required/>
+          <input id="teacher-code" type="password" autoComplete="current-password" placeholder="k" value={code} onChange={(event) => setCode(event.target.value)} required/>
           <button className="primary-button" type="submit" disabled={loading}>{loading ? "Opening…" : "Enter teacher area"} <span>↗</span></button>
           {error && <p className="error-message" role="alert">{error}</p>}
         </form>
@@ -273,7 +273,7 @@ export default function TeacherArea() {
                 {exercise.word_bank?.length ? <div className="teacher-word-bank"><strong>Word bank</strong>{exercise.word_bank.map((word) => <span key={word}>{word}</span>)}</div> : null}
                 {exercise.snake_words?.length ? <p className="teacher-exercise-words"><strong>Snake words:</strong> {exercise.snake_words.join(" · ")}</p> : null}
                 {exercise.items?.map((entry, entryIndex) => <p className="teacher-exercise-item" key={entry.number ?? entryIndex}>
-                  <span>{entry.number ?? entryIndex + 1}.</span>
+                  <span>{item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0) + entryIndex + 1}.</span>
                   {entry.prompt || (entry.words || []).join(" / ") || [entry.before, "___", entry.after].filter(Boolean).join("")}
                 </p>)}
                 {exercise.options?.length ? <div className="teacher-options"><strong>Options:</strong>{exercise.options.map((option) => <span key={option.id}>{option.id}. {option.text}</span>)}</div> : null}
