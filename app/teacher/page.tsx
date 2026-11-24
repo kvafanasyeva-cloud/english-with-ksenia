@@ -303,9 +303,10 @@ export default function TeacherArea() {
         const studentName = student?.name || "Student";
         const dateLabel = new Date(item.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
         const cleanTitle = item.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]\s*/, "");
+        const boardDate = item.title.match(/^(\d{1,2}[./]\d{1,2})/);
         return (
-          <article className="homework-card teacher-homework-card" key={item.id} ref={expandedHomeworkRef}>
-            <p className="eyebrow teacher-card-meta">{studentName.toUpperCase()} · {dateLabel.toUpperCase()}</p>
+          <article className="homework-card teacher-homework-card" key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
+            <p className="eyebrow teacher-card-meta">{studentName.toUpperCase()} · {dateLabel.toUpperCase()}{boardDate ? " · BOARD " + boardDate[1] : ""}</p>
             <h2>{cleanTitle}</h2>
             {item.exercises?.map((exercise, index) => {
               const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
@@ -321,13 +322,14 @@ export default function TeacherArea() {
 
                   {exercise.word_bank?.length ? (
                     <div className="word-bank">
-                      <strong>Word bank</strong>
+                      <strong>WORD BOX</strong>
                       {exercise.word_bank.map((word) => {
                         const wordKey = item.id + "::" + exercise.id + "::" + word;
                         return <button type="button" className={teacherCrossedWords[wordKey] ? "word-bank-word is-crossed" : "word-bank-word"} aria-pressed={!!teacherCrossedWords[wordKey]} onClick={() => setTeacherCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>;
                       })}
                     </div>
                   ) : null}
+                  {exercise.word_bank?.length ? <p className="teacher-word-bank-note">Click or tap a word to cross it out when you've used it.</p> : null}
 
                   {exercise.type === "snake" && exercise.snake_words?.length ? <TeacherWordSnake words={exercise.snake_words} /> : null}
 
