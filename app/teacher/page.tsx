@@ -235,7 +235,6 @@ export default function TeacherArea() {
         <div>
           <p className="eyebrow">PRIVATE TEACHER SPACE</p>
           <h1>Your <em>students.</em></h1>
-          <p className="intro">Every student, every assignment, all in one place.</p>
         </div>
       </div>
 
