@@ -659,7 +659,7 @@ export default function Home() {
                     <button type="button" className="is-ghost" onClick={() => { setAnswers((current) => { const next = { ...current }; Object.keys(next).forEach((key) => { if (key.startsWith(task.id + "::")) delete next[key]; }); return next; }); setGrades((current) => { const next = { ...current }; delete next[task.id]; return next; }); setGradeError(""); try { localStorage.removeItem("hw-answers|" + task.id); localStorage.removeItem("word-snake|" + task.id + "|nov24-word-snake"); } catch {} setActivityResetTrigger((value) => value + 1); setSaveNotice(""); }}>Reset</button>
                     {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
                     {gradeError && <span className="grade-error" role="alert">{gradeError}</span>}
-                    {grades[task.id] && <p className="grade-summary">Score: {grades[task.id].score} / {grades[task.id].total}<br />Wrong or empty: {grades[task.id].wrong_or_empty.length ? grades[task.id].wrong_or_empty.join(", ") : "none"}</p>}
+                    {grades[task.id] && <p className="grade-summary">Score: {grades[task.id].score} / {grades[task.id].total}</p>}
                     {grades[task.id] ? (
                       <a className="telegram-button" href={telegramShareUrl(task, grades[task.id])} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
                     ) : (
