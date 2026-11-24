@@ -249,7 +249,7 @@ function LessonWordSnake({
   const [start, setStart] = useState<number | null>(null);
   const [snakeLoaded, setSnakeLoaded] = useState(false);
   const targets = section.snake_words || [];
-  const letters = targets.join("").replace(/\\s/g, "").split("");
+  const letters = targets.join("").replace(/\s/g, "").split("");
   const storageKey = "word-snake|" + taskId + "|" + section.id;
 
   useEffect(() => {
