@@ -1059,3 +1059,49 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     margin-left: 0;
   }
 }
+
+
+/* Consistent reading size for every exercise prompt and answer line. */
+.exercise-section {
+  --exercise-copy-size: 17px;
+  --exercise-copy-leading: 1.65;
+}
+.exercise-section .section-heading p,
+.exercise-section .question label,
+.exercise-section .question input,
+.exercise-section .question select,
+.exercise-section .word-bank strong,
+.exercise-section .word-bank-word,
+.exercise-section .inline-gap-label,
+.exercise-section .word-snake-note,
+.exercise-section .word-snake-example,
+.exercise-section .word-snake-question p,
+.exercise-section .word-snake-number,
+.exercise-section .word-snake-gap {
+  font-size: var(--exercise-copy-size);
+}
+.exercise-section .section-heading p,
+.exercise-section .question label,
+.exercise-section .inline-gap-label,
+.exercise-section .word-snake-note,
+.exercise-section .word-snake-example,
+.exercise-section .word-snake-question p {
+  line-height: var(--exercise-copy-leading);
+}
+.exercise-section .question-number {
+  font-size: inherit;
+}
+.exercise-section .word-snake-number {
+  line-height: var(--exercise-copy-leading);
+}
+.teacher-live-question label,
+.teacher-live-question input,
+.teacher-live-question select,
+.teacher-live-prompt,
+.teacher-inline-gap {
+  font-size: 17px;
+}
+.teacher-live-question label,
+.teacher-live-prompt {
+  line-height: 1.65;
+}
