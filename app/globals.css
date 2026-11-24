@@ -161,6 +161,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   font-size: 10px;
   line-height: 1.6;
 }
+
+/* Hide any leftover personal-code reminder on the student login card. */
+.login-card .privacy-note { display: none; }
 .error-message {
   margin: 0 0 15px;
   color: var(--danger);
