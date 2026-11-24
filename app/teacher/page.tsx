@@ -312,15 +312,15 @@ export default function TeacherArea() {
               const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
               return (
                 <section className="exercise-section" key={exercise.id || index}>
-                  <div className="section-heading">
+                  {exercise.type !== "snake" && <div className="section-heading">
                     <span className="section-number">{String(index + 1).padStart(2, "0")}</span>
                     <div>
                       <h3>{exercise.title}</h3>
                       {exercise.instructions && <p>{exercise.instructions}</p>}
                     </div>
-                  </div>
+                  </div>}
 
-                  {exercise.word_bank?.length ? (
+                  {exercise.type !== "snake" && exercise.word_bank?.length ? (
                     <div className="word-bank">
                       <strong>WORD BOX</strong>
                       {exercise.word_bank.map((word) => {
