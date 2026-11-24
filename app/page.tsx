@@ -480,6 +480,42 @@ export default function Home() {
     }
   }
 
+
+  function resetHomework(task: Homework) {
+    const prefix = task.id + "::";
+    setAnswers((current) => {
+      const next = { ...current };
+      Object.keys(next).forEach((key) => { if (key.startsWith(prefix)) delete next[key]; });
+      return next;
+    });
+    setCrossedWords((current) => {
+      const next = { ...current };
+      Object.keys(next).forEach((key) => { if (key.startsWith(prefix)) delete next[key]; });
+      return next;
+    });
+    setGrades((current) => {
+      const next = { ...current };
+      delete next[task.id];
+      return next;
+    });
+    setGradeError("");
+    setSaveNotice("");
+    try {
+      localStorage.removeItem("hw-answers|" + task.id);
+      localStorage.removeItem("hw-crossed|" + task.id);
+      task.exercises.forEach((exercise) => {
+        if (exercise.type === "snake") {
+          localStorage.removeItem("word-snake|" + task.id + "|" + exercise.id);
+        }
+      });
+      localStorage.removeItem("word-snake|" + task.id + "|nov24-word-snake");
+      if (task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93") {
+        localStorage.removeItem("kate-word-snake");
+      }
+    } catch { /* Storage may be unavailable. */ }
+    setActivityResetTrigger((value) => value + 1);
+  }
+
   async function loadHomework() {
     setHomeworkLoading(true);
     const { data, error: homeworkError } = await getSupabase()
@@ -647,7 +683,7 @@ export default function Home() {
                   <div className="whole-homework-controls">
                     <button type="button" disabled={gradingTaskId === task.id} onClick={() => handleCheck(task)}>{gradingTaskId === task.id ? "Checking…" : "Check"}</button>
                     <button type="button" onClick={() => { try { const saved: Record<string, string> = {}; Object.entries(answers).forEach(([key, value]) => { const prefix = task.id + "::"; if (key.startsWith(prefix)) saved[key.slice(prefix.length)] = value; }); localStorage.setItem("hw-answers|" + task.id, JSON.stringify(saved)); setSaveNotice("Saved on this device"); } catch { setSaveNotice("Could not save on this device"); } }}>Save</button>
-                    <button type="button" className="is-ghost" onClick={() => { setAnswers((current) => { const next = { ...current }; Object.keys(next).forEach((key) => { if (key.startsWith(task.id + "::")) delete next[key]; }); return next; }); setGrades((current) => { const next = { ...current }; delete next[task.id]; return next; }); setGradeError(""); try { localStorage.removeItem("hw-answers|" + task.id); localStorage.removeItem("word-snake|" + task.id + "|nov24-word-snake"); } catch {} setActivityResetTrigger((value) => value + 1); setSaveNotice(""); }}>Reset</button>
+                    <button type="button" className="is-ghost" onClick={() => resetHomework(task)}>Reset</button>
                     {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
                     {gradeError && <span className="grade-error" role="alert">{gradeError}</span>}
                     {grades[task.id] ? (
