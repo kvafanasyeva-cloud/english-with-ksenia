@@ -215,7 +215,8 @@ function TeacherWordSnake({
               <p>
                 {entry.before}
                 <input
-                  aria-label={"Answer " + displayNumber}                  className="word-snake-gap"
+                  aria-label={"Answer " + displayNumber}
+                  className="word-snake-gap"
                   value={value}
                   autoComplete="off"
                   spellCheck={false}
