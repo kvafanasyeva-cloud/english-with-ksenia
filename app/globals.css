@@ -776,3 +776,101 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   .teacher-status { padding: 5px 7px; font-size: 8px; }
   .teacher-assignment-detail { padding: 4px 13px 14px; }
 }
+
+
+/* Teacher practice: editable student-style homework and right-aligned score. */
+.teacher-live-question {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 7px;
+  margin: 12px 0 18px;
+}
+.teacher-live-question label {
+  display: block;
+  font-size: 15px;
+  line-height: 1.65;
+  font-weight: 500;
+}
+.teacher-live-question label > span {
+  display: inline-block;
+  min-width: 27px;
+  color: var(--muted);
+}
+.teacher-live-question input,
+.teacher-live-question select {
+  width: 100%;
+  min-height: 39px;
+  padding: 6px 3px;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 16px Inter, sans-serif;
+}
+.teacher-snake-letters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 18px 0 24px;
+  font: 500 22px 'Space Grotesk', sans-serif;
+}
+.teacher-snake-letters span { padding: 2px 1px; }
+.teacher-practice-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.teacher-practice-footer button {
+  min-height: 40px;
+  padding: 9px 15px;
+  border: 1px solid var(--ink);
+  border-radius: 5px;
+  background: var(--ink);
+  color: white;
+  font: 500 13px Inter, sans-serif;
+  cursor: pointer;
+}
+.teacher-practice-footer button:disabled { opacity: .55; cursor: wait; }
+.teacher-practice-footer .teacher-clear-button { background: white; color: var(--ink); }
+.teacher-practice-score {
+  margin-left: auto;
+  font: 600 17px 'Space Grotesk', sans-serif;
+  text-align: right;
+}
+.simple-checkmark {
+  position: relative;
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  vertical-align: middle;
+}
+.simple-checkmark::before,
+.simple-checkmark::after {
+  position: absolute;
+  content: "";
+  display: block;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transform-origin: left center;
+}
+.simple-checkmark::before {
+  width: 5px;
+  left: 2px;
+  top: 8px;
+  transform: rotate(45deg);
+}
+.simple-checkmark::after {
+  width: 10px;
+  left: 5px;
+  top: 11px;
+  transform: rotate(-50deg);
+}
+@media (max-width: 600px) {
+  .teacher-practice-score { width: 100%; margin-left: 0; text-align: right; }
+}
