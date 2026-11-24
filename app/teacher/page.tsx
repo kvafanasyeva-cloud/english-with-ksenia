@@ -446,13 +446,13 @@ export default function TeacherArea() {
                         <div className={"question" + (exercise.type === "matching" ? "" : " answers-under")} key={entry.number ?? entryIndex}>
                           {exercise.type === "gap" ? (
                             <label className="inline-gap-label" htmlFor={"teacher-answer-" + item.id + "-" + number}>
-                              {number}. {(entry.prompt || "").split("___")[0]}
+                              <span className="question-number">{number}.</span> {(entry.prompt || "").split("___")[0]}
                               <input className="inline-gap-input" id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
                               {(entry.prompt || "").split("___").slice(1).join("___")}
                             </label>
                           ) : (
                             <>
-                              <label htmlFor={"teacher-answer-" + item.id + "-" + number}>{number}. {prompt}</label>
+                              <label htmlFor={"teacher-answer-" + item.id + "-" + number}><span className="question-number">{number}.</span> {prompt}</label>
                               {exercise.type === "matching" ? (
                                 <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(event) => updateAnswer(event.target.value)}>
                                   <option value="">Choose a meaning…</option>
