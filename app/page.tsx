@@ -328,12 +328,6 @@ function LessonWordSnake({
         })}
       </div>
       <p className="word-snake-note">Click the first and last letter of each word or phrase to circle it. Click a circle to remove it.</p>
-      {section.example && (
-        <div className="word-snake-example">
-          <span>EXAMPLE</span>
-          {section.example.before}<strong>{section.example.word}</strong>{section.example.after}
-        </div>
-      )}
       <div className="word-snake-questions">
         {section.items.map((item, index) => {
           const displayNumber = startNumber + index;
@@ -652,6 +646,7 @@ export default function Home() {
                       })}
                     </section>
                   ))}
+                  {grades[task.id] && <div className="homework-score"><p className="grade-summary">Score: {grades[task.id].score} / {grades[task.id].total}</p></div>}
                   {task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" && <section className="exercise-section word-snake-section"><div className="section-heading"><span className="section-number">{String((task.exercises?.length || 0) + 1).padStart(2, "0")}</span><div><h3>Find the verbs in the word snake</h3><p>Complete the sentences using verbs from the word snake in the correct form.</p></div></div><WordSnakeExercise checkTrigger={activityCheckTrigger} resetTrigger={activityResetTrigger} startNumber={(task.exercises?.reduce((total, exercise) => total + exercise.items.length, 0) || 0) + 1} /></section>}
                   <div className="whole-homework-controls">
                     <button type="button" disabled={gradingTaskId === task.id} onClick={() => handleCheck(task)}>{gradingTaskId === task.id ? "Checking…" : "Check"}</button>
@@ -659,7 +654,6 @@ export default function Home() {
                     <button type="button" className="is-ghost" onClick={() => { setAnswers((current) => { const next = { ...current }; Object.keys(next).forEach((key) => { if (key.startsWith(task.id + "::")) delete next[key]; }); return next; }); setGrades((current) => { const next = { ...current }; delete next[task.id]; return next; }); setGradeError(""); try { localStorage.removeItem("hw-answers|" + task.id); localStorage.removeItem("word-snake|" + task.id + "|nov24-word-snake"); } catch {} setActivityResetTrigger((value) => value + 1); setSaveNotice(""); }}>Reset</button>
                     {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
                     {gradeError && <span className="grade-error" role="alert">{gradeError}</span>}
-                    {grades[task.id] && <p className="grade-summary">Score: {grades[task.id].score} / {grades[task.id].total}</p>}
                     {grades[task.id] ? (
                       <a className="telegram-button" href={telegramShareUrl(task, grades[task.id])} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
                     ) : (
