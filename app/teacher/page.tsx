@@ -507,14 +507,6 @@ export default function TeacherArea() {
                 }
               }}>Save</button>
               <button type="button" className="is-ghost" onClick={() => resetTeacherHomework(item)}>Reset</button>
-                setTeacherAnswers((current) => {
-                  const next = { ...current };
-                  Object.keys(next).forEach((key) => { if (key.startsWith(item.id + "::")) delete next[key]; });
-                  return next;
-                });
-                setTeacherSaveNotice("");
-                setTeacherResetTrigger((value) => value + 1);
-              }}>Reset</button>
               {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
             </div>
           </article>
