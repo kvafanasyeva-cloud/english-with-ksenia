@@ -901,3 +901,94 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   cursor: pointer;
 }
 .teacher-word-bank .teacher-word-crossed { color: #888; text-decoration: line-through; }
+
+/* Teacher homework list and full-size student-style assignment view. */
+.teacher-roster { margin: 0 0 48px; }
+.teacher-student-group { margin: 0 0 22px; }
+.teacher-student-heading {
+  margin: 0;
+  padding: 0 0 9px;
+  border-bottom: 2px solid var(--ink);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.teacher-homework-links { display: block; }
+.teacher-homework-link {
+  width: 100%;
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 7px 0;
+  border: 0;
+  border-bottom: 1px dashed var(--line);
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.teacher-homework-link:hover { background: var(--soft); }
+.teacher-homework-date {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+.teacher-homework-title {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.teacher-homework-link.is-active .teacher-homework-title {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+.teacher-homework-card {
+  margin-top: 48px;
+  scroll-margin-top: 24px;
+}
+.teacher-homework-card > .teacher-card-meta {
+  margin: 0 0 7px;
+  font-size: 11px;
+  letter-spacing: .1em;
+}
+.teacher-homework-card > h2 {
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+  font-size: 23px;
+  letter-spacing: -.025em;
+}
+.teacher-homework-card .section-number { display: none; }
+.teacher-homework-card .section-heading { margin-bottom: 14px; }
+.teacher-homework-card .word-bank {
+  margin-left: 0;
+  padding: 14px 16px;
+}
+.teacher-homework-card .word-bank strong {
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: .08em;
+}
+.teacher-word-bank-note {
+  margin: -12px 0 20px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.teacher-homework-card .question { margin-left: 0; }
+.teacher-homework-card .question.answers-under { margin-left: 0; }
+.teacher-homework-card .word-snake-exercise { margin-left: 0; }
+.teacher-homework-card .word-snake-question { margin-bottom: 8px; }
+@media (max-width: 760px) {
+  .teacher-homework-link {
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 44px;
+  }
+  .teacher-homework-date, .teacher-homework-title { font-size: 15px; }
+  .teacher-homework-card { margin-top: 34px; padding: 22px 17px; }
+  .teacher-homework-card > h2 { font-size: 21px; }
+}
