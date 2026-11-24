@@ -270,6 +270,31 @@ export default function TeacherArea() {
     expandedHomeworkRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [expandedHomework]);
 
+
+  function resetTeacherHomework(item: Homework) {
+    const prefix = item.id + "::";
+    setTeacherAnswers((current) => {
+      const next = { ...current };
+      Object.keys(next).forEach((key) => { if (key.startsWith(prefix)) delete next[key]; });
+      return next;
+    });
+    setTeacherCrossedWords((current) => {
+      const next = { ...current };
+      Object.keys(next).forEach((key) => { if (key.startsWith(prefix)) delete next[key]; });
+      return next;
+    });
+    setTeacherSaveNotice("");
+    try {
+      localStorage.removeItem("teacher-preview|" + item.id);
+      item.exercises?.forEach((exercise) => {
+        if (exercise.type === "snake") {
+          localStorage.removeItem("teacher-word-snake|" + item.id + "|" + exercise.id);
+        }
+      });
+    } catch { /* Storage may be unavailable. */ }
+    setTeacherResetTrigger((value) => value + 1);
+  }
+
   async function loadData(accessCode: string) {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -471,7 +496,7 @@ export default function TeacherArea() {
               );
             })}
 <div className="whole-homework-controls">
-              <button type="button" onClick={() => markHomeworkChecked(item.id)} aria-pressed={!!teacherCheckedHomework[item.id]}>{teacherCheckedHomework[item.id] ? "Checked ✓" : "Check"}</button>
+              <button type="button" onClick={() => markHomeworkChecked(item.id)} aria-pressed={!!teacherCheckedHomework[item.id]}>Check</button>
               <button type="button" onClick={() => {
                 const savedAnswers = Object.fromEntries(Object.entries(teacherAnswers).filter(([key]) => key.startsWith(item.id + "::")));
                 try {
@@ -481,7 +506,7 @@ export default function TeacherArea() {
                   setTeacherSaveNotice("Could not save on this device");
                 }
               }}>Save</button>
-              <button type="button" className="is-ghost" onClick={() => {
+              <button type="button" className="is-ghost" onClick={() => resetTeacherHomework(item)}>Reset</button>
                 setTeacherAnswers((current) => {
                   const next = { ...current };
                   Object.keys(next).forEach((key) => { if (key.startsWith(item.id + "::")) delete next[key]; });
