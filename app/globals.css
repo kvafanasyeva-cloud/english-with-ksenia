@@ -1013,3 +1013,49 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .teacher-card-checkmark {
   margin-left: 12px;
 }
+
+
+/* Align numbered prompts across all exercises, including word-snake questions. */
+.question-number {
+  display: inline-block;
+  width: 30px;
+  min-width: 30px;
+  color: var(--muted);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.section-number {
+  font-weight: 400;
+}
+.word-snake-question {
+  margin-left: 44px;
+  gap: 0;
+}
+.word-snake-number {
+  display: inline-block;
+  flex: 0 0 30px;
+  width: 30px;
+  min-width: 30px;
+  padding-top: 1px;
+  color: var(--muted);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lighter typography throughout the exercise content. */
+.exercise-section .section-heading h3 {
+  font-weight: 600;
+}
+.question label,
+.inline-gap-label,
+.word-snake-question p {
+  font-weight: 400;
+}
+.exercise-section .word-bank strong {
+  font-weight: 500;
+}
+@media (max-width: 760px) {
+  .word-snake-question {
+    margin-left: 0;
+  }
+}
