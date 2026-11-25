@@ -213,6 +213,23 @@ const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
 };
 
 
+function getTeacherAnswerText(
+  answerKey: Record<string, string | string[]> | undefined,
+  number: number,
+  exercise: HomeworkExercise
+) {
+  const stored = answerKey?.[String(number)];
+  if (stored === undefined) return "";
+  const accepted = Array.isArray(stored) ? stored : [stored];
+  return accepted.map((value) => {
+    if (exercise.type === "matching") {
+      const option = exercise.options?.find((candidate) => candidate.id === value);
+      return option ? value.toUpperCase() + " — " + option.text : value;
+    }
+    return value;
+  }).join(" / ");
+}
+
 const KATE_NOV_21_ANSWER_KEY: Record<string, string | string[]> = {
   "1": "cancel",
   "2": "add up",
@@ -258,6 +275,8 @@ function TeacherWordSnake({
   onAnswer: (number: number, value: string) => void;
   resetTrigger: number;
   grade?: GradeResult;
+  answerKey?: Record<string, string | string[]>;
+  showAnswers?: boolean;
 }) {
   const [rings, setRings] = useState<Array<[number, number]>>([]);
   const [start, setStart] = useState<number | null>(null);
@@ -362,6 +381,11 @@ function TeacherWordSnake({
               <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect or empty" : ""}>
                 {mark === "ok" ? "✓" : mark === "no" ? "×" : ""}
               </span>
+              {showAnswers && (
+                <span className="teacher-inline-answer word-snake-inline-answer">
+                  <strong>Answer:</strong> {getTeacherAnswerText(answerKey, displayNumber, section) || "—"}
+                </span>
+              )}
             </div>
           );
         })}
@@ -764,50 +788,11 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
         return (
           <article className="homework-card teacher-homework-card" key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
             <h2>{item.title}</h2>
-            {answerVisibility[item.id] && (
-              <section className="teacher-answer-panel" aria-label="Homework answer key">
-                <div className="teacher-answer-panel-heading">
-                  <h3>Answer key</h3>
-                  <button type="button" onClick={() => setAnswerVisibility((current) => ({ ...current, [item.id]: false }))}>Hide</button>
-                </div>
-                {answerErrors[item.id] ? (
-                  <p className="teacher-answer-error" role="alert">{answerErrors[item.id]}</p>
-                ) : answerLoadingId === item.id ? (
-                  <p className="teacher-answer-loading">Loading answers…</p>
-                ) : teacherAnswerKeys[item.id] ? (
-                  item.exercises?.map((exercise, index) => {
-                    const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
-                    return (
-                      <div className="teacher-answer-exercise" key={exercise.id || index}>
-                        <h4>{exercise.title}</h4>
-                        <ol>
-                          {exercise.items?.map((entry, entryIndex) => {
-                            const number = offset + entryIndex + 1;
-                            const stored = teacherAnswerKeys[item.id][String(number)];
-                            const accepted = stored === undefined ? [] : Array.isArray(stored) ? stored : [stored];
-                            const displayAnswers = accepted.map((value) => {
-                              const answer = String(value);
-                              if (exercise.type === "matching") {
-                                const option = exercise.options?.find((candidate) => candidate.id === answer);
-                                return option ? answer.toUpperCase() + " — " + option.text : answer;
-                              }
-                              return answer;
-                            });
-                            return (
-                              <li key={number}>
-                                <span className="teacher-answer-number">{number}.</span>
-                                <span>{displayAnswers.length ? displayAnswers.join(" / ") : "—"}</span>
-                              </li>
-                            );
-                          })}
-                        </ol>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="teacher-answer-loading">No answer key is available for this homework yet.</p>
-                )}
-              </section>
+            {answerVisibility[item.id] && answerErrors[item.id] && (
+              <p className="teacher-answer-error teacher-answer-status" role="alert">{answerErrors[item.id]}</p>
+            )}
+            {answerVisibility[item.id] && answerLoadingId === item.id && (
+              <p className="teacher-answer-loading teacher-answer-status">Loading answers…</p>
             )}
             {item.exercises?.map((exercise, index) => {
               const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
@@ -841,12 +826,15 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                       onAnswer={(number, value) => updateTeacherAnswer(item.id, number, value)}
                       resetTrigger={teacherResetTrigger}
                       grade={teacherGrades[item.id]}
+                      answerKey={teacherAnswerKeys[item.id]}
+                      showAnswers={!!answerVisibility[item.id] && !!teacherAnswerKeys[item.id]}
                     />
                   ) : (
                     exercise.items?.map((entry, entryIndex) => {
                       const number = offset + entryIndex + 1;
                       const answerId = item.id + "::" + number;
                       const prompt = entry.prompt || (entry.words || []).join(" / ") || "";
+                      const displayAnswer = getTeacherAnswerText(teacherAnswerKeys[item.id], number, exercise);
                       const updateAnswer = (value: string) => updateTeacherAnswer(item.id, number, value);
 
                       return (
@@ -869,6 +857,11 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                                 <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
                               )}
                             </>
+                          )}
+                          {answerVisibility[item.id] && teacherAnswerKeys[item.id] && (
+                            <div className="teacher-inline-answer">
+                              <strong>Answer:</strong> {displayAnswer || "—"}
+                            </div>
                           )}
                         </div>
                       );
