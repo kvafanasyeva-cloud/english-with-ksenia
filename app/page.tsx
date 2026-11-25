@@ -68,93 +68,181 @@ function telegramShareUrl(task: Homework, grade: GradeResult) {
 
 
 const KATE_NOV_21_HOMEWORK: Homework = {
-  id: "kate-2026-11-21-b1-vocabulary",
-  title: "21.11 · Everyday life & communication",
-  description: "21 November · Vocabulary practice",
-  exercises: [
+  "id": "kate-2026-11-21-b1-vocabulary",
+  "title": "21.11 · Everyday life & communication",
+  "description": "21 November · Vocabulary practice",
+  "exercises": [
     {
-      id: "nov21-gap-fill",
-      type: "gap",
-      title: "Complete the sentences · 1",
-      instructions: "Complete each sentence with one word or phrase from the word bank.",
-      word_bank: ["cancel", "add up", "consider", "celebrate", "defend"],
-      items: [
-        { number: 1, prompt: "We had to ___ the meeting because the teacher was ill." },
-        { number: 2, prompt: "These numbers don't ___ . Can you check them again?" },
-        { number: 3, prompt: "Have you ever ___ moving to another country?" },
-        { number: 4, prompt: "We're going to ___ my sister's birthday this weekend." },
-        { number: 5, prompt: "It's important to ___ your point of view with clear reasons." }
-      ]
-    },
-    {
-      id: "nov21-gap-fill-part2",
-      type: "gap",
-      title: "Complete the sentences · 2",
-      instructions: "Complete each sentence with one word or phrase from the word bank.",
-      word_bank: ["comprehend", "opinion", "holiday", "door"],
-      items: [
-        { number: 6, prompt: "I didn't ___ what he was trying to explain." },
-        { number: 7, prompt: "In my ___, this is the best solution." },
-        { number: 8, prompt: "We usually travel abroad during the summer ___." },
-        { number: 9, prompt: "Please close the ___ quietly when you leave." }
-      ]
-    },
-    {
-      id: "nov21-matching",
-      type: "matching",
-      title: "Match the phrases and meanings",
-      instructions: "Choose the correct meaning for each phrase.",
-      options: [
-        { id: "a", text: "to understand something" },
-        { id: "b", text: "to agree with someone" },
-        { id: "c", text: "to be busy doing your job" },
-        { id: "d", text: "to tell someone something" },
-        { id: "e", text: "to understand or hear something with difficulty" }
+      "id": "nov21-gap-fill",
+      "type": "gap",
+      "title": "Complete the sentences",
+      "instructions": "Complete each sentence with one word or phrase from the word bank. Use each item once.",
+      "word_bank": [
+        "cancel",
+        "add up",
+        "consider",
+        "celebrate",
+        "defend",
+        "comprehend",
+        "opinion"
       ],
-      items: [
-        { number: 1, prompt: "quite get / catch it" },
-        { number: 2, prompt: "agree" },
-        { number: 3, prompt: "at work" },
-        { number: 4, prompt: "say something to you" },
-        { number: 5, prompt: "comprehend" }
+      "items": [
+        {
+          "number": 1,
+          "prompt": "We had to ___ the meeting because the teacher was ill."
+        },
+        {
+          "number": 2,
+          "prompt": "These numbers don't ___ . Can you check them again?"
+        },
+        {
+          "number": 3,
+          "prompt": "Have you ever ___ moving to another country?"
+        },
+        {
+          "number": 4,
+          "prompt": "We're going to ___ my sister's birthday this weekend."
+        },
+        {
+          "number": 5,
+          "prompt": "It's important to ___ your point of view with clear reasons."
+        },
+        {
+          "number": 6,
+          "prompt": "I didn't ___ what he was trying to explain."
+        },
+        {
+          "number": 7,
+          "prompt": "In my ___, this is the best solution."
+        }
       ]
     },
     {
-      id: "nov21-complete",
-      type: "write",
-      title: "Complete the sentences",
-      
-      items: [
-        { number: 1, prompt: "The way you see yourself is called your ___." },
-        { number: 2, prompt: "The plural of 'child' is ___." },
-        { number: 3, prompt: "___ it was raining, we went for a walk." },
-        { number: 4, prompt: "We should listen to ___, even when their opinions differ from ours." },
-        { number: 5, prompt: "Please don't ___ me for something I didn't do." }
+      "id": "nov21-matching",
+      "type": "matching",
+      "title": "Match the phrases and meanings",
+      "instructions": "Choose the correct meaning for each phrase.",
+      "options": [
+        {
+          "id": "a",
+          "text": "to understand something"
+        },
+        {
+          "id": "b",
+          "text": "to agree with someone"
+        },
+        {
+          "id": "c",
+          "text": "to be busy doing your job"
+        },
+        {
+          "id": "d",
+          "text": "to tell someone something"
+        },
+        {
+          "id": "e",
+          "text": "to understand or hear something with difficulty"
+        }
+      ],
+      "items": [
+        {
+          "number": 8,
+          "prompt": "quite get / catch it"
+        },
+        {
+          "number": 9,
+          "prompt": "agree"
+        },
+        {
+          "number": 10,
+          "prompt": "at work"
+        },
+        {
+          "number": 11,
+          "prompt": "say something to you"
+        },
+        {
+          "number": 12,
+          "prompt": "comprehend"
+        }
       ]
     },
     {
-      id: "nov21-rewrite",
-      type: "rewrite",
-      title: "Rewrite the sentences",
-      
-      items: [
-        { number: 1, prompt: "I don't understand what you mean. (quite get)" },
-        { number: 2, prompt: "I agree with your opinion. (share)" },
-        { number: 3, prompt: "Although she was tired, she finished the task. (even though)" },
-        { number: 4, prompt: "I will tell you my decision tomorrow. (say)" }
+      "id": "nov21-complete",
+      "type": "write",
+      "title": "Complete the sentences",
+      "items": [
+        {
+          "number": 13,
+          "prompt": "The way you see yourself is called your ___."
+        },
+        {
+          "number": 14,
+          "prompt": "The plural of 'child' is ___."
+        },
+        {
+          "number": 15,
+          "prompt": "___ it was raining, we went for a walk."
+        },
+        {
+          "number": 16,
+          "prompt": "We should listen to ___, even when their opinions differ from ours."
+        },
+        {
+          "number": 17,
+          "prompt": "Please don't ___ me for something I didn't do."
+        }
       ]
     },
     {
-      id: "nov21-error-correction",
-      type: "error-correction",
-      title: "Correct the mistakes",
-      instructions: "Each sentence contains one mistake. Rewrite the sentence correctly.",
-      items: [
-        { number: 1, prompt: "I don't can understand what he is saying." },
-        { number: 2, prompt: "Even though it was late, but we kept talking." },
-        { number: 3, prompt: "She explained me her opinion." },
-        { number: 4, prompt: "We have celebrated her birthday last weekend." },
-        { number: 5, prompt: "These figures don't adds up." }
+      "id": "nov21-rewrite",
+      "type": "rewrite",
+      "title": "Rewrite the sentences",
+      "items": [
+        {
+          "number": 18,
+          "prompt": "I don't understand what you mean. (quite get)"
+        },
+        {
+          "number": 19,
+          "prompt": "I agree with your opinion. (share)"
+        },
+        {
+          "number": 20,
+          "prompt": "Although she was tired, she finished the task. (even though)"
+        },
+        {
+          "number": 21,
+          "prompt": "I will tell you my decision tomorrow. (say)"
+        }
+      ]
+    },
+    {
+      "id": "nov21-error-correction",
+      "type": "error-correction",
+      "title": "Correct the mistakes",
+      "instructions": "Each sentence contains one mistake. Rewrite the sentence correctly.",
+      "items": [
+        {
+          "number": 22,
+          "prompt": "I don't can understand what he is saying."
+        },
+        {
+          "number": 23,
+          "prompt": "Even though it was late, but we kept talking."
+        },
+        {
+          "number": 24,
+          "prompt": "She explained me her opinion."
+        },
+        {
+          "number": 25,
+          "prompt": "We have celebrated her birthday last weekend."
+        },
+        {
+          "number": 26,
+          "prompt": "These figures don't adds up."
+        }
       ]
     }
   ]
