@@ -588,7 +588,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .question.answers-under {
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  gap: 7px;
+  gap: 4px;
 }
 .question.answers-under input {
   width: 100%;
@@ -987,7 +987,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   text-align: right;
 }
 .question {
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 }
 .question label {
   font-weight: 550;
@@ -1179,15 +1179,26 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   line-height: 1.45;
 }
 .teacher-homework-checkmark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  display: inline-block;
+  width: 17px;
+  height: 15px;
   justify-self: end;
   padding: 0 2px 0 10px;
   color: var(--ink);
-  font-size: 21px;
-  font-weight: 600;
-  line-height: 1;
+  font-size: 0;
+  line-height: 0;
+}
+.teacher-homework-checkmark::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 8px;
+  height: 5px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
 }
 .teacher-homework-answers-button {
   min-height: 34px;
@@ -1237,7 +1248,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .teacher-inline-answer {
   display: block;
   grid-column: 1 / -1;
-  margin: -8px 0 14px 44px;
+  margin: 5px 0 9px 44px;
   color: #555;
   font: 13px/1.55 Inter, sans-serif;
   overflow-wrap: anywhere;
@@ -1247,8 +1258,37 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   font-weight: 600;
 }
 .word-snake-question .word-snake-inline-answer {
-  margin: 5px 0 0;
+  margin: 6px 0 2px;
   font-size: 13px;
+}
+.source-sentence {
+  display: inline-block;
+  padding: 8px 11px;
+  border-radius: 7px;
+  background: #f2f2f2;
+  color: #333;
+  font-weight: 400;
+}
+.writing-instructions { white-space: pre-line; }
+.question.is-writing-question {
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.writing-answer {
+  display: block;
+  width: 100%;
+  min-height: 165px;
+  padding: 11px 13px;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: 17px/1.6 Inter, sans-serif;
+  resize: vertical;
+}
+.writing-answer:focus {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
 }
 @media (max-width: 760px) {
   .teacher-answer-status,
@@ -1268,5 +1308,4 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     padding: 10px 11px;
     font-size: 12px;
   }
-  .teacher-homework-checkmark { font-size: 19px; }
 }
