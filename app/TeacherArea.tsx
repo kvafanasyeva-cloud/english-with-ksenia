@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 type Student = { id: string; name: string; created_at: string };
-type HomeworkItem = { number?: number; prompt?: string; words?: string[]; before?: string; after?: string };
+type HomeworkItem = { number?: number; prompt?: string; cue?: string; words?: string[]; before?: string; after?: string };
 type HomeworkExercise = {
   id: string;
   type: string;
@@ -575,7 +575,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                             </label>
                           ) : (
                             <>
-                              <label htmlFor={"teacher-answer-" + item.id + "-" + number}><span className="question-number">{number}.</span> {prompt}</label>
+                              <label className={entry.cue ? "rewrite-question-label" : undefined} htmlFor={"teacher-answer-" + item.id + "-" + number}><span className="question-number">{number}.</span> {entry.cue ? <span className="rewrite-prompt-card"><span className="rewrite-cue">{entry.cue}</span><span className="rewrite-source">{prompt}</span></span> : prompt}</label>
                               {exercise.type === "matching" ? (
                                 <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(event) => updateAnswer(event.target.value)}>
                                   <option value="">Choose a meaning…</option>
