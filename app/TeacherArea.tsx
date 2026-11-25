@@ -212,6 +212,36 @@ const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
   ]
 };
 
+
+const KATE_NOV_21_ANSWER_KEY: Record<string, string | string[]> = {
+  "1": "cancel",
+  "2": "add up",
+  "3": "consider",
+  "4": "celebrate",
+  "5": "defend",
+  "6": "comprehend",
+  "7": "opinion",
+  "8": "e",
+  "9": "b",
+  "10": "c",
+  "11": "d",
+  "12": "a",
+  "13": "self-perception",
+  "14": "children",
+  "15": ["although", "even though"],
+  "16": ["others", "other people"],
+  "17": "blame",
+  "18": "I don't quite get what you mean.",
+  "19": "I share your opinion.",
+  "20": "Even though she was tired, she finished the task.",
+  "21": "I will say to you what my decision is tomorrow.",
+  "22": "I can't understand what he is saying.",
+  "23": "Although it was late, we kept talking.",
+  "24": "She explained her opinion to me.",
+  "25": "We celebrated her birthday last weekend.",
+  "26": "These figures don't add up."
+};
+
 function TeacherWordSnake({
   homeworkId,
   section,
@@ -356,7 +386,85 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
   const [homework, setHomework] = useState<Homework[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [expandedHomework, setExpandedHomework] = useState<string | null>(null);
+  const [checkedHomework, setCheckedHomework] = useState<Record<string, boolean>>({});
+  const [checksLoaded, setChecksLoaded] = useState(false);
+  const [teacherAnswerKeys, setTeacherAnswerKeys] = useState<Record<string, Record<string, string | string[]>>>({});
+  const [answerVisibility, setAnswerVisibility] = useState<Record<string, boolean>>({});
+  const [answerLoadingId, setAnswerLoadingId] = useState<string | null>(null);
+  const [answerErrors, setAnswerErrors] = useState<Record<string, string>>({});
   const expandedHomeworkRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("teacher-homework-checks");
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+          setCheckedHomework(Object.fromEntries(
+            Object.entries(saved).filter((entry): entry is [string, boolean] => typeof entry[1] === "boolean" && entry[1])
+          ));
+        }
+      }
+    } catch { /* Ignore unavailable or invalid local storage. */ }
+    setChecksLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!checksLoaded) return;
+    try {
+      localStorage.setItem("teacher-homework-checks", JSON.stringify(checkedHomework));
+    } catch { /* The checked marker remains visible for this session. */ }
+  }, [checkedHomework, checksLoaded]);
+
+  async function toggleHomeworkAnswers(item: Homework) {
+    const willShow = !answerVisibility[item.id];
+    setAnswerVisibility((current) => ({ ...current, [item.id]: willShow }));
+    if (!willShow) return;
+
+    setExpandedHomework(item.id);
+    setAnswerErrors((current) => ({ ...current, [item.id]: "" }));
+    if (teacherAnswerKeys[item.id]) return;
+
+    if (item.id === KATE_NOV_21_HOMEWORK.id) {
+      setTeacherAnswerKeys((current) => ({ ...current, [item.id]: KATE_NOV_21_ANSWER_KEY }));
+      return;
+    }
+
+    setAnswerLoadingId(item.id);
+    try {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!url || !anonKey) throw new Error("The website is not connected to Supabase yet.");
+
+      const response = await fetch(`${url.replace(/\/$/, "")}/functions/v1/teacher-dashboard`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({
+          username: "k",
+          code: teacherCode,
+          action: "answers",
+          homework_id: item.id
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "The answer key is not available for this homework.");
+      if (!data.answer_key || typeof data.answer_key !== "object" || Array.isArray(data.answer_key)) {
+        throw new Error("The answer key returned an unexpected result.");
+      }
+      setTeacherAnswerKeys((current) => ({ ...current, [item.id]: data.answer_key }));
+    } catch (err) {
+      setAnswerErrors((current) => ({
+        ...current,
+        [item.id]: err instanceof Error ? err.message : "Could not load the answer key."
+      }));
+    } finally {
+      setAnswerLoadingId(null);
+    }
+  }
 
   function updateTeacherAnswer(homeworkId: string, number: number, value: string) {
     setTeacherAnswers((current) => ({ ...current, [homeworkId + "::" + number]: value }));
@@ -411,6 +519,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
         throw new Error("The grading service returned an unexpected result.");
       }
       setTeacherGrades((current) => ({ ...current, [item.id]: result }));
+      setCheckedHomework((current) => ({ ...current, [item.id]: true }));
     } catch (err) {
       setTeacherGradeError(err instanceof Error ? err.message : "Automatic checking is not available for this homework yet.");
     } finally {
@@ -448,8 +557,15 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
       delete next[item.id];
       return next;
     });
+    setCheckedHomework((current) => {
+      const next = { ...current };
+      delete next[item.id];
+      return next;
+    });
     setTeacherGradeError("");
     setTeacherSaveNotice("");
+    setAnswerVisibility((current) => ({ ...current, [item.id]: false }));
+    setAnswerErrors((current) => ({ ...current, [item.id]: "" }));
 
     try {
       localStorage.removeItem("teacher-preview|" + item.id);
@@ -494,6 +610,10 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
     setTeacherCode(accessCode);
     setTeacherAnswers({});
     setTeacherGrades({});
+    setTeacherAnswerKeys({ [KATE_NOV_21_HOMEWORK.id]: KATE_NOV_21_ANSWER_KEY });
+    setAnswerVisibility({});
+    setAnswerErrors({});
+    setAnswerLoadingId(null);
     setTeacherGradeError("");
     setLoggedIn(true);
     setExpandedHomework(null);
@@ -606,11 +726,27 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                   const dateLabel = new Date(item.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
                   const cleanTitle = item.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]\s*/, "");
                   const isActive = expandedHomework === item.id;
+                  const hasBeenChecked = !!checkedHomework[item.id];
+                  const answersVisible = !!answerVisibility[item.id];
                   return (
-                    <button type="button" key={item.id} className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); setTeacherGradeError(""); }}>
-                      <span className="teacher-homework-date">{dateLabel}</span>
-                      <span className="teacher-homework-title"><span>{cleanTitle}</span></span>
-                    </button>
+                    <div className="teacher-homework-entry" key={item.id}>
+                      <button type="button" className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); setTeacherGradeError(""); }}>
+                        <span className="teacher-homework-date">{dateLabel}</span>
+                        <span className="teacher-homework-title">
+                          <span>{cleanTitle}</span>
+                          {hasBeenChecked && <span className="teacher-homework-checkmark" title="Checked" aria-label="Checked">✓</span>}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        className="teacher-homework-answers-button"
+                        aria-pressed={answersVisible}
+                        disabled={answerLoadingId === item.id}
+                        onClick={() => void toggleHomeworkAnswers(item)}
+                      >
+                        {answerLoadingId === item.id ? "Loading…" : answersVisible ? "Hide answers" : "Answers"}
+                      </button>
+                    </div>
                   );
                 })}
                 {studentHomework.length === 0 && <p className="teacher-empty">No homework yet.</p>}
@@ -623,7 +759,55 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
       {homework.filter((item) => item.id === expandedHomework).map((item) => {
         return (
           <article className="homework-card teacher-homework-card" key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
-            <h2>{item.title}</h2>
+            <h2>
+              {item.title}
+              {checkedHomework[item.id] && <span className="teacher-card-checkmark" title="Checked" aria-label="Checked"> ✓</span>}
+            </h2>
+            {answerVisibility[item.id] && (
+              <section className="teacher-answer-panel" aria-label="Homework answer key">
+                <div className="teacher-answer-panel-heading">
+                  <h3>Answer key</h3>
+                  <button type="button" onClick={() => setAnswerVisibility((current) => ({ ...current, [item.id]: false }))}>Hide</button>
+                </div>
+                {answerErrors[item.id] ? (
+                  <p className="teacher-answer-error" role="alert">{answerErrors[item.id]}</p>
+                ) : answerLoadingId === item.id ? (
+                  <p className="teacher-answer-loading">Loading answers…</p>
+                ) : teacherAnswerKeys[item.id] ? (
+                  item.exercises?.map((exercise, index) => {
+                    const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
+                    return (
+                      <div className="teacher-answer-exercise" key={exercise.id || index}>
+                        <h4>{exercise.title}</h4>
+                        <ol>
+                          {exercise.items?.map((entry, entryIndex) => {
+                            const number = offset + entryIndex + 1;
+                            const stored = teacherAnswerKeys[item.id][String(number)];
+                            const accepted = stored === undefined ? [] : Array.isArray(stored) ? stored : [stored];
+                            const displayAnswers = accepted.map((value) => {
+                              const answer = String(value);
+                              if (exercise.type === "matching") {
+                                const option = exercise.options?.find((candidate) => candidate.id === answer);
+                                return option ? answer.toUpperCase() + " — " + option.text : answer;
+                              }
+                              return answer;
+                            });
+                            return (
+                              <li key={number}>
+                                <span className="teacher-answer-number">{number}.</span>
+                                <span>{displayAnswers.length ? displayAnswers.join(" / ") : "—"}</span>
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="teacher-answer-loading">No answer key is available for this homework yet.</p>
+                )}
+              </section>
+            )}
             {item.exercises?.map((exercise, index) => {
               const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
               return (
