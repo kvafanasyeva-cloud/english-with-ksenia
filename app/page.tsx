@@ -620,7 +620,6 @@ export default function Home() {
           <div className="login-card">
             <p className="eyebrow">STUDENT ACCESS</p>
             <h2>Good to see you.</h2>
-            <p className="card-copy">Enter your name and personal code to open your learning space.</p>
             <form onSubmit={handleLogin}>
               <label htmlFor="student-name">Your name</label>
               <input id="student-name" type="text" autoComplete="name" placeholder="e.g. Kate" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
