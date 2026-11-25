@@ -432,6 +432,22 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
     setAnswerLoadingId(item.id);
     try {
+      if (item.id === KATE_NOV_21_HOMEWORK.id) {
+        const answerKey = KATE_NOV_21_ANSWER_KEY;
+        const numbers = Object.keys(answerKey);
+        const normalize = (value: unknown) => String(value ?? "").trim().toLowerCase().replace(/[\s\p{P}]+/gu, " ").trim();
+        const wrong = numbers.filter((number) => {
+          const stored = answerKey[number];
+          const accepted = Array.isArray(stored) ? stored : [stored];
+          const response = normalize(taskAnswers[number]);
+          return !response || !accepted.some((value) => normalize(value) === response);
+        }).map(Number).sort((a, b) => a - b);
+        const result = { score: numbers.length - wrong.length, total: numbers.length, wrong_or_empty: wrong };
+        setTeacherGrades((current) => ({ ...current, [item.id]: result }));
+        setCheckedHomework((current) => ({ ...current, [item.id]: true }));
+        return;
+      }
+
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       if (!url || !anonKey) throw new Error("The website is not connected to Supabase yet.");
