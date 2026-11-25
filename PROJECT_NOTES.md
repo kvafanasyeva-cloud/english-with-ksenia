@@ -103,6 +103,7 @@ Student drafts are stored in the browser's local storage. They remain available 
 - Clicking a homework entry opens the full assignment underneath the list and scrolls directly to it.
 - The opened assignment should follow the student page's visual layout and use the same exercise font sizes, numbering, spacing and input styles.
 - The teacher can type into the preview fields and save a teacher-side draft to local storage.
+- Place the teacher-only **Answers** button in the same action row as **Check / Save / Reset**, not in the homework list. The checked tick belongs at the far right of the corresponding homework row.
 - The teacher **Check** button grades the teacher-entered answers and, after a successful response, adds a simple tick beside that homework in the student/homework list and next to the open homework title. The checked marker is stored in local storage for this browser; **Reset** clears it.
 - Every homework row has an **Answers** button. It opens that homework and reveals its answer key inside the teacher view. Answer keys are fetched through the authenticated `teacher-dashboard` Edge Function; they are never sent to the student page.
 
@@ -119,6 +120,7 @@ The exercise data supports prompts and answer items, optional word banks, matchi
 - **Gap fill / sentence completion:** students type into answer fields. When a word bank is present, its words can be crossed out; the answer field is visually an underline rather than a large boxed field.
 - **Matching:** exactly five pairs/items when this type is used. Students choose a meaning from a dropdown.
 - **Writing / rewriting / error correction:** students type the corrected or rewritten answer. These are not multiple-choice tasks.
+- **Word order:** show the scrambled sentence as individual words, with every word separated from the next. Never bundle two or more words into a single chunk.
 - **Word snake:** students identify words or phrases by selecting the first and last letters, then complete the related sentence prompts in input fields.
 
 ### Authoring rules for new homework
