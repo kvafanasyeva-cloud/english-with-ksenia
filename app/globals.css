@@ -999,22 +999,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   line-height: 1.55;
 }
 
-/* Checked homework is marked with the same simple tick used in exercises. */
-.teacher-homework-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.teacher-homework-checkmark,
-.teacher-card-checkmark {
-  flex: 0 0 auto;
-}
-.teacher-card-checkmark {
-  margin-left: 12px;
-}
-
-
 /* Align numbered prompts across all exercises, including word-snake questions. */
 .question-number {
   display: inline-block;
