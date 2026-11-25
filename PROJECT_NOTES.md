@@ -133,7 +133,8 @@ The exercise data supports prompts and answer items, optional word banks, matchi
 - Do not put hints, tips or explanations inside the task prompt unless Ksenia asks for them.
 - Number every scored item in one continuous sequence from the first task through the final word-snake item.
 - Keep the requested number of items. Do not silently add or remove questions.
-- Never put more than **7 scored items in a single exercise** for any student. When source material contains more, split it into multiple clearly titled exercises while preserving every question, continuous numbering and the matching answer-key entries. A specifically requested smaller count (for example, 5 items) takes priority.
+- Never put more than **7 scored items in a single exercise** for any student. A specifically requested smaller count (for example, 5 items) takes priority.
+- Use **only one exercise of each exercise type per homework** (for example, one gap-fill, one matching, one rewrite). Do not split a long exercise into another exercise of the same type; select the most useful items up to the 7-item limit instead.
 - Do not add crossword exercises; the current preferred exercise set does not include a crossword.
 
 ## 8. Visual and interaction requirements
