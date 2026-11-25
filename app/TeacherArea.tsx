@@ -266,7 +266,9 @@ function TeacherWordSnake({
   answers,
   onAnswer,
   resetTrigger,
-  grade
+  grade,
+  answerKey,
+  showAnswers
 }: {
   homeworkId: string;
   section: HomeworkExercise;
@@ -377,15 +379,15 @@ function TeacherWordSnake({
                   onChange={(event) => onAnswer(displayNumber, event.target.value)}
                 />
                 {entry.after}
+                {showAnswers && (
+                  <span className="teacher-inline-answer word-snake-inline-answer">
+                    <strong>Answer:</strong> {getTeacherAnswerText(answerKey, displayNumber, section) || "—"}
+                  </span>
+                )}
               </p>
               <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect or empty" : ""}>
                 {mark === "ok" ? "✓" : mark === "no" ? "×" : ""}
               </span>
-              {showAnswers && (
-                <span className="teacher-inline-answer word-snake-inline-answer">
-                  <strong>Answer:</strong> {getTeacherAnswerText(answerKey, displayNumber, section) || "—"}
-                </span>
-              )}
             </div>
           );
         })}
