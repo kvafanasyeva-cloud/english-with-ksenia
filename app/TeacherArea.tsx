@@ -239,6 +239,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
   const [teacherAnswers, setTeacherAnswers] = useState<Record<string, string>>({});
   const [teacherSaveNotice, setTeacherSaveNotice] = useState("");
   const [teacherCheckedHomework, setTeacherCheckedHomework] = useState<Record<string, boolean>>({});
+  const [teacherActionNotice, setTeacherActionNotice] = useState<{ homeworkId: string; kind: "checked" | "reset" } | null>(null);
   const [teacherResetTrigger, setTeacherResetTrigger] = useState(0);
   const [teacherCrossedWords, setTeacherCrossedWords] = useState<Record<string, boolean>>({});
   const [loggedIn, setLoggedIn] = useState(false);
@@ -260,9 +261,12 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
   function markHomeworkChecked(homeworkId: string) {
     setTeacherCheckedHomework((current) => {
       const next = { ...current, [homeworkId]: true };
-      try { localStorage.setItem("teacher-homework-checks", JSON.stringify(next)); } catch { /* Storage may be unavailable. */ }
+      try {
+        localStorage.setItem("teacher-homework-checks", JSON.stringify(next));
+      } catch { /* The visible checked state still updates for this session. */ }
       return next;
     });
+    setTeacherActionNotice({ homeworkId, kind: "checked" });
   }
 
   useEffect(() => {
@@ -300,6 +304,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
     });
 
     setTeacherSaveNotice("");
+    setTeacherActionNotice({ homeworkId: item.id, kind: "reset" });
 
     try {
       localStorage.removeItem("teacher-preview|" + item.id);
@@ -453,7 +458,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                   const cleanTitle = item.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]\s*/, "");
                   const isActive = expandedHomework === item.id;
                   return (
-                    <button type="button" key={item.id} className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); }}>
+                    <button type="button" key={item.id} className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); setTeacherActionNotice(null); }}>
                       <span className="teacher-homework-date">{dateLabel}</span>
                       <span className="teacher-homework-title"><span>{cleanTitle}</span>{teacherCheckedHomework[item.id] && <span className="simple-checkmark teacher-homework-checkmark" role="img" aria-label="Checked" />}</span>
                     </button>
@@ -542,7 +547,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
               );
             })}
 <div className="whole-homework-controls teacher-homework-controls">
-              <button type="button" onClick={() => markHomeworkChecked(item.id)} aria-pressed={!!teacherCheckedHomework[item.id]}>Check</button>
+              <button type="button" onClick={() => markHomeworkChecked(item.id)} aria-pressed={!!teacherCheckedHomework[item.id]}>{teacherCheckedHomework[item.id] ? "Checked ✓" : "Check"}</button>
               <button type="button" onClick={() => {
                 const savedAnswers = Object.fromEntries(Object.entries(teacherAnswers).filter(([key]) => key.startsWith(item.id + "::")));
                 try {
@@ -555,6 +560,13 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
               <button type="button" className="is-ghost" onClick={() => resetTeacherHomework(item)}>Reset</button>
               {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
             </div>
+            {teacherActionNotice?.homeworkId === item.id && (
+              <p className={"teacher-action-feedback is-" + teacherActionNotice.kind} role="status" aria-live="polite">
+                {teacherActionNotice.kind === "checked"
+                  ? "Homework marked as checked ✓"
+                  : "Homework reset — answers, selections and check mark cleared."}
+              </p>
+            )}
           </article>
         );
       })}
