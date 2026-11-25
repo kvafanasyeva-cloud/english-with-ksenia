@@ -105,7 +105,7 @@ Student drafts are stored in the browser's local storage. They remain available 
 - The teacher can type into the preview fields and save a teacher-side draft to local storage.
 - Place the teacher-only **Answers** button in the same action row as **Check / Save / Reset**, not in the homework list. The checked tick belongs at the far right of the corresponding homework row.
 - The teacher **Check** button grades the teacher-entered answers and, after a successful response, adds a simple tick beside that homework in the student/homework list and next to the open homework title. The checked marker is stored in local storage for this browser; **Reset** clears it.
-- Every homework row has an **Answers** button. It opens that homework and reveals its answer key inside the teacher view. Answer keys are fetched through the authenticated `teacher-dashboard` Edge Function; they are never sent to the student page.
+- Every homework row has an **Answers** button in the teacher action row. It reveals each answer directly beneath its matching numbered question (including Word Snake items). Answer keys are fetched through the authenticated `teacher-dashboard` Edge Function; they are never sent to the student page.
 
 ### Teacher check-mark limitation
 
