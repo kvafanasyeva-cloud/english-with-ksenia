@@ -236,3 +236,9 @@ Never paste or commit real environment values into project notes.
 - The old 18 November assignment is hidden in the student page through an ID-based filter.
 
 Update this document when a product decision or implementation detail changes, so it remains the single useful reference for future maintenance.
+
+
+## Teacher homework controls — reset behaviour
+
+- Align the teacher **Check / Save / Reset** row with the numbered exercise column (44px left offset on desktop; no offset on narrow screens).
+- Teacher **Reset** clears typed answers, word-bank crossed-out states, Word Snake circles, saved preview data, the checked marker, and any save notice for the selected homework only.
