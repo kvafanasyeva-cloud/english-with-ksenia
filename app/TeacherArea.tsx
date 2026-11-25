@@ -26,6 +26,7 @@ type Homework = {
   exercises: HomeworkExercise[];
 };
 type Submission = { id: string; student_id: string; homework_id: string; score: number | null; submitted_at: string };
+type GradeResult = { score: number; total: number; wrong_or_empty: number[] };
 
 const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
   id: "kate-2026-11-21-b1-vocabulary",
@@ -118,7 +119,8 @@ function TeacherWordSnake({
   startNumber,
   answers,
   onAnswer,
-  resetTrigger
+  resetTrigger,
+  grade
 }: {
   homeworkId: string;
   section: HomeworkExercise;
@@ -126,6 +128,7 @@ function TeacherWordSnake({
   answers: Record<string, string>;
   onAnswer: (number: number, value: string) => void;
   resetTrigger: number;
+  grade?: GradeResult;
 }) {
   const [rings, setRings] = useState<Array<[number, number]>>([]);
   const [start, setStart] = useState<number | null>(null);
@@ -209,6 +212,8 @@ function TeacherWordSnake({
         {section.items.map((entry, index) => {
           const displayNumber = startNumber + index;
           const value = answers[homeworkId + "::" + displayNumber] || "";
+          const wrong = grade?.wrong_or_empty.includes(displayNumber) || false;
+          const mark = grade ? (wrong ? "no" : "ok") : "";
           return (
             <div className="word-snake-question" key={displayNumber}>
               <span className="word-snake-number">{displayNumber}.</span>
@@ -216,7 +221,7 @@ function TeacherWordSnake({
                 {entry.before}
                 <input
                   aria-label={"Answer " + displayNumber}
-                  className="word-snake-gap"
+                  className={"word-snake-gap" + (grade && !wrong ? " is-correct" : "") + (grade && wrong && value.trim() ? " is-wrong" : "")}
                   value={value}
                   autoComplete="off"
                   spellCheck={false}
@@ -225,7 +230,9 @@ function TeacherWordSnake({
                 />
                 {entry.after}
               </p>
-              <span className="word-snake-mark" aria-hidden="true" />
+              <span className={"word-snake-mark " + mark} aria-label={mark === "ok" ? "Correct" : mark === "no" ? "Incorrect or empty" : ""}>
+                {mark === "ok" ? "✓" : mark === "no" ? "×" : ""}
+              </span>
             </div>
           );
         })}
@@ -238,8 +245,10 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
   const [teacherCode, setTeacherCode] = useState("");
   const [teacherAnswers, setTeacherAnswers] = useState<Record<string, string>>({});
   const [teacherSaveNotice, setTeacherSaveNotice] = useState("");
-  const [teacherCheckedHomework, setTeacherCheckedHomework] = useState<Record<string, boolean>>({});
-  const [teacherActionNotice, setTeacherActionNotice] = useState<{ homeworkId: string; kind: "checked" | "reset" } | null>(null);
+  const [teacherGrades, setTeacherGrades] = useState<Record<string, GradeResult>>({});
+  const [teacherGradingHomeworkId, setTeacherGradingHomeworkId] = useState<string | null>(null);
+  const [teacherGradeError, setTeacherGradeError] = useState("");
+  const [teacherActionNotice, setTeacherActionNotice] = useState<{ homeworkId: string; kind: "reset" } | null>(null);
   const [teacherResetTrigger, setTeacherResetTrigger] = useState(0);
   const [teacherCrossedWords, setTeacherCrossedWords] = useState<Record<string, boolean>>({});
   const [loggedIn, setLoggedIn] = useState(false);
@@ -251,22 +260,64 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
   const [expandedHomework, setExpandedHomework] = useState<string | null>(null);
   const expandedHomeworkRef = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("teacher-homework-checks");
-      if (saved) setTeacherCheckedHomework(JSON.parse(saved));
-    } catch { /* Ignore unavailable or invalid saved check marks. */ }
-  }, []);
-
-  function markHomeworkChecked(homeworkId: string) {
-    setTeacherCheckedHomework((current) => {
-      const next = { ...current, [homeworkId]: true };
-      try {
-        localStorage.setItem("teacher-homework-checks", JSON.stringify(next));
-      } catch { /* The visible checked state still updates for this session. */ }
+  function updateTeacherAnswer(homeworkId: string, number: number, value: string) {
+    setTeacherAnswers((current) => ({ ...current, [homeworkId + "::" + number]: value }));
+    setTeacherGrades((current) => {
+      if (!current[homeworkId]) return current;
+      const next = { ...current };
+      delete next[homeworkId];
       return next;
     });
-    setTeacherActionNotice({ homeworkId, kind: "checked" });
+    setTeacherGradeError("");
+  }
+
+  async function checkTeacherHomework(item: Homework) {
+    setTeacherGradeError("");
+    setTeacherGrades((current) => {
+      const next = { ...current };
+      delete next[item.id];
+      return next;
+    });
+    setTeacherGradingHomeworkId(item.id);
+
+    const taskAnswers: Record<string, string> = {};
+    const prefix = item.id + "::";
+    Object.entries(teacherAnswers).forEach(([key, value]) => {
+      if (key.startsWith(prefix)) taskAnswers[key.slice(prefix.length)] = value;
+    });
+
+    try {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!url || !anonKey) throw new Error("The website is not connected to Supabase yet.");
+
+      const response = await fetch(`${url.replace(/\/$/, "")}/functions/v1/teacher-dashboard`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({
+          username: "k",
+          code: teacherCode,
+          action: "grade",
+          homework_id: item.id,
+          answers: taskAnswers
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Automatic checking is not available for this homework yet.");
+      const result = data as GradeResult;
+      if (typeof result.score !== "number" || typeof result.total !== "number" || !Array.isArray(result.wrong_or_empty)) {
+        throw new Error("The grading service returned an unexpected result.");
+      }
+      setTeacherGrades((current) => ({ ...current, [item.id]: result }));
+    } catch (err) {
+      setTeacherGradeError(err instanceof Error ? err.message : "Automatic checking is not available for this homework yet.");
+    } finally {
+      setTeacherGradingHomeworkId(null);
+    }
   }
 
   useEffect(() => {
@@ -294,15 +345,12 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
       return next;
     });
 
-    setTeacherCheckedHomework((current) => {
+    setTeacherGrades((current) => {
       const next = { ...current };
       delete next[item.id];
-      try {
-        localStorage.setItem("teacher-homework-checks", JSON.stringify(next));
-      } catch { /* Storage may be unavailable. */ }
       return next;
     });
-
+    setTeacherGradeError("");
     setTeacherSaveNotice("");
     setTeacherActionNotice({ homeworkId: item.id, kind: "reset" });
 
@@ -348,6 +396,8 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
     setSubmissions(data.submissions || []);
     setTeacherCode(accessCode);
     setTeacherAnswers({});
+    setTeacherGrades({});
+    setTeacherGradeError("");
     setLoggedIn(true);
     setExpandedHomework(null);
   }
@@ -390,6 +440,8 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
     setCode("");
     setTeacherCode("");
     setTeacherAnswers({});
+    setTeacherGrades({});
+    setTeacherGradeError("");
     setError("");
     onExit?.();
   }
@@ -460,7 +512,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                   return (
                     <button type="button" key={item.id} className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); setTeacherActionNotice(null); }}>
                       <span className="teacher-homework-date">{dateLabel}</span>
-                      <span className="teacher-homework-title"><span>{cleanTitle}</span>{teacherCheckedHomework[item.id] && <span className="simple-checkmark teacher-homework-checkmark" role="img" aria-label="Checked" />}</span>
+                      <span className="teacher-homework-title"><span>{cleanTitle}</span></span>
                     </button>
                   );
                 })}
@@ -474,7 +526,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
       {homework.filter((item) => item.id === expandedHomework).map((item) => {
         return (
           <article className="homework-card teacher-homework-card" key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
-            <h2>{item.title}{teacherCheckedHomework[item.id] && <span className="simple-checkmark teacher-card-checkmark" role="img" aria-label="Checked" />}</h2>
+            <h2>{item.title}</h2>
             {item.exercises?.map((exercise, index) => {
               const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
               return (
@@ -504,19 +556,16 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                       section={exercise}
                       startNumber={offset + 1}
                       answers={teacherAnswers}
-                      onAnswer={(number, value) => {
-                        const answerId = item.id + "::" + number;
-                        setTeacherAnswers((current) => ({ ...current, [answerId]: value }));
-                      }}                      resetTrigger={teacherResetTrigger}
+                      onAnswer={(number, value) => updateTeacherAnswer(item.id, number, value)}
+                      resetTrigger={teacherResetTrigger}
+                      grade={teacherGrades[item.id]}
                     />
                   ) : (
                     exercise.items?.map((entry, entryIndex) => {
                       const number = offset + entryIndex + 1;
                       const answerId = item.id + "::" + number;
                       const prompt = entry.prompt || (entry.words || []).join(" / ") || "";
-                      const updateAnswer = (value: string) => {
-                        setTeacherAnswers((current) => ({ ...current, [answerId]: value }));
-                      };
+                      const updateAnswer = (value: string) => updateTeacherAnswer(item.id, number, value);
 
                       return (
                         <div className={"question" + (exercise.type === "matching" ? "" : " answers-under")} key={entry.number ?? entryIndex}>
@@ -546,8 +595,15 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                 </section>
               );
             })}
-<div className="whole-homework-controls teacher-homework-controls">
-              <button type="button" onClick={() => markHomeworkChecked(item.id)} aria-pressed={!!teacherCheckedHomework[item.id]}>{teacherCheckedHomework[item.id] ? "Checked ✓" : "Check"}</button>
+            {teacherGrades[item.id] && (
+              <div className="homework-score">
+                <p className="grade-summary">Score: {teacherGrades[item.id].score} / {teacherGrades[item.id].total}</p>
+              </div>
+            )}
+            <div className="whole-homework-controls teacher-homework-controls">
+              <button type="button" disabled={teacherGradingHomeworkId === item.id} onClick={() => checkTeacherHomework(item)}>
+                {teacherGradingHomeworkId === item.id ? "Checking…" : "Check"}
+              </button>
               <button type="button" onClick={() => {
                 const savedAnswers = Object.fromEntries(Object.entries(teacherAnswers).filter(([key]) => key.startsWith(item.id + "::")));
                 try {
@@ -559,12 +615,11 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
               }}>Save</button>
               <button type="button" className="is-ghost" onClick={() => resetTeacherHomework(item)}>Reset</button>
               {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
+              {teacherGradeError && <span className="grade-error" role="alert">{teacherGradeError}</span>}
             </div>
             {teacherActionNotice?.homeworkId === item.id && (
-              <p className={"teacher-action-feedback is-" + teacherActionNotice.kind} role="status" aria-live="polite">
-                {teacherActionNotice.kind === "checked"
-                  ? "Homework marked as checked ✓"
-                  : "Homework reset — answers, selections and check mark cleared."}
+              <p className="teacher-action-feedback is-reset" role="status" aria-live="polite">
+                Homework reset — answers and selections cleared.
               </p>
             )}
           </article>
