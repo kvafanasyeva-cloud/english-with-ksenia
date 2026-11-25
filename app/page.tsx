@@ -754,7 +754,7 @@ export default function Home() {
                   <h2>{task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" ? "18.11 · Films, feelings & should have + V3" : task.title}</h2>
                   {task.exercises?.map((section, index) => (
                     <section className="exercise-section" key={section.id}>
-                      <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p>{section.instructions}</p>}</div></div>
+                      <div className="section-heading"><span className="section-number">0{index + 1}</span><div><h3>{section.title}</h3>{section.instructions && <p className={section.type === "writing" ? "writing-instructions" : undefined}>{section.instructions}</p>}</div></div>
                       {section.type !== "snake" && section.word_bank && <div className="word-bank"><strong>Word bank</strong>{section.word_bank.map((word) => { const wordKey = `${task.id}::${section.id}::${word}`; return <button type="button" className={`word-bank-word ${crossedWords[wordKey] ? "is-crossed" : ""}`} aria-pressed={!!crossedWords[wordKey]} onClick={() => setCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>; })}</div>}
                       {section.type === "snake" ? (
                         <LessonWordSnake
@@ -771,7 +771,7 @@ export default function Home() {
                         const displayNumber = previousItems + itemIndex + 1;
                         const answerKey = task.id + "::" + displayNumber;
                         return (
-                          <div className={"question" + (section.type === "matching" ? "" : " answers-under")} key={item.number}>
+                          <div className={"question" + (section.type === "matching" ? "" : " answers-under") + (section.type === "writing" ? " is-writing-question" : "")} key={item.number}>
                             {section.type === "gap" ? (
                               <label className="inline-gap-label" htmlFor={"answer-" + task.id + "-" + displayNumber}>
                                 <span className="question-number">{displayNumber}.</span> {(item.prompt || "").split("___")[0]}
@@ -780,8 +780,10 @@ export default function Home() {
                               </label>
                             ) : (
                               <>
-                                <label className={item.cue ? "rewrite-question-label" : undefined} htmlFor={"answer-" + task.id + "-" + displayNumber}><span className="question-number">{displayNumber}.</span> {item.cue ? <span className="rewrite-prompt-card"><span className="rewrite-cue">{item.cue}</span><span className="rewrite-source">{item.prompt || item.words?.join(" / ") || ""}</span></span> : item.prompt || item.words?.join(" / ") || ""}</label>
-                                {section.type === "matching" ? (
+                                <label className={item.cue ? "rewrite-question-label" : undefined} htmlFor={"answer-" + task.id + "-" + displayNumber}><span className="question-number">{displayNumber}.</span> {item.cue ? <span className="rewrite-prompt-card"><span className="rewrite-cue">{item.cue}</span><span className="rewrite-source">{item.prompt || item.words?.join(" / ") || ""}</span></span> : section.type === "error-correction" ? <span className="source-sentence">{item.prompt || item.words?.join(" / ") || ""}</span> : item.prompt || item.words?.join(" / ") || ""}</label>
+                                {section.type === "writing" ? (
+                                  <textarea className="writing-answer" id={"answer-" + task.id + "-" + displayNumber} rows={7} spellCheck={false} autoCorrect="off" value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)} aria-label={"Writing response " + displayNumber} />
+                                ) : section.type === "matching" ? (
                                   <select id={"answer-" + task.id + "-" + displayNumber} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
                                     <option value="">Choose a meaning…</option>
                                     {section.options?.map((option) => <option value={option.id} key={option.id}>{option.text}</option>)}
