@@ -105,7 +105,7 @@ Student drafts are stored in the browser's local storage. They remain available 
 - The teacher can type into the preview fields and save a teacher-side draft to local storage.
 - Place the teacher-only **Answers** button in the same action row as **Check / Save / Reset**, not in the homework list. The checked tick belongs at the far right of the corresponding homework row.
 - The teacher **Check** button grades the teacher-entered answers and, after a successful response, adds a simple tick beside that homework in the student/homework list and next to the open homework title. The checked marker is stored in local storage for this browser; **Reset** clears it.
-- Every homework row has an **Answers** button in the teacher action row. It reveals each answer directly beneath its matching numbered question (including Word Snake items). Answer keys are fetched through the authenticated `teacher-dashboard` Edge Function; they are never sent to the student page.
+- Every homework row has an **Answers** button in the teacher action row. It reveals each answer directly beneath its matching numbered question (including Word Snake items), with a clear gap after the answer line. Answer keys are fetched through the authenticated `teacher-dashboard` Edge Function; they are never included in student page code or student responses.
 
 ### Teacher check-mark limitation
 
@@ -119,7 +119,8 @@ The exercise data supports prompts and answer items, optional word banks, matchi
 
 - **Gap fill / sentence completion:** students type into answer fields. When a word bank is present, its words can be crossed out; the answer field is visually an underline rather than a large boxed field.
 - **Matching:** exactly five pairs/items when this type is used. Students choose a meaning from a dropdown.
-- **Writing / rewriting / error correction:** students type the corrected or rewritten answer. These are not multiple-choice tasks.
+- **Writing:** use a multiline text area for open-ended paragraphs; the teacher reviews this response, and it is excluded from automatic scoring unless a specific rubric is authored.
+- **Writing / rewriting / error correction:** students type the corrected or rewritten answer. These are not multiple-choice tasks. Error-correction source sentences appear in a subtle grey prompt box.
 - **Word order:** show the scrambled sentence as individual words, with every word separated from the next. Never bundle two or more words into a single chunk.
 - **Word snake:** students identify words or phrases by selecting the first and last letters, then complete the related sentence prompts in input fields.
 
@@ -137,6 +138,7 @@ The exercise data supports prompts and answer items, optional word banks, matchi
 - Number every scored item in one continuous sequence from the first task through the final word-snake item.
 - Keep the requested number of items. Do not silently add or remove questions.
 - Never put more than **7 scored items in a single exercise** for any student. A specifically requested smaller count (for example, 5 items) takes priority.
+- Every **second homework for each student** (homework numbers 2, 4, 6, etc.) must include a dedicated open-ended **Writing** exercise. Count any existing fallback assignment as part of that student's sequence. The writing task uses a multiline response box and is teacher-reviewed rather than automatically scored.
 - Use **only one exercise of each exercise type per homework**, across all students and all assignments. This means one `gap`, one `matching`, one `write`, one `rewrite`, one `error-correction`, one `order`, one `snake`, etc. Do not create a second section of the same type under a different title (for example, two “Vocabulary in context” sections or two “Language use” sections).
 - When the source material contains more than 7 items of a type, select the most useful items and combine them into that type's single exercise. Prioritise a good spread of content; omit lower-priority items rather than creating another section. A specifically requested smaller count takes priority.
 - Apply this rule to **new and existing homework**. When an existing assignment is revised, renumber all scored items continuously and update its answer key to match.
