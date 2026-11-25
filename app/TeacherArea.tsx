@@ -508,7 +508,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                   const cleanTitle = item.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]\s*/, "");
                   const isActive = expandedHomework === item.id;
                   return (
-                    <button type="button" key={item.id} className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); setTeacherGradeError(""); setTeacherActionNotice(null); }}>
+                    <button type="button" key={item.id} className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); setTeacherGradeError(""); }}>
                       <span className="teacher-homework-date">{dateLabel}</span>
                       <span className="teacher-homework-title"><span>{cleanTitle}</span></span>
                     </button>
