@@ -127,6 +127,7 @@ The exercise data supports prompts and answer items, optional word banks, matchi
 ### Authoring rules for new homework
 
 - Use typed answers for productive tasks; do not turn writing tasks into multiple choice.
+- Never use generic sentence starters with blanks or ellipses (for example, “November is the month when …”) in homework. A Writing exercise must have one clear, complete writing prompt and specific requirements; do not turn it into a list of unfinished sentence beginnings unless Ksenia explicitly asks for that format.
 - Matching is the exception and uses the meaning dropdown.
 - Use exactly five items for a matching exercise.
 - Use exactly five items for a “Correct the mistakes” exercise.
