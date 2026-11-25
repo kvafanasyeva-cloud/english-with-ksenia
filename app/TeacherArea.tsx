@@ -804,7 +804,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                     <span className="section-number">{String(index + 1).padStart(2, "0")}</span>
                     <div>
                       <h3>{exercise.title}</h3>
-                      {exercise.instructions && <p>{exercise.instructions}</p>}
+                      {exercise.instructions && <p className={exercise.type === "writing" ? "writing-instructions" : undefined}>{exercise.instructions}</p>}
                     </div>
                   </div>
 
@@ -840,7 +840,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                       const updateAnswer = (value: string) => updateTeacherAnswer(item.id, number, value);
 
                       return (
-                        <div className={"question" + (exercise.type === "matching" ? "" : " answers-under")} key={entry.number ?? entryIndex}>
+                        <div className={"question" + (exercise.type === "matching" ? "" : " answers-under") + (exercise.type === "writing" ? " is-writing-question" : "")} key={entry.number ?? entryIndex}>
                           {exercise.type === "gap" ? (
                             <label className="inline-gap-label" htmlFor={"teacher-answer-" + item.id + "-" + number}>
                               <span className="question-number">{number}.</span> {(entry.prompt || "").split("___")[0]}
@@ -849,8 +849,10 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                             </label>
                           ) : (
                             <>
-                              <label className={entry.cue ? "rewrite-question-label" : undefined} htmlFor={"teacher-answer-" + item.id + "-" + number}><span className="question-number">{number}.</span> {entry.cue ? <span className="rewrite-prompt-card"><span className="rewrite-cue">{entry.cue}</span><span className="rewrite-source">{prompt}</span></span> : prompt}</label>
-                              {exercise.type === "matching" ? (
+                              <label className={entry.cue ? "rewrite-question-label" : undefined} htmlFor={"teacher-answer-" + item.id + "-" + number}><span className="question-number">{number}.</span> {entry.cue ? <span className="rewrite-prompt-card"><span className="rewrite-cue">{entry.cue}</span><span className="rewrite-source">{prompt}</span></span> : exercise.type === "error-correction" ? <span className="source-sentence">{prompt}</span> : prompt}</label>
+                              {exercise.type === "writing" ? (
+                                <textarea className="writing-answer" id={"teacher-answer-" + item.id + "-" + number} rows={7} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} aria-label={"Writing response " + number} />
+                              ) : exercise.type === "matching" ? (
                                 <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(event) => updateAnswer(event.target.value)}>
                                   <option value="">Choose a meaning…</option>
                                   {exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.text}</option>)}
@@ -862,7 +864,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                           )}
                           {answerVisibility[item.id] && teacherAnswerKeys[item.id] && (
                             <div className="teacher-inline-answer">
-                              <strong>Answer:</strong> {displayAnswer || "—"}
+                              <strong>{exercise.type === "writing" ? "Review:" : "Answer:"}</strong> {displayAnswer || (exercise.type === "writing" ? "Open-ended writing — no single model answer." : "—")}
                             </div>
                           )}
                         </div>
