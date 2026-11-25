@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import TeacherArea from "./TeacherArea";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 let supabase: SupabaseClient | null = null;
@@ -359,6 +360,8 @@ function LessonWordSnake({
 
 export default function Home() {
   const [name, setName] = useState("");
+  const [teacherMode, setTeacherMode] = useState(false);
+  const [teacherInitialCode, setTeacherInitialCode] = useState("");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -543,6 +546,11 @@ export default function Home() {
     setError("");
     setLoading(true);
     try {
+      if (name.trim().toLowerCase() === "k") {
+        setTeacherInitialCode(code);
+        setTeacherMode(true);
+        return;
+      }
       const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       if (!projectUrl || !anonKey) throw new Error("The website is not connected to Supabase yet.");
@@ -576,6 +584,21 @@ export default function Home() {
     setGrades({});
     setGradeError("");
     setError("");
+  }
+
+  if (teacherMode) {
+    return (
+      <TeacherArea
+        initialCode={teacherInitialCode}
+        onExit={() => {
+          setTeacherMode(false);
+          setTeacherInitialCode("");
+          setName("");
+          setCode("");
+          setError("");
+        }}
+      />
+    );
   }
 
   return (
