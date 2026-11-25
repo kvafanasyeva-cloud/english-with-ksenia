@@ -248,7 +248,6 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
   const [teacherGrades, setTeacherGrades] = useState<Record<string, GradeResult>>({});
   const [teacherGradingHomeworkId, setTeacherGradingHomeworkId] = useState<string | null>(null);
   const [teacherGradeError, setTeacherGradeError] = useState("");
-  const [teacherActionNotice, setTeacherActionNotice] = useState<{ homeworkId: string; kind: "reset" } | null>(null);
   const [teacherResetTrigger, setTeacherResetTrigger] = useState(0);
   const [teacherCrossedWords, setTeacherCrossedWords] = useState<Record<string, boolean>>({});
   const [loggedIn, setLoggedIn] = useState(false);
@@ -352,7 +351,6 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
     });
     setTeacherGradeError("");
     setTeacherSaveNotice("");
-    setTeacherActionNotice({ homeworkId: item.id, kind: "reset" });
 
     try {
       localStorage.removeItem("teacher-preview|" + item.id);
@@ -613,15 +611,10 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                   setTeacherSaveNotice("Could not save on this device");
                 }
               }}>Save</button>
-              <button type="button" className="is-ghost" onClick={() => resetTeacherHomework(item)}>Reset</button>
+              <button type="button" className="reset-button" onClick={() => resetTeacherHomework(item)}>Reset</button>
               {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
               {teacherGradeError && <span className="grade-error" role="alert">{teacherGradeError}</span>}
             </div>
-            {teacherActionNotice?.homeworkId === item.id && (
-              <p className="teacher-action-feedback is-reset" role="status" aria-live="polite">
-                Homework reset — answers and selections cleared.
-              </p>
-            )}
           </article>
         );
       })}
