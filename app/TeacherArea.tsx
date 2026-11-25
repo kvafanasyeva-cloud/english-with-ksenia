@@ -273,17 +273,34 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
   function resetTeacherHomework(item: Homework) {
     const prefix = item.id + "::";
+
     setTeacherAnswers((current) => {
       const next = { ...current };
-      Object.keys(next).forEach((key) => { if (key.startsWith(prefix)) delete next[key]; });
+      Object.keys(next).forEach((key) => {
+        if (key.startsWith(prefix)) delete next[key];
+      });
       return next;
     });
+
     setTeacherCrossedWords((current) => {
       const next = { ...current };
-      Object.keys(next).forEach((key) => { if (key.startsWith(prefix)) delete next[key]; });
+      Object.keys(next).forEach((key) => {
+        if (key.startsWith(prefix)) delete next[key];
+      });
       return next;
     });
+
+    setTeacherCheckedHomework((current) => {
+      const next = { ...current };
+      delete next[item.id];
+      try {
+        localStorage.setItem("teacher-homework-checks", JSON.stringify(next));
+      } catch { /* Storage may be unavailable. */ }
+      return next;
+    });
+
     setTeacherSaveNotice("");
+
     try {
       localStorage.removeItem("teacher-preview|" + item.id);
       item.exercises?.forEach((exercise) => {
@@ -292,6 +309,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
         }
       });
     } catch { /* Storage may be unavailable. */ }
+
     setTeacherResetTrigger((value) => value + 1);
   }
 
@@ -476,6 +494,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
                   {exercise.type === "snake" ? (
                     <TeacherWordSnake
+                      key={item.id + "::" + exercise.id + "::" + teacherResetTrigger}
                       homeworkId={item.id}
                       section={exercise}
                       startNumber={offset + 1}
@@ -522,7 +541,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                 </section>
               );
             })}
-<div className="whole-homework-controls">
+<div className="whole-homework-controls teacher-homework-controls">
               <button type="button" onClick={() => markHomeworkChecked(item.id)} aria-pressed={!!teacherCheckedHomework[item.id]}>Check</button>
               <button type="button" onClick={() => {
                 const savedAnswers = Object.fromEntries(Object.entries(teacherAnswers).filter(([key]) => key.startsWith(item.id + "::")));
