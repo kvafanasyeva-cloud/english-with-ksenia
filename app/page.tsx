@@ -618,11 +618,10 @@ export default function Home() {
             <p className="intro">Your lessons, homework and progress — all in one place. Come in and pick up where you left off.</p>
           </div>
           <div className="login-card">
-            <p className="eyebrow">STUDENT ACCESS</p>
             <h2>Good to see you.</h2>
             <form onSubmit={handleLogin}>
               <label htmlFor="student-name">Your name</label>
-              <input id="student-name" type="text" autoComplete="name" placeholder="e.g. Kate" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
+              <input id="student-name" type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
               <label htmlFor="student-code">Personal code</label>
               <input id="student-code" type="password" autoComplete="current-password" placeholder="Enter your code" value={code} onChange={(e) => setCode(e.target.value)} required maxLength={100} />
               {error && <p className="error-message" role="alert">{error}</p>}
@@ -705,7 +704,7 @@ export default function Home() {
                   <div className="whole-homework-controls student-homework-controls">
                     <button type="button" disabled={gradingTaskId === task.id} onClick={() => handleCheck(task)}>{gradingTaskId === task.id ? "Checking…" : "Check"}</button>
                     <button type="button" onClick={() => { try { const saved: Record<string, string> = {}; Object.entries(answers).forEach(([key, value]) => { const prefix = task.id + "::"; if (key.startsWith(prefix)) saved[key.slice(prefix.length)] = value; }); localStorage.setItem("hw-answers|" + task.id, JSON.stringify(saved)); setSaveNotice("Saved on this device"); } catch { setSaveNotice("Could not save on this device"); } }}>Save</button>
-                    <button type="button" className="is-ghost" onClick={() => resetHomework(task)}>Reset</button>
+                    <button type="button" className="reset-button" onClick={() => resetHomework(task)}>Reset</button>
                     {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
                     {gradeError && <span className="grade-error" role="alert">{gradeError}</span>}
                     {grades[task.id] ? (
