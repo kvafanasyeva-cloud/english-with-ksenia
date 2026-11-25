@@ -75,15 +75,24 @@ const KATE_NOV_21_HOMEWORK: Homework = {
     {
       id: "nov21-gap-fill",
       type: "gap",
-      title: "Complete the sentences",
+      title: "Complete the sentences · 1",
       instructions: "Complete each sentence with one word or phrase from the word bank.",
-      word_bank: ["cancel", "add up", "consider", "celebrate", "defend", "comprehend", "opinion", "holiday", "door"],
+      word_bank: ["cancel", "add up", "consider", "celebrate", "defend"],
       items: [
         { number: 1, prompt: "We had to ___ the meeting because the teacher was ill." },
         { number: 2, prompt: "These numbers don't ___ . Can you check them again?" },
         { number: 3, prompt: "Have you ever ___ moving to another country?" },
         { number: 4, prompt: "We're going to ___ my sister's birthday this weekend." },
-        { number: 5, prompt: "It's important to ___ your point of view with clear reasons." },
+        { number: 5, prompt: "It's important to ___ your point of view with clear reasons." }
+      ]
+    },
+    {
+      id: "nov21-gap-fill-part2",
+      type: "gap",
+      title: "Complete the sentences · 2",
+      instructions: "Complete each sentence with one word or phrase from the word bank.",
+      word_bank: ["comprehend", "opinion", "holiday", "door"],
+      items: [
         { number: 6, prompt: "I didn't ___ what he was trying to explain." },
         { number: 7, prompt: "In my ___, this is the best solution." },
         { number: 8, prompt: "We usually travel abroad during the summer ___." },
