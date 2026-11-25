@@ -242,3 +242,6 @@ Update this document when a product decision or implementation detail changes, s
 
 - Align the teacher **Check / Save / Reset** row with the numbered exercise column (44px left offset on desktop; no offset on narrow screens).
 - Teacher **Reset** clears typed answers, word-bank crossed-out states, Word Snake circles, saved preview data, the checked marker, and any save notice for the selected homework only.
+
+
+- After teacher **Check** or **Reset**, show a dedicated status line below the controls. The Check button changes to **Checked ✓** while the marker is set; Reset clears the marker and displays a reset confirmation.
