@@ -103,7 +103,8 @@ Student drafts are stored in the browser's local storage. They remain available 
 - Clicking a homework entry opens the full assignment underneath the list and scrolls directly to it.
 - The opened assignment should follow the student page's visual layout and use the same exercise font sizes, numbering, spacing and input styles.
 - The teacher can type into the preview fields and save a teacher-side draft to local storage.
-- The teacher **Check** button is a review marker only. It adds a simple tick to the homework title and changes the button label to `Checked ✓`. It must not try to grade teacher-entered answers or show an “invalid answers” popup.
+- The teacher **Check** button grades the teacher-entered answers and, after a successful response, adds a simple tick beside that homework in the student/homework list and next to the open homework title. The checked marker is stored in local storage for this browser; **Reset** clears it.
+- Every homework row has an **Answers** button. It opens that homework and reveals its answer key inside the teacher view. Answer keys are fetched through the authenticated `teacher-dashboard` Edge Function; they are never sent to the student page.
 
 ### Teacher check-mark limitation
 
