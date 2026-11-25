@@ -1,6 +1,6 @@
 # Project Notes — English with Ksenia
 
-_Last reviewed: 24 November 2026_
+_Last reviewed: 25 November 2026_
 
 This file records the current product behaviour and the decisions that should guide future changes. It is intended to prevent regressions and repeated setup work.
 
@@ -134,7 +134,9 @@ The exercise data supports prompts and answer items, optional word banks, matchi
 - Number every scored item in one continuous sequence from the first task through the final word-snake item.
 - Keep the requested number of items. Do not silently add or remove questions.
 - Never put more than **7 scored items in a single exercise** for any student. A specifically requested smaller count (for example, 5 items) takes priority.
-- Use **only one exercise of each exercise type per homework** (for example, one gap-fill, one matching, one rewrite). Do not split a long exercise into another exercise of the same type; select the most useful items up to the 7-item limit instead.
+- Use **only one exercise of each exercise type per homework**, across all students and all assignments. This means one `gap`, one `matching`, one `write`, one `rewrite`, one `error-correction`, one `order`, one `snake`, etc. Do not create a second section of the same type under a different title (for example, two “Vocabulary in context” sections or two “Language use” sections).
+- When the source material contains more than 7 items of a type, select the most useful items and combine them into that type's single exercise. Prioritise a good spread of content; omit lower-priority items rather than creating another section. A specifically requested smaller count takes priority.
+- Apply this rule to **new and existing homework**. When an existing assignment is revised, renumber all scored items continuously and update its answer key to match.
 - Do not add crossword exercises; the current preferred exercise set does not include a crossword.
 
 ## 8. Visual and interaction requirements
@@ -177,10 +179,10 @@ The design is intentionally restrained, monochrome and readable.
 
 ## 9. Published homework change policy
 
-Published homework is frozen.
+Published homework is frozen by default.
 
 - Do not rewrite, reorder, restyle individual questions in, or otherwise alter an existing published lesson unless Ksenia explicitly requests it.
-- Apply content updates to new homework only.
+- An explicit request to revise existing homework overrides the freeze for the assignments covered by that request. The one-exercise-per-type and seven-item maximum rules still apply.
 - If a technical change is needed to the shared renderer or styles, preserve the published assignment's text, order, numbering and answer key.
 - If an assignment must be removed or hidden, confirm the specific assignment and change only its publication/visibility as requested.
 
@@ -190,7 +192,7 @@ Published homework is frozen.
 
 1. Create the new homework record and exercise data in Supabase.
 2. Associate it with the intended student.
-3. Check the exercise order, item counts, continuous numbering and answer key.
+3. Check that each exercise type appears once, every task has no more than 7 items, numbering is continuous and the answer key matches the revised numbering.
 4. Set `published = true` when it is ready.
 5. Confirm that it appears in that student's account and in the teacher overview.
 
