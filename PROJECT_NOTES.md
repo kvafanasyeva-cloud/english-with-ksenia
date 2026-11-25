@@ -41,6 +41,7 @@ The student and teacher pages currently render their own exercise JSX. They shar
 ### Students
 
 - Students enter their name and personal access code on the main page.
+- The teacher can use this same main page and URL by entering the username `k` and teacher code `k`; this opens the teacher workspace in place of the student dashboard.
 - Name and code matching should be case-insensitive.
 - Student login is verified by the Supabase Edge Function `student-login`.
 - On successful login, the browser establishes a Supabase session and loads homework published for that student.
@@ -48,8 +49,8 @@ The student and teacher pages currently render their own exercise JSX. They shar
 
 ### Teacher
 
-- The teacher workspace is at `/teacher`.
-- The username field is fixed to `k`; the entered code is sent to the Supabase Edge Function `teacher-dashboard` for verification and data retrieval.
+- The teacher workspace is available from the same homepage URL as students: enter `k` as the name and `k` as the code. The existing `/teacher` route remains available as a direct shortcut.
+- The teacher username is fixed to `k`; the entered code is sent to the Supabase Edge Function `teacher-dashboard` for verification and data retrieval.
 - Keep the actual teacher access code out of source files and documentation.
 - The student login page should not grow a visible teacher-login link unless Ksenia explicitly asks for one.
 
