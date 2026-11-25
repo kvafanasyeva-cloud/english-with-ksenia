@@ -621,7 +621,7 @@ export default function Home() {
             <h2>Good to see you.</h2>
             <form onSubmit={handleLogin}>
               <label htmlFor="student-name">Your name</label>
-              <input id="student-name" type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
+              <input id="student-name" type="text" autoComplete="name" placeholder="hi, my name is" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
               <label htmlFor="student-code">Personal code</label>
               <input id="student-code" type="password" autoComplete="current-password" placeholder="Enter your code" value={code} onChange={(e) => setCode(e.target.value)} required maxLength={100} />
               {error && <p className="error-message" role="alert">{error}</p>}
@@ -683,7 +683,7 @@ export default function Home() {
                               </label>
                             ) : (
                               <>
-                                <label htmlFor={"answer-" + task.id + "-" + displayNumber}><span className="question-number">{displayNumber}.</span> {item.prompt || item.words?.join(" / ") || ""}</label>
+                                <label className={item.cue ? "rewrite-question-label" : undefined} htmlFor={"answer-" + task.id + "-" + displayNumber}><span className="question-number">{displayNumber}.</span> {item.cue ? <span className="rewrite-prompt-card"><span className="rewrite-cue">{item.cue}</span><span className="rewrite-source">{item.prompt || item.words?.join(" / ") || ""}</span></span> : item.prompt || item.words?.join(" / ") || ""}</label>
                                 {section.type === "matching" ? (
                                   <select id={"answer-" + task.id + "-" + displayNumber} value={answers[answerKey] || ""} onChange={(e) => setAnswer(task.id, displayNumber, e.target.value)}>
                                     <option value="">Choose a meaning…</option>
