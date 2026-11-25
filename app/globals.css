@@ -1223,71 +1223,38 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   opacity: .55;
   cursor: wait;
 }
-.teacher-answer-panel {
-  margin: 18px 0 24px 44px;
-  padding: 17px 20px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fafafa;
-}
-.teacher-answer-panel-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.teacher-answer-panel-heading h3 {
-  margin: 0;
-  font: 600 17px 'Space Grotesk', sans-serif;
-}
-.teacher-answer-panel-heading button {
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  font: 500 12px Inter, sans-serif;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.teacher-answer-exercise {
-  margin-top: 15px;
-}
-.teacher-answer-exercise h4 {
-  margin: 0 0 7px;
-  font: 600 13px Inter, sans-serif;
-}
-.teacher-answer-exercise ol {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px 18px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.teacher-answer-exercise li {
-  display: flex;
-  gap: 9px;
-  min-width: 0;
-  font: 13px/1.5 Inter, sans-serif;
-  overflow-wrap: anywhere;
-}
-.teacher-answer-number {
-  flex: 0 0 25px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
+.teacher-answer-status {
+  margin: 12px 0 18px 44px;
 }
 .teacher-answer-error {
-  margin: 0;
   color: #9a3030;
   font-size: 13px;
 }
 .teacher-answer-loading {
-  margin: 0;
   color: var(--muted);
   font-size: 13px;
 }
+.teacher-inline-answer {
+  display: block;
+  grid-column: 1 / -1;
+  margin: -8px 0 14px 44px;
+  color: #555;
+  font: 13px/1.55 Inter, sans-serif;
+  overflow-wrap: anywhere;
+}
+.teacher-inline-answer strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.word-snake-question .word-snake-inline-answer {
+  margin: 5px 0 0;
+  font-size: 13px;
+}
 @media (max-width: 760px) {
-  .teacher-answer-panel { margin-left: 0; padding: 14px; }
+  .teacher-answer-status,
+  .teacher-inline-answer {
+    margin-left: 0;
+  }
 }
 @media (max-width: 600px) {
   .teacher-homework-entry { gap: 6px; }
@@ -1302,5 +1269,4 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     font-size: 12px;
   }
   .teacher-homework-checkmark { font-size: 19px; }
-  .teacher-answer-exercise ol { grid-template-columns: 1fr; }
 }
