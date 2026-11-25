@@ -743,25 +743,13 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                   const cleanTitle = item.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]\s*/, "");
                   const isActive = expandedHomework === item.id;
                   const hasBeenChecked = !!checkedHomework[item.id];
-                  const answersVisible = !!answerVisibility[item.id];
                   return (
                     <div className="teacher-homework-entry" key={item.id}>
                       <button type="button" className={"teacher-homework-link" + (isActive ? " is-active" : "")} aria-expanded={isActive} onClick={() => { setExpandedHomework(isActive ? null : item.id); setTeacherSaveNotice(""); setTeacherGradeError(""); }}>
                         <span className="teacher-homework-date">{dateLabel}</span>
-                        <span className="teacher-homework-title">
-                          <span>{cleanTitle}</span>
-                          {hasBeenChecked && <span className="teacher-homework-checkmark" title="Checked" aria-label="Checked">✓</span>}
-                        </span>
+                        <span className="teacher-homework-title">{cleanTitle}</span>
                       </button>
-                      <button
-                        type="button"
-                        className="teacher-homework-answers-button"
-                        aria-pressed={answersVisible}
-                        disabled={answerLoadingId === item.id}
-                        onClick={() => void toggleHomeworkAnswers(item)}
-                      >
-                        {answerLoadingId === item.id ? "Loading…" : answersVisible ? "Hide answers" : "Answers"}
-                      </button>
+                      {hasBeenChecked && <span className="teacher-homework-checkmark" title="Checked" aria-label="Checked">✓</span>}
                     </div>
                   );
                 })}
@@ -775,10 +763,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
       {homework.filter((item) => item.id === expandedHomework).map((item) => {
         return (
           <article className="homework-card teacher-homework-card" key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
-            <h2>
-              {item.title}
-              {checkedHomework[item.id] && <span className="teacher-card-checkmark" title="Checked" aria-label="Checked"> ✓</span>}
-            </h2>
+            <h2>{item.title}</h2>
             {answerVisibility[item.id] && (
               <section className="teacher-answer-panel" aria-label="Homework answer key">
                 <div className="teacher-answer-panel-heading">
@@ -911,6 +896,9 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                 }
               }}>Save</button>
               <button type="button" className="reset-button" onClick={() => resetTeacherHomework(item)}>Reset</button>
+              <button type="button" className="teacher-homework-answers-button" aria-pressed={!!answerVisibility[item.id]} disabled={answerLoadingId === item.id} onClick={() => void toggleHomeworkAnswers(item)}>
+                {answerLoadingId === item.id ? "Loading…" : answerVisibility[item.id] ? "Hide answers" : "Answers"}
+              </button>
               {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
               {teacherGradeError && <span className="grade-error" role="alert">{teacherGradeError}</span>}
             </div>
