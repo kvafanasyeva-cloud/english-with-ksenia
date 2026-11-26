@@ -952,6 +952,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
               {teacherGradeError && <span className="grade-error" role="alert">{teacherGradeError}</span>}
             </div>
             </div>
+            </div>
           </article>
         );
       })}
