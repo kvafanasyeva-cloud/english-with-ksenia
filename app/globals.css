@@ -1309,3 +1309,102 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     font-size: 12px;
   }
 }
+
+/* Compact homework layout: keep prompts, answer lines and sections visually close. */
+.homework-card {
+  padding: 22px 24px;
+}
+.exercise-section {
+  padding: 14px 0;
+}
+.section-heading {
+  margin-bottom: 10px;
+  gap: 11px;
+}
+.exercise-section .section-heading h3 {
+  font-size: 18px;
+}
+.exercise-section .section-heading p {
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.word-bank {
+  gap: 7px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+}
+.exercise-section {
+  --exercise-copy-size: 15px;
+  --exercise-copy-leading: 1.4;
+}
+.question {
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.question.answers-under {
+  gap: 2px;
+}
+.question.answers-under input {
+  min-height: 30px;
+  padding: 3px 2px;
+  font-size: 15px;
+}
+.exercise-section .question label,
+.exercise-section .inline-gap-label,
+.exercise-section .word-snake-question p {
+  line-height: 1.4;
+}
+.inline-gap-label {
+  line-height: 1.7;
+}
+.inline-gap-input {
+  min-height: 27px !important;
+  font-size: 15px;
+}
+.exercise-section .word-bank-word {
+  font-size: 15px;
+  padding: 4px 7px;
+}
+.word-snake-exercise {
+  margin-top: 16px;
+  padding-top: 14px;
+}
+.word-snake-questions {
+  gap: 5px;
+}
+.word-snake-question p {
+  line-height: 1.4;
+}
+.whole-homework-controls {
+  gap: 7px;
+  margin-top: 16px;
+}
+.whole-homework-controls > button {
+  padding: 9px 13px;
+}
+.teacher-live-question {
+  gap: 4px;
+  margin: 7px 0 10px;
+}
+.teacher-live-question label,
+.teacher-live-question input,
+.teacher-live-question select,
+.teacher-live-prompt,
+.teacher-inline-gap {
+  font-size: 15px;
+}
+.teacher-live-question label,
+.teacher-live-prompt {
+  line-height: 1.4;
+}
+@media (max-width: 760px) {
+  .homework-card {
+    padding: 17px 14px;
+  }
+  .exercise-section {
+    padding: 12px 0;
+  }
+  .section-heading {
+    margin-bottom: 9px;
+  }
+}
