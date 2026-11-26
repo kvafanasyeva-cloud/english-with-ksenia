@@ -1408,3 +1408,18 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     margin-bottom: 9px;
   }
 }
+
+/* Make the Telegram action match the adjacent Check / Save / Reset buttons. */
+.whole-homework-controls .telegram-button {
+  min-height: 0;
+  padding: 9px 13px;
+  border-radius: 6px;
+  font: 500 13px Inter, sans-serif;
+  letter-spacing: normal;
+  line-height: normal;
+  text-transform: none;
+}
+.whole-homework-controls .telegram-button span {
+  font-size: 13px;
+  line-height: 1;
+}
