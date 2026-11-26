@@ -752,7 +752,7 @@ export default function Home() {
                 ))}
               </nav>
               {homework.filter((task) => task.id === activeHomeworkId).map((task) => (
-                <article className="homework-card" key={task.id}>
+                <article className={"homework-card" + (task.id === "c1e2a2ce-41fa-4599-9445-9698661bbfe4" ? " maria-kids-homework" : "")} key={task.id}>
                   <h2>{task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" ? "18.11 · Films, feelings & should have + V3" : task.title}</h2>
                   {task.exercises?.map((section, index) => (
                     <section className="exercise-section" key={section.id}>

@@ -788,7 +788,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
       {homework.filter((item) => item.id === expandedHomework).map((item) => {
         return (
-          <article className="homework-card teacher-homework-card" key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
+          <article className={"homework-card teacher-homework-card" + (item.id === "c1e2a2ce-41fa-4599-9445-9698661bbfe4" ? " maria-kids-homework" : "")} key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
             <h2>{item.title}</h2>
             {answerVisibility[item.id] && answerErrors[item.id] && (
               <p className="teacher-answer-error teacher-answer-status" role="alert">{answerErrors[item.id]}</p>

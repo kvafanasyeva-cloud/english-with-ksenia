@@ -1423,3 +1423,147 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   font-size: 13px;
   line-height: 1;
 }
+
+
+/* Maria's 26.11 homework: colourful kids treatment from the HTML reference.
+   Scoped to this single assignment in both the student and teacher views. */
+.maria-kids-homework {
+  --maria-ink: #2b2340;
+  --maria-accent: #ff5d73;
+  --maria-tint: #fff0f2;
+  background: #fffdf6;
+  color: var(--maria-ink);
+  border: 3px solid var(--maria-ink);
+  border-radius: 22px;
+}
+.maria-kids-homework > h2 {
+  color: var(--maria-ink);
+  font-family: 'Space Grotesk', sans-serif;
+}
+.maria-kids-homework > .exercise-section {
+  --maria-accent: #ff5d73;
+  --maria-tint: #fff0f2;
+  margin: 13px 0;
+  padding: 16px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--maria-tint);
+}
+.maria-kids-homework > .exercise-section:nth-of-type(2) {
+  --maria-accent: #f59e0b;
+  --maria-tint: #fff6e0;
+}
+.maria-kids-homework > .exercise-section:nth-of-type(3) {
+  --maria-accent: #14b8a6;
+  --maria-tint: #e3faf6;
+}
+.maria-kids-homework > .exercise-section:nth-of-type(4) {
+  --maria-accent: #8b5cf6;
+  --maria-tint: #f1ecff;
+}
+.maria-kids-homework .section-heading {
+  align-items: center;
+  margin-bottom: 14px;
+}
+.maria-kids-homework .section-number {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 50%;
+  background: var(--maria-accent);
+  color: #fff;
+  font-weight: 700;
+}
+.maria-kids-homework .section-heading h3 {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--maria-accent);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+}
+.maria-kids-homework .section-heading p {
+  color: #5b5170;
+}
+.maria-kids-homework .word-bank {
+  margin-left: 41px;
+  border: 2px dashed var(--maria-accent);
+  border-radius: 14px;
+  background: #fff;
+}
+.maria-kids-homework .word-bank strong {
+  color: var(--maria-accent);
+}
+.maria-kids-homework .word-bank-word {
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--maria-accent);
+  color: #fff;
+}
+.maria-kids-homework .word-bank-word:hover {
+  background: var(--maria-accent);
+  opacity: .85;
+}
+.maria-kids-homework .word-bank-word.is-crossed {
+  background: #e5e2ea;
+  color: #8a8496;
+}
+.maria-kids-homework .question label {
+  color: var(--maria-ink);
+}
+.maria-kids-homework .inline-gap-input {
+  border-bottom: 3px solid var(--maria-accent) !important;
+  border-radius: 8px 8px 0 0 !important;
+  background: #fff !important;
+  color: var(--maria-ink) !important;
+}
+.maria-kids-homework .question.answers-under input {
+  border-bottom: 3px solid var(--maria-accent);
+  border-radius: 8px 8px 0 0;
+  background: #fff;
+  color: var(--maria-ink);
+}
+.maria-kids-homework .question select {
+  border: 1.5px solid var(--maria-accent);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--maria-ink);
+}
+.maria-kids-homework .source-sentence {
+  border-left: 4px solid var(--maria-accent);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--maria-ink);
+}
+.maria-kids-homework .whole-homework-controls {
+  border-top: 3px dashed var(--maria-ink);
+  padding-top: 16px;
+}
+.maria-kids-homework .whole-homework-controls > button,
+.maria-kids-homework .whole-homework-controls .telegram-button {
+  border: 1px solid var(--maria-ink);
+  border-radius: 999px;
+  background: var(--maria-ink);
+  color: #fff;
+}
+.maria-kids-homework .whole-homework-controls > button.is-ghost {
+  background: #fff;
+  color: var(--maria-ink);
+}
+.maria-kids-homework .homework-score,
+.maria-kids-homework .grade-summary {
+  color: var(--maria-ink);
+}
+.maria-kids-homework .teacher-inline-answer {
+  border-left-color: var(--maria-accent);
+  background: #fff;
+  color: var(--maria-ink);
+}
+@media (max-width: 760px) {
+  .maria-kids-homework > .exercise-section { padding: 13px; }
+  .maria-kids-homework .word-bank { margin-left: 0; }
+}
