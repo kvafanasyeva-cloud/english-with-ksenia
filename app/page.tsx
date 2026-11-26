@@ -49,20 +49,22 @@ type GradeResult = {
 };
 
 function homeworkDateLabel(task: Homework) {
-  const match = task.title.match(/(\\d{1,2})\\.(\\d{1,2})/);
+  const match = task.title.match(/(\d{1,2})\.(\d{1,2})/);
   if (!match) return task.title;
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const month = months[Number(match[2]) - 1];
   return month ? Number(match[1]) + " " + month : task.title;
 }
 
-function telegramShareUrl(task: Homework, grade: GradeResult) {
-  const wrongOrEmpty = grade.wrong_or_empty.length ? grade.wrong_or_empty.join(", ") : "none";
+function telegramShareUrl(task: Homework, grade?: GradeResult) {
+  const wrongOrEmpty = grade
+    ? (grade.wrong_or_empty.length ? grade.wrong_or_empty.join(", ") : "none")
+    : "not checked";
   const message = [
     "Homework - " + homeworkDateLabel(task),
-    "Score: " + grade.score + " / " + grade.total,
+    grade ? "Score: " + grade.score + " / " + grade.total : "Score: not checked",
     "Wrong or empty: " + wrongOrEmpty
-  ].join("\\n").replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-");
+  ].join("\n").replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-");
   return "https://t.me/afanasyeva_x?text=" + encodeURIComponent(message);
 }
 
@@ -806,11 +808,7 @@ export default function Home() {
                     <button type="button" className="reset-button" onClick={() => resetHomework(task)}>Reset</button>
                     {saveNotice && <span className="save-notice" role="status">{saveNotice}</span>}
                     {gradeError && <span className="grade-error" role="alert">{gradeError}</span>}
-                    {grades[task.id] ? (
-                      <a className="telegram-button" href={telegramShareUrl(task, grades[task.id])} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
-                    ) : (
-                      <span className="telegram-hint">Check your answers to prepare the Telegram message.</span>
-                    )}
+                    <a className="telegram-button" href={telegramShareUrl(task, grades[task.id])} target="_blank" rel="noreferrer">Send to Ksenia in Telegram <span>↗</span></a>
                   </div>
                 </article>
               ))}
