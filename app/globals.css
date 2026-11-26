@@ -1425,145 +1425,429 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 }
 
 
-/* Maria's 26.11 homework: colourful kids treatment from the HTML reference.
-   Scoped to this single assignment in both the student and teacher views. */
-.maria-kids-homework {
-  --maria-ink: #2b2340;
-  --maria-accent: #ff5d73;
-  --maria-tint: #fff0f2;
+
+/* Maria's 26.11 lesson: port of the reference HTML's original kids theme. */
+.homework-card.maria-kids-homework {
+  --kink: #2b2340;
+  padding: 0;
   background: #fffdf6;
-  color: var(--maria-ink);
-  border: 3px solid var(--maria-ink);
+  color: var(--kink);
+  border: 3px solid var(--kink);
   border-radius: 22px;
+  color-scheme: light;
+  overflow: hidden;
 }
-.maria-kids-homework > h2 {
-  color: var(--maria-ink);
+.maria-kids-homework .maria-lesson-head {
+  padding: 16px 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.maria-kids-homework .maria-date {
+  color: #7a6f8f;
+  font-size: 12px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.maria-kids-homework .maria-lesson-head h2 {
+  margin: 0;
+  color: var(--kink);
   font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
 }
-.maria-kids-homework > .exercise-section {
-  --maria-accent: #ff5d73;
-  --maria-tint: #fff0f2;
-  margin: 13px 0;
+.maria-lesson-body {
+  padding: 4px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.maria-kids-homework .maria-kids-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
   padding: 16px;
   border: 0;
   border-radius: 18px;
-  background: var(--maria-tint);
+  background: var(--ct);
 }
-.maria-kids-homework > .exercise-section:nth-of-type(2) {
-  --maria-accent: #f59e0b;
-  --maria-tint: #fff6e0;
+.maria-kids-homework .maria-kids-section:nth-of-type(6n+1) { --c: #ff5d73; --ct: #fff0f2; }
+.maria-kids-homework .maria-kids-section:nth-of-type(6n+2) { --c: #f59e0b; --ct: #fff6e0; }
+.maria-kids-homework .maria-kids-section:nth-of-type(6n+3) { --c: #14b8a6; --ct: #e3faf6; }
+.maria-kids-homework .maria-kids-section:nth-of-type(6n+4) { --c: #8b5cf6; --ct: #f1ecff; }
+.maria-kids-homework .maria-kids-section:nth-of-type(6n+5) { --c: #0ea5e9; --ct: #e2f5fd; }
+.maria-kids-homework .maria-kids-section:nth-of-type(6n+6) { --c: #22a55b; --ct: #e6f7ec; }
+.maria-kids-homework .maria-kids-section .section-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin: 0;
+  border: 0;
+  padding: 0;
 }
-.maria-kids-homework > .exercise-section:nth-of-type(3) {
-  --maria-accent: #14b8a6;
-  --maria-tint: #e3faf6;
-}
-.maria-kids-homework > .exercise-section:nth-of-type(4) {
-  --maria-accent: #8b5cf6;
-  --maria-tint: #f1ecff;
-}
-.maria-kids-homework .section-heading {
-  align-items: center;
-  margin-bottom: 14px;
-}
-.maria-kids-homework .section-number {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
-  border-radius: 50%;
-  background: var(--maria-accent);
-  color: #fff;
-  font-weight: 700;
-}
-.maria-kids-homework .section-heading h3 {
-  display: inline-block;
+.maria-kids-homework .maria-kids-section .section-heading h3 {
+  align-self: flex-start;
+  margin: 0;
   padding: 6px 16px;
   border-radius: 999px;
-  background: var(--maria-accent);
+  background: var(--c);
   color: #fff;
-  font-size: 17px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
   font-weight: 600;
 }
-.maria-kids-homework .section-heading p {
+.maria-kids-homework .maria-kids-section .section-heading p {
+  margin: 2px 0 0;
   color: #5b5170;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.maria-kids-homework .maria-note {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 2px 0 4px auto;
+  padding: 12px 18px;
+  background: #355b3a;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.45;
+  white-space: pre-line;
+  box-shadow: 0 5px 12px #00000012;
+}
+.maria-kids-homework .maria-note strong {
+  margin-bottom: 2px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
 }
 .maria-kids-homework .word-bank {
-  margin-left: 41px;
-  border: 2px dashed var(--maria-accent);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 2px dashed var(--c);
   border-radius: 14px;
   background: #fff;
+  font-size: 14px;
 }
 .maria-kids-homework .word-bank strong {
-  color: var(--maria-accent);
+  width: 100%;
+  color: var(--c);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
 .maria-kids-homework .word-bank-word {
-  padding: 4px 12px;
+  padding: 4px 14px;
   border: 0;
   border-radius: 999px;
-  background: var(--maria-accent);
+  background: var(--c);
   color: #fff;
+  font-size: 16px;
+  font-weight: 500;
 }
-.maria-kids-homework .word-bank-word:hover {
-  background: var(--maria-accent);
-  opacity: .85;
-}
+.maria-kids-homework .word-bank-word:hover { background: var(--c); opacity: .85; }
 .maria-kids-homework .word-bank-word.is-crossed {
   background: #e5e2ea;
   color: #8a8496;
+  text-decoration: line-through;
 }
-.maria-kids-homework .question label {
-  color: var(--maria-ink);
+.maria-kids-homework .maria-bank-note {
+  width: 100%;
+  margin-top: 2px;
+  color: #6b6b6b;
+  font-size: 12px;
 }
-.maria-kids-homework .inline-gap-input {
-  border-bottom: 3px solid var(--maria-accent) !important;
-  border-radius: 8px 8px 0 0 !important;
-  background: #fff !important;
-  color: var(--maria-ink) !important;
+.maria-kids-homework .maria-kids-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 4px 0;
 }
-.maria-kids-homework .question.answers-under input {
-  border-bottom: 3px solid var(--maria-accent);
+.maria-kids-homework .maria-inline-question {
+  flex: 1;
+  min-width: 0;
+  color: var(--kink);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+.maria-kids-homework .maria-num {
+  display: inline-block;
+  min-width: 22px;
+  color: var(--c);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.maria-kids-homework .inline-gap-input,
+.maria-kids-homework .maria-fix-input,
+.maria-kids-homework .maria-followup input {
+  display: inline-block;
+  min-width: 90px;
+  width: 150px;
+  max-width: 100%;
+  min-height: 30px;
+  margin: 0 6px;
+  padding: 2px 5px;
+  border: 0;
+  border-bottom: 3px solid var(--c);
   border-radius: 8px 8px 0 0;
   background: #fff;
-  color: var(--maria-ink);
+  color: var(--kink);
+  vertical-align: baseline;
+  text-align: center;
+  font: inherit;
 }
-.maria-kids-homework .question select {
-  border: 1.5px solid var(--maria-accent);
-  border-radius: 9px;
+.maria-kids-homework .inline-gap-input.maria-wide-gap { width: 230px; }
+.maria-kids-homework .maria-match-item {
+  align-items: flex-start;
+}
+.maria-kids-homework .maria-match-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.maria-kids-homework .maria-match-question {
+  display: block;
+  color: var(--kink);
+  font-size: 16px;
+  line-height: 1.65;
+}
+.maria-kids-homework .maria-match-select,
+.maria-kids-homework .maria-teacher-match select {
+  display: inline-block;
+  width: 116px;
+  min-height: 34px;
+  margin: 0 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--c);
+  border-radius: 8px;
   background: #fff;
-  color: var(--maria-ink);
+  color: var(--kink);
+  font: inherit;
 }
-.maria-kids-homework .source-sentence {
-  border-left: 4px solid var(--maria-accent);
+.maria-kids-homework .maria-followup {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  color: var(--kink);
+  font-size: 16px;
+}
+.maria-kids-homework .maria-followup input {
+  flex: 1;
+  width: auto;
+  margin: 0;
+  text-align: left;
+}
+.maria-kids-homework .maria-fix-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.maria-kids-homework .maria-fix-body label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  color: var(--kink);
+  font-size: 16px;
+  line-height: 1.6;
+}
+.maria-kids-homework .maria-wrong-sentence {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border-left: 4px solid var(--c);
   border-radius: 10px;
   background: #fff;
-  color: var(--maria-ink);
+  color: var(--kink);
 }
-.maria-kids-homework .whole-homework-controls {
-  border-top: 3px dashed var(--maria-ink);
+.maria-kids-homework .maria-fix-input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+}
+.maria-kids-homework .maria-answer-line {
+  color: #5b5170;
+  font-size: 14px;
+}
+.maria-kids-homework .maria-mark {
+  width: 20px;
+  flex: 0 0 20px;
+  padding-top: 3px;
+  color: var(--kink);
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+.maria-kids-homework .maria-mark.good { color: #16a34a; }
+.maria-kids-homework .maria-mark.bad { color: #dc2626; }
+.maria-kids-homework .maria-writing {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.maria-kids-homework .maria-writing-task {
+  padding-left: 12px;
+  border-left: 2px solid var(--c);
+  color: var(--kink);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.maria-kids-homework .maria-writing-area {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 170px;
+  padding: 10px 12px;
+  border: 2px solid var(--c);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--kink);
+  font: inherit;
+  line-height: 1.6;
+  resize: vertical;
+}
+.maria-kids-homework .maria-word-count {
+  color: #6b6b6b;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.maria-kids-homework .maria-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0;
   padding-top: 16px;
+  border-top: 3px dashed var(--kink);
 }
-.maria-kids-homework .whole-homework-controls > button,
-.maria-kids-homework .whole-homework-controls .telegram-button {
-  border: 1px solid var(--maria-ink);
+.maria-kids-homework .maria-controls > button,
+.maria-kids-homework .maria-controls .telegram-button {
+  min-height: 36px;
+  padding: 8px 16px;
+  border: 1px solid var(--kink);
   border-radius: 999px;
-  background: var(--maria-ink);
+  background: var(--kink);
   color: #fff;
+  font: 500 14px Inter, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
 }
-.maria-kids-homework .whole-homework-controls > button.is-ghost {
+.maria-kids-homework .maria-controls > button.is-ghost,
+.maria-kids-homework .maria-controls > button.reset-button,
+.maria-kids-homework .maria-controls .telegram-button {
   background: #fff;
-  color: var(--maria-ink);
+  color: var(--kink);
 }
-.maria-kids-homework .homework-score,
-.maria-kids-homework .grade-summary {
-  color: var(--maria-ink);
+.maria-kids-homework .maria-controls > button:disabled { opacity: .6; cursor: default; }
+.maria-kids-homework .maria-score {
+  margin-left: auto;
+  color: var(--kink);
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
-.maria-kids-homework .teacher-inline-answer {
-  border-left-color: var(--maria-accent);
-  background: #fff;
-  color: var(--maria-ink);
+.maria-kids-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: #ece8f3;
+  overflow: hidden;
+}
+.maria-kids-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff5d73, #f59e0b, #14b8a6, #8b5cf6);
+  transition: width .6s ease;
+}
+.maria-confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  pointer-events: none;
+}
+.maria-confetti span {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  animation-name: maria-confetti-fall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+@keyframes maria-confetti-fall {
+  to { top: 105%; transform: rotate(540deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .maria-kids-fill { transition: none; }
+  .maria-confetti { display: none; }
 }
 @media (max-width: 760px) {
-  .maria-kids-homework > .exercise-section { padding: 13px; }
-  .maria-kids-homework .word-bank { margin-left: 0; }
+  .maria-lesson-body { padding: 4px 13px 18px; gap: 18px; }
+  .maria-kids-homework .maria-kids-section { padding: 13px; }
+  .maria-kids-homework .maria-note { margin-left: 0; }
+  .maria-kids-homework .maria-score { margin-left: 0; }
+}
+
+
+/* Teacher preview uses the same colourful lesson surface. */
+.homework-card.maria-kids-homework {
+  width: 100%;
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.maria-kids-homework .teacher-homework-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 3px dashed var(--kink);
+}
+.maria-kids-homework .teacher-homework-controls > button {
+  min-height: 36px;
+  padding: 8px 16px;
+  border: 1px solid var(--kink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--kink);
+  font: 500 14px Inter, sans-serif;
+}
+.maria-kids-homework .teacher-homework-controls > button:first-child {
+  background: var(--kink);
+  color: #fff;
+}
+.maria-kids-homework .teacher-homework-controls .reset-button {
+  background: #fff;
+  color: var(--kink);
+}
+.maria-kids-homework .teacher-inline-answer {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-left: 4px solid var(--c);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--kink);
+}
+.maria-kids-homework .maria-teacher-match {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 type Student = { id: string; name: string; created_at: string };
-type HomeworkItem = { number?: number; prompt?: string; cue?: string; words?: string[]; before?: string; after?: string };
+type HomeworkItem = { number?: number; prompt?: string; cue?: string; words?: string[]; before?: string; after?: string; followup_prompt?: string };
 type HomeworkExercise = {
   id: string;
   type: string;
@@ -12,6 +12,9 @@ type HomeworkExercise = {
   instructions?: string;
   items: HomeworkItem[];
   word_bank?: string[];
+  word_bank_hint?: string;
+  note?: string;
+  task?: string;
   snake_words?: string[];
   options?: Array<{ id: string; text: string }>;
 };
@@ -27,6 +30,8 @@ type Homework = {
 };
 type Submission = { id: string; student_id: string; homework_id: string; score: number | null; submitted_at: string };
 type GradeResult = { score: number; total: number; wrong_or_empty: number[] };
+
+const MARIA_KIDS_HOMEWORK_ID = "c1e2a2ce-41fa-4599-9445-9698661bbfe4";
 
 const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
   "id": "kate-2026-11-21-b1-vocabulary",
@@ -492,7 +497,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
     }
   }
 
-  function updateTeacherAnswer(homeworkId: string, number: number, value: string) {
+  function updateTeacherAnswer(homeworkId: string, number: number | string, value: string) {
     setTeacherAnswers((current) => ({ ...current, [homeworkId + "::" + number]: value }));
     setTeacherGrades((current) => {
       if (!current[homeworkId]) return current;
@@ -787,9 +792,17 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
       </section>
 
       {homework.filter((item) => item.id === expandedHomework).map((item) => {
+        const isMariaKids = item.id === MARIA_KIDS_HOMEWORK_ID;
         return (
-          <article className={"homework-card teacher-homework-card" + (item.id === "c1e2a2ce-41fa-4599-9445-9698661bbfe4" ? " maria-kids-homework" : "")} key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
-            <h2>{item.title}</h2>
+          <article className={"homework-card teacher-homework-card" + (isMariaKids ? " maria-kids-homework" : "")} key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
+            {isMariaKids ? (
+              <div className="maria-lesson-head">
+                <span className="maria-date">26 November · Board 26.11</span>
+                <h2>{item.title.replace(/^\d{1,2}\.\d{1,2}\s*·\s*/, "")}</h2>
+              </div>
+            ) : <h2>{item.title}</h2>}
+            <div className={isMariaKids ? "maria-lesson-body" : undefined}>
+            <div className={isMariaKids ? "maria-teacher-alerts" : undefined}>
             {answerVisibility[item.id] && answerErrors[item.id] && (
               <p className="teacher-answer-error teacher-answer-status" role="alert">{answerErrors[item.id]}</p>
             )}
@@ -799,26 +812,51 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
             {item.exercises?.map((exercise, index) => {
               const offset = item.exercises.slice(0, index).reduce((total, previous) => total + (previous.items?.length || 0), 0);
               return (
-                <section className="exercise-section" key={exercise.id || index}>
+                <section className={"exercise-section" + (isMariaKids ? " maria-kids-section" : "")} key={exercise.id || index}>
                   <div className="section-heading">
-                    <span className="section-number">{String(index + 1).padStart(2, "0")}</span>
+                    {!isMariaKids && <span className="section-number">{String(index + 1).padStart(2, "0")}</span>}
                     <div>
                       <h3>{exercise.title}</h3>
                       {exercise.instructions && <p className={exercise.type === "writing" ? "writing-instructions" : undefined}>{exercise.instructions}</p>}
                     </div>
                   </div>
 
+                  {isMariaKids && exercise.note && (
+                    <div className="maria-note">
+                      <strong>Remember!</strong>
+                      {exercise.note.split("\n").map((line, lineIndex) => <span key={lineIndex}>{line}</span>)}
+                    </div>
+                  )}
+
                   {exercise.type !== "snake" && exercise.word_bank?.length ? (
                     <div className="word-bank">
-                      <strong>Word bank</strong>
+                      <strong>{isMariaKids ? "Word box" : "Word bank"}</strong>
                       {exercise.word_bank.map((word) => {
                         const wordKey = item.id + "::" + exercise.id + "::" + word;
                         return <button type="button" className={teacherCrossedWords[wordKey] ? "word-bank-word is-crossed" : "word-bank-word"} aria-pressed={!!teacherCrossedWords[wordKey]} onClick={() => setTeacherCrossedWords((current) => ({ ...current, [wordKey]: !current[wordKey] }))} key={word}>{word}</button>;
                       })}
+                      {isMariaKids && exercise.word_bank_hint && <p className="maria-bank-note">{exercise.word_bank_hint}</p>}
                     </div>
                   ) : null}
 
-                  {exercise.type === "snake" ? (
+                  {isMariaKids && exercise.type === "writing" ? (
+                    <div className="maria-writing">
+                      <p className="maria-writing-task">{exercise.task}</p>
+                      <textarea
+                        className="maria-writing-area"
+                        rows={7}
+                        value={teacherAnswers[item.id + "::" + (offset + 1)] || ""}
+                        autoComplete="off"
+                        spellCheck={false}
+                        autoCorrect="off"
+                        onChange={(event) => updateTeacherAnswer(item.id, offset + 1, event.target.value)}
+                        aria-label="Writing response"
+                      />
+                      <span className="maria-word-count">
+                        {(teacherAnswers[item.id + "::" + (offset + 1)] || "").trim().split(/\\s+/).filter(Boolean).length} words
+                      </span>
+                    </div>
+                  ) : exercise.type === "snake" ? (
                     <TeacherWordSnake
                       key={item.id + "::" + exercise.id + "::" + teacherResetTrigger}
                       homeworkId={item.id}
@@ -841,7 +879,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
                       return (
                         <div className={"question" + (exercise.type === "matching" ? "" : " answers-under") + (exercise.type === "writing" ? " is-writing-question" : "")} key={entry.number ?? entryIndex}>
-                          {exercise.type === "gap" ? (
+                          {(exercise.type === "gap" || (isMariaKids && exercise.type === "write")) ? (
                             <label className="inline-gap-label" htmlFor={"teacher-answer-" + item.id + "-" + number}>
                               <span className="question-number">{number}.</span> {(entry.prompt || "").split("___")[0]}
                               <input className="inline-gap-input" id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
@@ -853,10 +891,24 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                               {exercise.type === "writing" ? (
                                 <textarea className="writing-answer" id={"teacher-answer-" + item.id + "-" + number} rows={7} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} aria-label={"Writing response " + number} />
                               ) : exercise.type === "matching" ? (
-                                <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(event) => updateAnswer(event.target.value)}>
-                                  <option value="">Choose a meaning…</option>
-                                  {exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.text}</option>)}
-                                </select>
+                                <div className={isMariaKids ? "maria-teacher-match" : undefined}>
+                                  <select id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} onChange={(event) => updateAnswer(event.target.value)}>
+                                    <option value="">— choose —</option>
+                                    {exercise.options?.map((option) => <option key={option.id} value={option.id}>{option.text}</option>)}
+                                  </select>
+                                  {isMariaKids && entry.followup_prompt && (
+                                    <label className="maria-followup">
+                                      {entry.followup_prompt}
+                                      <input
+                                        value={teacherAnswers[item.id + "::" + number + "-followup"] || ""}
+                                        autoComplete="off"
+                                        spellCheck={false}
+                                        autoCorrect="off"
+                                        onChange={(event) => updateTeacherAnswer(item.id, number + "-followup", event.target.value)}
+                                      />
+                                    </label>
+                                  )}
+                                </div>
                               ) : (
                                 <input id={"teacher-answer-" + item.id + "-" + number} value={teacherAnswers[answerId] || ""} autoComplete="off" spellCheck={false} autoCorrect="off" onChange={(event) => updateAnswer(event.target.value)} />
                               )}
@@ -898,6 +950,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
               </button>
               {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
               {teacherGradeError && <span className="grade-error" role="alert">{teacherGradeError}</span>}
+            </div>
             </div>
           </article>
         );
