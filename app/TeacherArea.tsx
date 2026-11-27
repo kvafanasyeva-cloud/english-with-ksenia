@@ -713,7 +713,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
   if (!loggedIn && initialCode) return (
     <main className="page-shell">
       <header className="topbar">
-        <Link className="homework-page-title" href="/">Homework</Link>
+        <h1 className="homework-page-title">Homework</h1>
         <span className="topbar-note">TEACHER ACCESS</span>
       </header>
       <section className="dashboard">
@@ -724,7 +724,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
   if (!loggedIn) return <main className="page-shell">
     <header className="topbar">
-      <Link className="homework-page-title" href="/">Homework</Link>
+      <h1 className="homework-page-title">Homework</h1>
       <span className="topbar-note">TEACHER ACCESS</span>
     </header>
     <section className="hero">
@@ -751,7 +751,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
   return <main className="page-shell">
     <header className="topbar">
-      <Link className="homework-page-title" href="/">Homework</Link>
+      <h1 className="homework-page-title">Homework</h1>
       <button className="secondary-button signout" onClick={logout}>Not you? Switch student</button>
     </header>
     <section className="dashboard">
