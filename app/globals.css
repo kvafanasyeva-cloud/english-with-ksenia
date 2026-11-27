@@ -2133,9 +2133,10 @@ body {
 .maria-kids-homework .maria-writing-area { min-height: 200px; }
 @media (max-width: 760px) {
   .page-shell { width: calc(100% - 32px); padding-top: 28px; }
-  .login-card form { align-items: stretch; }
-  .login-card .field { width: 100%; }
-  .login-card .field input { width: 100%; }
+  .login-card form { align-items: flex-end; }
+  .login-card .field { width: auto; }
+  .login-card .field input { width: 220px; }
+  .login-card .field:nth-child(2) input { width: 180px; }
   .dashboard-heading { align-items: flex-start; }
   .homework-list-item { gap: 10px; }
   .homework-list-item .toc-date, .teacher-homework-date { flex-basis: 90px; min-width: 90px; font-size: 12px; }
