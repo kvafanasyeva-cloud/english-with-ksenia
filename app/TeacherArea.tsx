@@ -824,7 +824,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                   {isMariaKids && exercise.note && (
                     <div className="maria-note">
                       <strong>Remember!</strong>
-                      {exercise.note.split("\n").map((line, lineIndex) => <span key={lineIndex}>{line}</span>)}
+                      {exercise.note.replace(/^Remember!\s*/i, "").split("\n").filter(Boolean).map((line, lineIndex) => <span key={lineIndex}>{line}</span>)}
                     </div>
                   )}
 
@@ -951,6 +951,21 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
               {teacherSaveNotice && <span className="save-notice" role="status">{teacherSaveNotice}</span>}
               {teacherGradeError && <span className="grade-error" role="alert">{teacherGradeError}</span>}
             </div>
+            {isMariaKids && (
+              <div
+                className="maria-kids-bar"
+                role="progressbar"
+                aria-label="Homework progress"
+                aria-valuemin={0}
+                aria-valuemax={teacherGrades[item.id]?.total || 0}
+                aria-valuenow={teacherGrades[item.id]?.score || 0}
+              >
+                <span
+                  className="maria-kids-fill"
+                  style={{ width: teacherGrades[item.id] ? Math.round(100 * teacherGrades[item.id].score / Math.max(teacherGrades[item.id].total, 1)) + "%" : "0%" }}
+                />
+              </div>
+            )}
             </div>
             </div>
           </article>
