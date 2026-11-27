@@ -890,7 +890,7 @@ export default function Home() {
                             {isMariaKids && section.note && (
                               <div className="maria-note">
                                 <strong>Remember!</strong>
-                                {section.note.split("\n").map((line, lineIndex) => <span key={lineIndex}>{line}</span>)}
+                                {section.note.replace(/^Remember!\s*/i, "").split("\n").filter(Boolean).map((line, lineIndex) => <span key={lineIndex}>{line}</span>)}
                               </div>
                             )}
 
