@@ -769,6 +769,8 @@ export default function Home() {
     await getSupabase().auth.signOut();
     setSignedIn(false);
     setHomework([]);
+    setName("");
+    setCode("");
     setAnswers({});
     setGrades({});
     setRevealedAnswers({});
@@ -809,10 +811,8 @@ export default function Home() {
         </div>
       )}
       <header className="topbar">
-        <Link className="wordmark" href="/" aria-label="English with Ksenia home">
-          <span className="wordmark-mark">e.</span><span>ENGLISH WITH KSENIA</span>
-        </Link>
-        <span className="topbar-note">YOUR LEARNING SPACE</span>
+        <Link className="homework-page-title" href="/" aria-label="Homework home">Homework</Link>
+        <span className="topbar-note">ENGLISH WITH KSENIA</span>
       </header>
 
       {!signedIn ? (
@@ -823,14 +823,12 @@ export default function Home() {
             <p className="intro">Your lessons, homework and progress — all in one place. Come in and pick up where you left off.</p>
           </div>
           <div className="login-card">
-            <h2>Good to see you.</h2>
+          <h2>Who are you?</h2>
             <form onSubmit={handleLogin}>
-              <label htmlFor="student-name">Your name</label>
-              <input id="student-name" type="text" autoComplete="name" placeholder="hi, my name is" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
-              <label htmlFor="student-code">Personal code</label>
-              <input id="student-code" type="password" autoComplete="current-password" placeholder="Enter your code" value={code} onChange={(e) => setCode(e.target.value)} required maxLength={100} />
+              <label className="field" htmlFor="student-name"><span>Your name</span><input id="student-name" type="text" autoComplete="name" placeholder="hi, my name is" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} /></label>
+              <label className="field" htmlFor="student-code"><span>Personal code</span><input id="student-code" type="password" autoComplete="current-password" placeholder="Enter your code" value={code} onChange={(e) => setCode(e.target.value)} required maxLength={100} /></label>
               {error && <p className="error-message" role="alert">{error}</p>}
-              <button className="primary-button" type="submit" disabled={loading}>{loading ? "Checking…" : "Enter my space"} {!loading && <span>↗</span>}</button>
+              <button className="primary-button" type="submit" disabled={loading}>{loading ? "Opening…" : "Open"}</button>
             </form>
           </div>
         </section>
@@ -838,22 +836,22 @@ export default function Home() {
         <section className="dashboard">
           <div className="dashboard-heading">
             <div>
-              <p className="eyebrow">YOUR LEARNING SPACE</p>
-              <h1>Welcome, <em>{name.trim().charAt(0).toUpperCase() + name.trim().slice(1)}.</em></h1>
+              <h2>Hi, {name.trim().charAt(0).toUpperCase() + name.trim().slice(1)}</h2>
             </div>
-            <button className="secondary-button signout" onClick={handleSignOut}>Sign out</button>
+            <button className="secondary-button signout" onClick={handleSignOut}>Not you? Switch student</button>
           </div>
           {error && <p className="error-message" role="alert">{error}</p>}
           {homeworkLoading ? <p className="card-copy">Loading your homework…</p> : homework.length === 0 ? (
             <div className="homework-card"><h2>No homework yet</h2><p className="card-copy">There are no published assignments in your space right now.</p></div>
           ) : (
             <>
-              <nav className="homework-list" aria-label="Your homework">
-                <p className="eyebrow">ALL HOMEWORK</p>
+              <nav className="homework-list toc" aria-label="Your homework">
+                <p className="toc-label">All homework</p>
                 {homework.map((task) => (
                   <button className={`homework-list-item ${activeHomeworkId === task.id ? "is-active" : ""}`} key={task.id} onClick={() => setActiveHomeworkId((current) => current === task.id ? null : task.id)}>
-                    <span><strong>{task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" ? "18.11 · Films, feelings & should have + V3" : task.title}</strong></span>
-                    <span className="homework-list-arrow" aria-hidden="true">{activeHomeworkId === task.id ? "−" : "+"}</span>
+                    <span className="toc-date">{homeworkDateLabel(task)}</span>
+                    <strong className="toc-title">{task.id === "18bbb034-4f7e-4a77-aa35-851d101b3d93" ? "Films, feelings & should have + V3" : task.title.replace(/^\d{1,2}[./]\d{1,2}\s*[·—-]?\s*/, "")}</strong>
+                    <span className={"toc-mark" + (grades[task.id] ? " on" : "")} aria-label={grades[task.id] ? "checked" : undefined} />
                   </button>
                 ))}
               </nav>
