@@ -59,7 +59,8 @@ function homeworkDateLabel(task: Homework) {
   return month ? Number(match[1]) + " " + month : task.title;
 }
 
-const MARIA_KIDS_HOMEWORK_ID = "c1e2a2ce-41fa-4599-9445-9698661bbfe4";
+const MARIA_KIDS_HOMEWORK_IDS = new Set(["c1e2a2ce-41fa-4599-9445-9698661bbfe4", "e10f034a-98c7-4cc9-a0ce-7706b1a88c57"]);
+const MARIA_REVISED_HOMEWORK_ID = "e10f034a-98c7-4cc9-a0ce-7706b1a88c57";
 
 function telegramShareUrl(task: Homework, grade?: GradeResult, writingText = "") {
   const wrongOrEmpty = grade
@@ -597,7 +598,7 @@ export default function Home() {
         throw new Error("The grading service returned an unexpected result.");
       }
       setGrades((current) => ({ ...current, [task.id]: result }));
-      if (task.id === MARIA_KIDS_HOMEWORK_ID && result.total > 0 && result.score === result.total) {
+      if (MARIA_KIDS_HOMEWORK_IDS.has(task.id) && result.total > 0 && result.score === result.total) {
         const colors = ["#ff5d73", "#ffb703", "#2ec4b6", "#8e7dff", "#4cc9f0", "#7bd389"];
         setConfettiPieces(Array.from({ length: 70 }, (_, index) => ({
           id: index,
@@ -608,7 +609,7 @@ export default function Home() {
           rotation: Math.round(Math.random() * 360)
         })));
         window.setTimeout(() => setConfettiPieces([]), 3500);
-      } else if (task.id === MARIA_KIDS_HOMEWORK_ID) {
+      } else if (MARIA_KIDS_HOMEWORK_IDS.has(task.id)) {
         setConfettiPieces([]);
       }
     } catch {
@@ -687,7 +688,7 @@ export default function Home() {
       delete next[task.id];
       return next;
     });
-    if (task.id === MARIA_KIDS_HOMEWORK_ID) {
+    if (MARIA_KIDS_HOMEWORK_IDS.has(task.id)) {
       setConfettiPieces([]);
       setSendCopiedTaskId("");
     }
@@ -855,7 +856,7 @@ export default function Home() {
                 ))}
               </nav>
               {homework.filter((task) => task.id === activeHomeworkId).map((task) => {
-                const isMariaKids = task.id === MARIA_KIDS_HOMEWORK_ID;
+                const isMariaKids = MARIA_KIDS_HOMEWORK_IDS.has(task.id);
                 const writingIndex = task.exercises.findIndex((exercise) => exercise.type === "writing");
                 const writingNumber = writingIndex >= 0
                   ? task.exercises.slice(0, writingIndex).reduce((total, exercise) => total + (exercise.items?.length || 0), 0) + 1
@@ -867,7 +868,7 @@ export default function Home() {
                   <article className={"homework-card" + (isMariaKids ? " maria-kids-homework" : "")} key={task.id}>
                     {isMariaKids ? (
                       <div className="maria-lesson-head">
-                        <span className="maria-date">26 November · Board 26.11</span>
+                        <span className="maria-date">{task.id === MARIA_REVISED_HOMEWORK_ID ? "27 November · Homework" : "26 November · Board 26.11"}</span>
                         <h2>{task.title.replace(/^\d{1,2}\.\d{1,2}\s*·\s*/, "")}</h2>
                       </div>
                     ) : (
