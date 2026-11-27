@@ -821,13 +821,6 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
                     </div>
                   </div>
 
-                  {isMariaKids && exercise.note && (
-                    <div className="maria-note">
-                      <strong>Remember!</strong>
-                      {exercise.note.replace(/^Remember!\s*/i, "").split("\n").filter(Boolean).map((line, lineIndex) => <span key={lineIndex}>{line}</span>)}
-                    </div>
-                  )}
-
                   {exercise.type !== "snake" && exercise.word_bank?.length ? (
                     <div className="word-bank">
                       <strong>{isMariaKids ? "Word box" : "Word bank"}</strong>
