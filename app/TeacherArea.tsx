@@ -713,7 +713,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
   if (!loggedIn && initialCode) return (
     <main className="page-shell">
       <header className="topbar">
-        <Link className="wordmark" href="/"><span className="wordmark-mark">e.</span><span>ENGLISH WITH KSENIA</span></Link>
+        <Link className="homework-page-title" href="/">Homework</Link>
         <span className="topbar-note">TEACHER ACCESS</span>
       </header>
       <section className="dashboard">
@@ -724,7 +724,7 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
   if (!loggedIn) return <main className="page-shell">
     <header className="topbar">
-      <Link className="wordmark" href="/"><span className="wordmark-mark">e.</span><span>ENGLISH WITH KSENIA</span></Link>
+      <Link className="homework-page-title" href="/">Homework</Link>
       <span className="topbar-note">TEACHER ACCESS</span>
     </header>
     <section className="hero">
@@ -751,14 +751,14 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
 
   return <main className="page-shell">
     <header className="topbar">
-      <Link className="wordmark" href="/"><span className="wordmark-mark">e.</span><span>ENGLISH WITH KSENIA</span></Link>
-      <button className="secondary-button signout" onClick={logout}>Sign out</button>
+      <Link className="homework-page-title" href="/">Homework</Link>
+      <button className="secondary-button signout" onClick={logout}>Not you? Switch student</button>
     </header>
     <section className="dashboard">
       <div className="dashboard-heading">
         <div>
           <p className="eyebrow">PRIVATE TEACHER SPACE</p>
-          <h1>Your <em>students.</em></h1>
+          <h2>Your students</h2>
         </div>
       </div>
 
