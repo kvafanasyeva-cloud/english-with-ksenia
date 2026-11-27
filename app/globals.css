@@ -1851,3 +1851,294 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   flex-direction: column;
   gap: 7px;
 }
+
+/* Reference homework page: shared layout and controls for student and teacher views. */
+:root {
+  color-scheme: light;
+  --ink: #111;
+  --muted: #6b6b6b;
+  --paper: #fff;
+  --line: #d9d9d9;
+  --soft: #f3f3f3;
+}
+html, body { min-height: 100%; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Inter, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.page-shell {
+  width: min(980px, calc(100% - 32px));
+  max-width: 980px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 40px 0 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.topbar {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 0 0 18px;
+  border-bottom: 2px solid var(--ink);
+}
+.homework-page-title {
+  color: var(--ink);
+  font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  font-size: clamp(28px, 6vw, 40px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+.topbar-note, .eyebrow {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.hero {
+  flex: initial;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding: 0;
+}
+.hero-copy { display: none; }
+.login-card {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.login-card h2, .homework-card h2, .teacher-student-heading {
+  margin: 0;
+  font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.login-card form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+}
+.login-card .field {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 400;
+}
+.login-card .field input {
+  width: 220px;
+  min-height: 0;
+  margin: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px;
+}
+.primary-button, .secondary-button, .whole-homework-controls > button,
+.whole-homework-controls .telegram-button {
+  min-height: 40px;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-decoration: none;
+  text-transform: none;
+}
+.primary-button:hover, .secondary-button:hover, .whole-homework-controls > button:hover,
+.whole-homework-controls .telegram-button:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+.secondary-button, .whole-homework-controls > button:not(:first-child),
+.whole-homework-controls .telegram-button {
+  background: transparent;
+  color: var(--ink);
+}
+.dashboard { flex: initial; padding: 0; }
+.dashboard-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+.dashboard-heading h1, .dashboard-heading h2 {
+  margin: 0;
+  font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+.dashboard-heading .eyebrow { margin: 0 0 6px; }
+.signout {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  text-decoration: underline;
+  font-size: 14px;
+}
+.signout:hover { background: transparent; color: var(--ink); }
+.homework-list {
+  margin: 0 0 28px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+}
+.homework-list > .toc-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.homework-list-item {
+  width: 100%;
+  min-height: 0;
+  justify-content: flex-start;
+  gap: 16px;
+  padding: 7px 0;
+  border: 0;
+  border-bottom: 1px dashed var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font-size: 16px;
+  font-weight: 400;
+}
+.homework-list-item:hover, .homework-list-item.is-active {
+  background: transparent;
+  color: var(--ink);
+}
+.homework-list-item:hover .toc-title, .homework-list-item.is-active .toc-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.homework-list-item .toc-date {
+  flex: 0 0 110px;
+  min-width: 110px;
+  color: var(--muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.homework-list-item .toc-title {
+  flex: 1;
+  min-width: 0;
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.homework-list-item .toc-mark { width: 22px; flex: 0 0 22px; text-align: center; }
+.homework-card {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--ink);
+  border-radius: 10px;
+  background: var(--paper);
+}
+.homework-card > h2 { margin: 0 0 12px; font-size: 22px; }
+.exercise-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--line);
+}
+.exercise-section + .exercise-section { margin-top: 12px; }
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin: 0;
+}
+.section-heading h3 { font-size: 17px; font-weight: 500; }
+.section-heading p { margin: 0; color: var(--muted); font-size: 14px; }
+.question { margin: 0 0 8px; }
+.question-number { width: 22px; min-width: 22px; }
+.word-bank { margin: 0; border-radius: 8px; }
+.whole-homework-controls { margin: 0; padding-top: 16px; border-top: 2px solid var(--ink); }
+.student-homework-controls, .teacher-homework-controls { margin-left: 0; }
+.footer { min-height: 0; padding-top: 14px; }
+.teacher-roster { display: flex; flex-direction: column; gap: 22px; }
+.teacher-student-group { display: flex; flex-direction: column; gap: 8px; }
+.teacher-student-heading { padding: 18px 0 4px; border-bottom: 1.5px solid var(--ink); }
+.teacher-homework-links { display: flex; flex-direction: column; }
+.teacher-homework-entry { border-bottom: 1px dashed var(--line); }
+.teacher-homework-link {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 7px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+.teacher-homework-link:hover, .teacher-homework-link.is-active { background: transparent; }
+.teacher-homework-date { flex: 0 0 110px; color: var(--muted); font-size: 14px; }
+.teacher-homework-title { font-size: 16px; font-weight: 400; }
+.teacher-homework-link.is-active .teacher-homework-title,
+.teacher-homework-link:hover .teacher-homework-title { text-decoration: underline; text-underline-offset: 3px; }
+.teacher-homework-card { margin-top: 0; }
+
+/* Match the reference lesson card closely for Maria's published kids homework. */
+.homework-card.maria-kids-homework { box-shadow: none; }
+.maria-kids-homework .maria-lesson-head { padding: 16px 18px 0; }
+.maria-kids-homework .maria-lesson-head h2 { font-size: 22px; line-height: 1.25; }
+.maria-lesson-body { padding: 4px 18px 22px; gap: 26px; }
+.maria-kids-homework .maria-kids-section { gap: 12px; }
+.maria-kids-homework .maria-inline-question,
+.maria-kids-homework .maria-match-question,
+.maria-kids-homework .maria-followup,
+.maria-kids-homework .maria-fix-body label { font-size: 16px; }
+.maria-kids-homework .maria-writing-area { min-height: 200px; }
+@media (max-width: 760px) {
+  .page-shell { width: calc(100% - 32px); padding-top: 28px; }
+  .login-card form { align-items: stretch; }
+  .login-card .field { width: 100%; }
+  .login-card .field input { width: 100%; }
+  .dashboard-heading { align-items: flex-start; }
+  .homework-list-item { gap: 10px; }
+  .homework-list-item .toc-date, .teacher-homework-date { flex-basis: 90px; min-width: 90px; font-size: 12px; }
+  .homework-list-item .toc-title, .teacher-homework-title { font-size: 14px; }
+  .homework-card { padding: 16px 13px; }
+  .maria-lesson-body { padding: 4px 13px 18px; gap: 18px; }
+  .maria-kids-homework .maria-kids-section { padding: 13px; }
+}
