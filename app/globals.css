@@ -1474,10 +1474,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   background: var(--ct);
 }
 .maria-kids-homework .maria-kids-section:nth-of-type(6n+1) { --c: #ff5d73; --ct: #fff0f2; }
-.maria-kids-homework .maria-kids-section:nth-of-type(6n+2) { --c: #f59e0b; --ct: #fff6e0; }
+.maria-kids-homework .maria-kids-section:nth-of-type(6n+2) { --c: #d58a00; --ct: #fff4c2; }
 .maria-kids-homework .maria-kids-section:nth-of-type(6n+3) { --c: #14b8a6; --ct: #e3faf6; }
 .maria-kids-homework .maria-kids-section:nth-of-type(6n+4) { --c: #8b5cf6; --ct: #f1ecff; }
-.maria-kids-homework .maria-kids-section:nth-of-type(6n+5) { --c: #0ea5e9; --ct: #e2f5fd; }
+.maria-kids-homework .maria-kids-section:nth-of-type(6n+5) { --c: #087eae; --ct: #e4f4ff; }
 .maria-kids-homework .maria-kids-section:nth-of-type(6n+6) { --c: #22a55b; --ct: #e6f7ec; }
 .maria-kids-homework .maria-kids-section .section-heading {
   display: flex;
@@ -1535,8 +1535,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 }
 .maria-kids-homework .word-bank-word:hover { background: var(--c); opacity: .85; }
 .maria-kids-homework .word-bank-word.is-crossed {
-  background: #e5e2ea;
-  color: #8a8496;
+  background: #fff;
+  color: var(--c);
+  outline: 1px dashed var(--c);
   text-decoration: line-through;
 }
 .maria-kids-homework .maria-bank-note {
@@ -1744,7 +1745,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .maria-kids-bar {
   height: 12px;
   border-radius: 999px;
-  background: #ece8f3;
+  background: #fff1d1;
   overflow: hidden;
 }
 .maria-kids-fill {
@@ -2125,6 +2126,10 @@ body {
 .maria-kids-homework .maria-followup,
 .maria-kids-homework .maria-fix-body label { font-size: 16px; }
 .maria-kids-homework .maria-writing-area { min-height: 200px; }
+.maria-kids-homework .lesson-word-snake { margin: 0; padding: 0; border: 0; background: transparent; }
+.maria-kids-homework .lesson-word-snake .word-snake-ring { border-color: var(--c); background: #fff; color: var(--kink); }
+.maria-kids-homework .lesson-word-snake .word-snake-note { color: #5b5170; }
+.maria-kids-homework .lesson-word-snake .word-snake-gap { border-color: var(--c); background: #fff; color: var(--kink); }
 @media (max-width: 760px) {
   .page-shell { width: calc(100% - 32px); padding-top: 28px; }
   .login-card form { align-items: flex-end; }
