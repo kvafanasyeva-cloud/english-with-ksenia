@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Link from "next/link";
 import TeacherArea from "./TeacherArea";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
@@ -811,7 +810,7 @@ export default function Home() {
         </div>
       )}
       <header className="topbar">
-        <Link className="homework-page-title" href="/" aria-label="Homework home">Homework</Link>
+        <h1 className="homework-page-title">Homework</h1>
         <span className="topbar-note">ENGLISH WITH KSENIA</span>
       </header>
 
