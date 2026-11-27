@@ -887,13 +887,6 @@ export default function Home() {
                               </div>
                             </div>
 
-                            {isMariaKids && section.note && (
-                              <div className="maria-note">
-                                <strong>Remember!</strong>
-                                {section.note.replace(/^Remember!\s*/i, "").split("\n").filter(Boolean).map((line, lineIndex) => <span key={lineIndex}>{line}</span>)}
-                              </div>
-                            )}
-
                             {section.type !== "snake" && section.word_bank && (
                               <div className="word-bank">
                                 <strong>{isMariaKids ? "Word box" : "Word bank"}</strong>
