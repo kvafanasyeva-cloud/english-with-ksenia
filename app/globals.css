@@ -1905,6 +1905,8 @@ body {
   letter-spacing: .12em;
   text-transform: uppercase;
 }
+.topbar-note, .footer { display: none; }
+.homework-page-title { margin: 0; }
 .hero {
   flex: initial;
   display: flex;
