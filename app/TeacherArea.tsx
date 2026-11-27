@@ -31,7 +31,8 @@ type Homework = {
 type Submission = { id: string; student_id: string; homework_id: string; score: number | null; submitted_at: string };
 type GradeResult = { score: number; total: number; wrong_or_empty: number[] };
 
-const MARIA_KIDS_HOMEWORK_ID = "c1e2a2ce-41fa-4599-9445-9698661bbfe4";
+const MARIA_KIDS_HOMEWORK_IDS = new Set(["c1e2a2ce-41fa-4599-9445-9698661bbfe4", "e10f034a-98c7-4cc9-a0ce-7706b1a88c57"]);
+const MARIA_REVISED_HOMEWORK_ID = "e10f034a-98c7-4cc9-a0ce-7706b1a88c57";
 
 const KATE_NOV_21_HOMEWORK: Omit<Homework, "student_id"> = {
   "id": "kate-2026-11-21-b1-vocabulary",
@@ -792,12 +793,12 @@ export default function TeacherArea({ initialCode, onExit }: { initialCode?: str
       </section>
 
       {homework.filter((item) => item.id === expandedHomework).map((item) => {
-        const isMariaKids = item.id === MARIA_KIDS_HOMEWORK_ID;
+        const isMariaKids = MARIA_KIDS_HOMEWORK_IDS.has(item.id);
         return (
           <article className={"homework-card teacher-homework-card" + (isMariaKids ? " maria-kids-homework" : "")} key={item.id} ref={(node) => { expandedHomeworkRef.current = node; }}>
             {isMariaKids ? (
               <div className="maria-lesson-head">
-                <span className="maria-date">26 November · Board 26.11</span>
+                <span className="maria-date">{item.id === MARIA_REVISED_HOMEWORK_ID ? "27 November · Homework" : "26 November · Board 26.11"}</span>
                 <h2>{item.title.replace(/^\d{1,2}\.\d{1,2}\s*·\s*/, "")}</h2>
               </div>
             ) : <h2>{item.title}</h2>}
