@@ -1505,26 +1505,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   font-size: 14px;
   line-height: 1.5;
 }
-.maria-kids-homework .maria-note {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  width: fit-content;
-  max-width: 100%;
-  margin: 2px 0 4px auto;
-  padding: 12px 18px;
-  background: #355b3a;
-  color: #fff;
-  font-size: 15px;
-  line-height: 1.45;
-  white-space: pre-line;
-  box-shadow: 0 5px 12px #00000012;
-}
-.maria-kids-homework .maria-note strong {
-  margin-bottom: 2px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 16px;
-}
 .maria-kids-homework .word-bank {
   display: flex;
   flex-wrap: wrap;
@@ -1550,7 +1530,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   border-radius: 999px;
   background: var(--c);
   color: #fff;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
 }
 .maria-kids-homework .word-bank-word:hover { background: var(--c); opacity: .85; }
@@ -1802,7 +1782,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 @media (max-width: 760px) {
   .maria-lesson-body { padding: 4px 13px 18px; gap: 18px; }
   .maria-kids-homework .maria-kids-section { padding: 13px; }
-  .maria-kids-homework .maria-note { margin-left: 0; }
   .maria-kids-homework .maria-score { margin-left: 0; }
 }
 
@@ -2127,6 +2106,20 @@ body {
 .maria-kids-homework .maria-lesson-head h2 { font-size: 22px; line-height: 1.25; }
 .maria-lesson-body { padding: 4px 18px 22px; gap: 26px; }
 .maria-kids-homework .maria-kids-section { gap: 12px; }
+.maria-kids-homework .maria-kids-section .section-heading > div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.maria-kids-homework .maria-kids-section + .maria-kids-section { margin-top: 0; }
+.maria-kids-homework .maria-teacher-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.maria-kids-homework .maria-teacher-alerts > .maria-kids-section + .maria-kids-section { margin-top: 0; }
 .maria-kids-homework .maria-inline-question,
 .maria-kids-homework .maria-match-question,
 .maria-kids-homework .maria-followup,
@@ -2145,4 +2138,5 @@ body {
   .homework-card { padding: 16px 13px; }
   .maria-lesson-body { padding: 4px 13px 18px; gap: 18px; }
   .maria-kids-homework .maria-kids-section { padding: 13px; }
+  .maria-kids-homework .maria-teacher-alerts { gap: 18px; }
 }
